@@ -333,11 +333,14 @@ section {
 }
 
 /* COMPONENTE PLANETA SATURNO CORRIGIDO */
-.hero-image-container {
+/* ==========================================================================
+   COMPONENTE PLANETA SATURNO (CORRIGIDO PARA TEXTOS LONGOS)
+   ========================================================================== */
+   .hero-image-container {
     position: relative;
     width: 100%;
-    max-width: 420px;
-    height: 420px;
+    max-width: 460px; /* Aumentado de 420px para 460px para dar mais área interna */
+    height: 460px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -346,8 +349,8 @@ section {
 
 .saturn-ring {
     position: absolute;
-    width: 145%;
-    height: 45px;
+    width: 140%; /* Ajuste proporcional ao novo tamanho do planeta */
+    height: 50px;
     border: 2px solid var(--saturn-gold);
     border-radius: 50%;
     z-index: 5; /* Fica à frente do planeta */
@@ -357,20 +360,23 @@ section {
 }
 
 .hero-image {
-    width: 80%;
-    height: 80%;
+    width: 85%;
+    height: 85%;
     /* Gradiente esférico simulando relevo lunar e sombra de eclipse */
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(154, 155, 193, 0.1) 40%, rgba(0, 0, 0, 0.75) 85%);
     border: 1px solid var(--glass-border);
     border-radius: 50%;
     display: flex;
+    flex-direction: column; /* Faz o emoji ficar em cima do texto de forma organizada */
     align-items: center;
     justify-content: center;
+    padding: 40px; /* Evita que o texto encoste nas bordas redondas do planeta */
+    text-align: center;
     animation: moonEclipseGlow 9s ease-in-out infinite;
     z-index: 2; /* Corpo do planeta */
 }
 
-/* Texto de dentro do Planeta estilizado e bonito */
+/* Texto de dentro do Planeta estilizado e centralizado sem quebras feias */
 .hero-image p {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.4rem;
@@ -378,7 +384,11 @@ section {
     color: var(--starlight);
     text-shadow: 0 0 10px rgba(255,255,255,0.5);
     letter-spacing: 1px;
+    line-height: 1.4; /* Melhora o espaçamento entre as linhas do texto longo */
+    max-width: 260px; /* Garante que o texto quebre linhas de forma harmônica dentro do círculo */
+    margin: 0;
 }
+
 
 /* Layout Organizado de Grids */
 .feature-grid, .gallery {
@@ -438,7 +448,7 @@ section {
 }
 
 /* ==========================================================================
-   CAIXA DO MANIFESTO
+   5. CAIXA DO MANIFESTO
    ========================================================================== */
 .manifesto-box {
     max-width: 950px;
@@ -458,7 +468,7 @@ section {
 }
 
 /* ==========================================================================
-   FORMULÁRIO ESPACIAL
+    6. FORMULÁRIO ESPACIAL
    ========================================================================== */
 #Agendamento {
     max-width: 750px;
@@ -605,4 +615,243 @@ form select:focus {
     .hero-content h2 {
         font-size: 5.4rem;
     }
+}
+/* ==========================================================================
+   9. TELA DE LOGIN ATELIÊ CELESTIAL (SISTEMA SPA)
+   ========================================================================== */
+   main {
+    transition: opacity 0.25s ease-in-out; /* Efeito de transição suave entre telas */
+}
+
+.login-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+    padding: 40px 5%;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 520px;
+    background: radial-gradient(circle at top, rgba(53, 42, 85, 0.15) 0%, var(--glass-bg) 100%);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(154, 155, 193, 0.05);
+    position: relative;
+}
+
+/* Detalhe estelar decorativo no topo do card */
+.login-box::before {
+    content: '✦';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--saturn-gold);
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px var(--saturn-gold);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.login-header h2 {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+    color: #ffffff;
+    text-shadow: 0 0 15px var(--saturn-gold-dim), 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.login-header p {
+    font-size: 1rem;
+    color: var(--lavender-glow);
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.input-group label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Customização galáctica para os inputs específicos do login */
+.input-group input {
+    background: rgba(25, 27, 34, 0.75) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+.input-group input:focus {
+    border-color: var(--saturn-gold) !important;
+    box-shadow: 0 0 20px var(--saturn-gold-dim), inset 0 0 5px rgba(238, 228, 187, 0.2) !important;
+}
+
+.login-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.forgot-password {
+    color: var(--lavender-glow);
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: color 0.3s ease;
+    font-style: italic;
+}
+
+.forgot-password:hover {
+    color: var(--saturn-gold);
+    text-shadow: 0 0 8px var(--saturn-gold-dim);
+}
+
+.btn-submit-login {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid var(--saturn-gold);
+    color: var(--starlight);
+    padding: 18px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-submit-login:hover {
+    background-color: var(--saturn-gold);
+    color: var(--bg-space);
+    box-shadow: 0 0 30px var(--saturn-gold), 0 0 10px #ffffff;
+    transform: translateY(-2px);
+}
+
+.login-footer {
+    margin-top: 35px;
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    color: var(--lavender-glow);
+    border-top: 1px solid rgba(154, 155, 193, 0.1);
+    padding-top: 25px;
+}
+
+.login-footer a {
+    color: var(--saturn-gold);
+    text-decoration: none;
+    font-weight: 500;
+    text-shadow: 0 0 5px rgba(238, 228, 187, 0.3);
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+.btn-back-home {
+    all: unset;
+    display: block;
+    margin: 25px auto 0 auto;
+    font-size: 0.95rem;
+    color: var(--lavender-glow);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.btn-back-home:hover {
+    color: var(--saturn-gold);
+    transform: translateX(-4px);
+    text-shadow: 0 0 8px var(--saturn-gold-dim);
+}
+
+/* Ajustes de Responsividade para Celulares */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 35px 20px;
+        border-radius: 20px;
+    }
+    
+    .login-header h2 {
+        font-size: 2.2rem;
+    }
+}
+/* ==========================================================================
+   9. VITRINE DE PRODUTOS E CONFIGURAÇÃO DE IMAGENS
+   ========================================================================== */
+   .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.product-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Contêiner da imagem (Moldura de Alta Costura) */
+.product-thumb {
+    width: 100%;
+    height: 420px; /* Altura elegante para vestidos e ternos */
+    border-radius: 20px; /* Cantos levemente arredondados */
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease, border-color 0.4s ease;
+}
+
+/* Comportamento da Imagem Interna */
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta a imagem sem distorcer para preencher o espaço */
+    object-position: center; /* Mantém o foco do look no meio */
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Efeito flutuante de órbita ao passar o mouse */
+.product-item:hover .product-thumb {
+    border-color: var(--saturn-gold);
+    transform: translateY(-10px);
+}
+
+.product-item:hover .product-thumb img {
+    transform: scale(1.06); /* Zoom sutil e elegante no tecido */
+}
+
+.product-item h4 {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.product-item p {
+    font-size: 0.95rem;
+    color: var(--lavender-glow);
+    font-family: 'Space Grotesk', sans-serif;
 }
