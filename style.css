@@ -855,3 +855,115 @@ form select:focus {
     color: var(--lavender-glow);
     font-family: 'Space Grotesk', sans-serif;
 }
+/* Estilização para o Agendamento quando isolado em sua própria tela */
+.agendamento-section {
+    max-width: 750px;
+    margin: 40px auto !important;
+    padding: 65px 50px !important;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Botão de retorno estilizado dentro das caixas */
+.btn-back-home {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--glass-border) !important;
+    font-size: 0.85rem !important;
+    padding: 10px 24px !important;
+    margin-top: 15px;
+}
+
+.btn-back-home:hover {
+    background: var(--saturn-gold) !important;
+    color: var(--bg-space) !important;
+}
+/* ==========================================================================
+   10. ESTILIZAÇÃO COMPLETA DA PÁGINA INSTITUCIONAL DO ATELIÊ
+   ========================================================================== */
+   .atelie-page-section {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.atelie-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    padding: 70px 55px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+}
+
+.atelie-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.atelie-header h2 {
+    font-size: 4rem;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.atelie-subtitle {
+    font-size: 1.25rem;
+    color: var(--lavender-glow);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 300;
+}
+
+.atelie-content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 50px;
+    margin-bottom: 60px;
+}
+
+.atelie-text-block h3 {
+    font-size: 2rem;
+    color: var(--saturn-gold);
+    margin-bottom: 20px;
+    border-bottom: 1px dashed rgba(238, 228, 187, 0.2);
+    padding-bottom: 10px;
+}
+
+.atelie-text-block p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #e0e0e0;
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.atelie-manifesto-highlight {
+    border-left: 3px solid var(--saturn-gold);
+    padding: 25px 40px;
+    background: rgba(53, 42, 85, 0.15);
+    border-radius: 0 20px 20px 0;
+    margin: 40px 0;
+}
+
+.atelie-manifesto-highlight p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+/* Responsividade Adaptativa para Telas Menores */
+@media (max-width: 768px) {
+    .atelie-container {
+        padding: 40px 25px;
+    }
+    .atelie-header h2 {
+        font-size: 2.8rem;
+    }
+    .atelie-content-grid {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+}

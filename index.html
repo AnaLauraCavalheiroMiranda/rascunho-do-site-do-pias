@@ -21,7 +21,6 @@
                 <li><a href="#pedidos">📦 Caixa de Pedidos</a></li>
                 <li><a href="#mais-vendidos">👑 Mais Vendidos (Clientes)</a></li>
                 <li><a href="#provador">🪐 Provador de Saturno 3D</a></li>
-                <li><a href="#fases">🌙 Ciclos Lunares (Promoções)</a></li>
             </ul>
         </div>
     </aside>
@@ -32,16 +31,17 @@
             <h1>Celestine Ateliê</h1>
             <p>✂️ Alta Costura Orbital</p>
         </div>
+                <nav class="desktop-nav">
+                    <ul>
+                        <li><a href="#inicio">Órbita</a></li>
+                        <li><a href="#colecoes">Coleções</a></li>
+                        <li><a href="#atelie">O Ateliê</a></li>
+                        <!-- Alterado aqui para indicar que se trata do agendamento de pedidos -->
+                        <li><a href="#Agendamento">Ciclos Lunares (Pedidos)</a></li> 
+                        <li><a href="#Exploracao">Exploração</a></li> 
+                    </ul>
+                </nav>
         
-        <!-- Menu principal Desktop -->
-        <nav class="desktop-nav">
-            <ul>
-                <li><a href="#inicio">Órbita</a></li>
-                <li><a href="#colecoes">Coleções</a></li>
-                <li><a href="#atelie">O Ateliê</a></li>
-                <li><a href="#Agendamento">Exploração</a></li>
-            </ul>
-        </nav>
 
         <div class="header-actions">
             <button class="menu-hamburger" onclick="toggleMenu()" aria-label="Abrir menu">
@@ -121,30 +121,8 @@
         <section id="atelie">
             <div class="manifesto-box">
                 <h3>📜 O Manifesto Celestine</h3>
-                <p>Nascemos sob a ideia de que a moda não deve ser terrena. O Celestine Ateliê une o mistério do universo profundo à sofisticação da alfaiataria. Cada peça é uma constelação única, feita sob medida para quem não tem medo de orbitar em alta sociedade.</p>
+                <p>Nascemos sob a ideia de que a moda não deve ser terrena. O Celestine Ateliê une o mistério do universe profundo à sofisticação da alfaiataria. Cada peça é uma constelação única, feita sob medida para quem não tem medo de orbitar em alta sociedade.</p>
             </div>
-        </section>
-
-        <!-- SEÇÃO DE INTERAÇÃO / AGENDAMENTO -->
-        <section id="Agendamento">
-            <h3>📡 Agende uma Consulta Interestelar</h3>
-            <p class="form-subtitle">Conecte-se com nossa estação base para desenhar sua armadura de luxo.</p>
-            <form>
-                <label for="nome">Nome do Tripulante:</label>
-                <input type="text" id="nome" required placeholder="Ex: Comandante Silva">
-
-                <label for="email">Frequência Digital (E-mail):</label>
-                <input type="email" id="email" required placeholder="seu-canal@galaxia.com">
-
-                <label for="Estilo">Estilo de Preferência:</label>
-                <select id="Estilo">
-                    <option value="minimalista">🌘 Eclipse (Minimalista e Escuro)</option>
-                    <option value="brilhante">🪐 Saturniano (Anéis e Camadas Extravagantes)</option>
-                    <option value="futurista">✨ Via Láctea (Brilho Máximo e Cristais)</option>
-                </select>
-
-                <button type="submit">Enviar Sinal de Rádio</button>
-            </form>
         </section>
     </main>
 
@@ -158,7 +136,6 @@
             <div class="footer-links">
                 <a href="#inicio">Início</a>
                 <a href="#colecoes">Coleções</a>
-                <a href="#Agendamento">Base</a>
             </div>
             <div class="footer-socials">
                 <a href="#" aria-label="Instagram">🌌 Instagram</a>
