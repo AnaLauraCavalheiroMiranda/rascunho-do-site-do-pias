@@ -85,7 +85,55 @@ const telasCelestine = {
                 </div>
             </div>
         </section>
-    `
+    `,
+    'colecoes': `
+    <section class="catalogo-exclusivo-section">
+        <div class="catalogo-header">
+            <h2>Boutique Interplanetária: Peças Únicas</h2>
+            <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
+        </div>
+        
+        <div class="gallery">
+            <!-- VESTIDO -->
+            <article class="product-item">
+                <div class="product-thumb" style="position: relative;">
+                    <span class="badge-exclusiva">Exclusivo</span>
+                    <img src="img/vestido.jpeg" alt="Vestido Eclipse Total">
+                </div>
+                <h4>Vestido Eclipse Total</h4>
+                <p>Veludo negro profundo com detalhes em branco puro.</p>
+                <button type="button" class="btn-buy" onclick="alert('Iniciando transmissão de pagamento via rede quântica...')">Adquirir Manto</button>
+            </article>
+
+            <!-- TERNO -->
+            <article class="product-item">
+                <div class="product-thumb" style="position: relative;">
+                    <span class="badge-exclusiva">Exclusivo</span>
+                    <img src="img/terno.jpg" alt="Terno Alinhamento Astral">
+                </div>
+                <h4>Terno Alinhamento Astral</h4>
+                <p>Cortes assimétricos com reflexos furta-cor de nebulosas.</p>
+                <button type="button" class="btn-buy" onclick="alert('Iniciando transmissão de pagamento via rede quântica...')">Adquirir Manto</button>
+            </article>
+
+            <!-- CORSET -->
+            <article class="product-item">
+                <div class="product-thumb" style="position: relative;">
+                    <span class="badge-exclusiva">Exclusivo</span>
+                    <img src="img/corset.jpeg" alt="Corset Aurora Lunar">
+                </div>
+                <h4>Corset Aurora Lunar</h4>
+                <p>Estrutura translúcida banhada a pó de pérola cósmica.</p>
+                <button type="button" class="btn-buy" onclick="alert('Iniciando transmissão de pagamento via rede quântica...')">Adquirir Manto</button>
+            </article>
+        </div>
+
+        <div style="text-align: center; margin-top: 70px;">
+            <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+        </div>
+    </section>
+`,
+
 };
 
 // 2. Inicialização do sistema assim que a página carrega
@@ -119,6 +167,13 @@ function configurarGatilhosNavegacao() {
 
     const btnJornada = document.querySelector('.hero-content button');
     if (btnJornada) btnJornada.setAttribute('onclick', "mudarTela('login')");
+
+        // Faz o link "Coleções" carregar a nova tela em vez de rolar a página
+        const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
+        if (linkColecoes) {
+            linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
+        }
+    
 }
 
 function mudarTela(nomeDaTela) {
@@ -188,3 +243,44 @@ function autenticarTripulante(event) {
     alert(`Tripulante ${email} autenticado com sucesso!`);
     mudarTela('orbita');
 }
+// Efeito de rolagem orbital no cabeçalho
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    if (window.scrollY > 50) {
+        header.style.padding = '14px 6%';
+        header.style.background = 'rgba(25, 27, 34, 0.96)';
+        header.style.borderBottom = '1px solid var(--saturn-gold-dim)';
+        header.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
+    } else {
+        header.style.padding = '22px 6%';
+        header.style.background = 'rgba(38, 41, 52, 0.92)';
+        header.style.borderBottom = '1px solid var(--glass-border)';
+        header.style.boxShadow = 'none';
+    }
+});
+// Rastro de Fótons Estelares no cursor
+document.addEventListener('mousemove', (e) => {
+    const star = document.createElement('div');
+    star.innerHTML = '✦';
+    star.style.position = 'fixed';
+    star.style.left = e.clientX + 'px';
+    star.style.top = e.clientY + 'px';
+    star.style.pointerEvents = 'none';
+    star.style.color = Math.random() > 0.5 ? 'var(--saturn-gold)' : 'var(--lavender-glow)';
+    star.style.fontSize = Math.random() * (14 - 6) + 6 + 'px';
+    star.style.opacity = '0.8';
+    star.style.transition = 'all 0.8s ease-out';
+    star.style.zIndex = '9999';
+    star.style.transform = 'translate(-50%, -50%)';
+
+    document.body.appendChild(star);
+
+    setTimeout(() => {
+        star.style.transform = 'translate(-50%, -50%) translateY(30px) scale(0)';
+        star.style.opacity = '0';
+    }, 50);
+
+    setTimeout(() => {
+        star.remove();
+    }, 800);
+});
