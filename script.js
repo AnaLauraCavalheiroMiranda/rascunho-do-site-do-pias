@@ -87,7 +87,7 @@ const telasCelestine = {
         </section>
     `,
     'colecoes': `
-    <section class="catalogo-exclusivo-section">
+   <section class="catalogo-exclusivo-section">
         <div class="catalogo-header">
             <h2>Boutique Interplanetária: Peças Únicas</h2>
             <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
@@ -96,7 +96,7 @@ const telasCelestine = {
         <!-- PÁGINA 1: EXIBE APENAS AS 6 PRIMEIRAS -->
         <div id="galeria-p1" class="gallery galeria-orbital ativa">
             <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/conjunto macaquinho.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Vestido Eclipse Total</h4>
                     <p>Veludo negro profundo com detalhes em branco puro.</p>
@@ -104,7 +104,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/terno.jpg" alt=""></div>
+                <div class="product-thumb"><img src="img/macaquinho rosa.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Terno Alinhamento Astral</h4>
                     <p>Cortes assimétricos com reflexos furta-cor de nebulosas.</p>
@@ -112,7 +112,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/corset.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/vestido rosa.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Corset Aurora Lunar</h4>
                     <p>Estrutura translúcida banhada a pó de pérola cósmica.</p>
@@ -120,7 +120,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido2.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/vestido japones.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Manto Estelar Andromeda</h4>
                     <p>Tule importado salpicado com poeira de diamante estelar.</p>
@@ -128,7 +128,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/terno2.jpg" alt=""></div>
+                <div class="product-thumb"><img src="img/vestido negro.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Casaco Horizonte de Eventos</h4>
                     <p>Lã negra densa capaz de absorver reflexos de luz.</p>
@@ -136,10 +136,11 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/corset2.jpeg" alt=""></div>
+                <!-- SUBSTITUÍDO: Entrou a primeira imagem enviada -->
+                <div class="product-thumb"><img src="img/vestido branco.jpeg"></div>
                 <div class="product-info-block">
-                    <h4>Corpet Supernova</h4>
-                    <p>Estrutura metálica flexível banhada a ouro rosa.</p>
+                    <h4>Mangas Nebulosa de Primavera</h4>
+                    <p>Mangas bufantes removíveis em tule translúcido com apliques de flores rosadas 3D.</p>
                     <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
                 </div>
             </article>
@@ -148,7 +149,7 @@ const telasCelestine = {
         <!-- PÁGINA 2: EXIBE AS OUTRAS 6 (FICA INVISÍVEL ATÉ CLICAR NO BOTÃO) -->
         <div id="galeria-p2" class="gallery galeria-orbital">
             <article class="product-item">
-                <div class="product-thumb"><img src="img/capa.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/terno beje.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Capa Nebulosa Escura</h4>
                     <p>Fios de fibra óptica ativos que imitam pulsares galácticos.</p>
@@ -156,7 +157,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/tunica.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/terno branco e vermelho.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Túnica Gravidade Zero</h4>
                     <p>Seda plissada reativa ao magnetismo local.</p>
@@ -164,7 +165,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/tiara.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/terno vermelho.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Diadema Estelar</h4>
                     <p>Cristais lapidados sob a pressão de meteoritos brutos.</p>
@@ -172,7 +173,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido3.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/terno azul escuro.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Vestido Radiação Cósmica</h4>
                     <p>Tecido holográfico mutável dependendo do ângulo orbital.</p>
@@ -180,7 +181,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/terno3.jpg" alt=""></div>
+                <div class="product-thumb"><img src="img/xale.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Smoking Anéis de Saturno</h4>
                     <p>Lapelas circulares com costuras finas douradas.</p>
@@ -188,7 +189,7 @@ const telasCelestine = {
                 </div>
             </article>
             <article class="product-item">
-                <div class="product-thumb"><img src="img/acessorio.jpeg" alt=""></div>
+                <div class="product-thumb"><img src="img/corset verde masc.jpeg" alt=""></div>
                 <div class="product-info-block">
                     <h4>Ombreiras Cinturão de Asteroides</h4>
                     <p>Placas geométricas com fragmentos minerais brutos lapidados.</p>
@@ -207,7 +208,8 @@ const telasCelestine = {
         <div style="text-align: center; margin-top: 40px;">
             <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
         </div>
-    </section>
+</section>
+
     `,
 
 
