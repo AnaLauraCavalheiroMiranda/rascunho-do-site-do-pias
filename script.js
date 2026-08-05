@@ -1,8 +1,12 @@
+/* ==========================================================================
+   1. CONTROLADORES DE ESTADO AND SIMULAÇÃO DE BANCO DE DADOS (SQLITE)
+   ========================================================================== */
+
 // Contadores para simular os IDs INCREMENTAIS do SQLite
 let proximoIdCliente = 7; 
 let proximoIdAgendamento = 5;
 
-// 1. Guardamos as estruturas das telas organizadas por chaves
+// Guardamos as estruturas das telas organizadas por chaves
 const telasCelestine = {
     'orbita': null, 
     
@@ -31,7 +35,6 @@ const telasCelestine = {
         </section>
     `,
 
-    // TELA REAJUSTADA: Títulos e subtítulos atualizados para focar no Pedido/Reserva
     'agendamento': `
         <section id="Agendamento" class="agendamento-section">
             <h3>🌙 Ciclos Lunares: Reservar Atendimento</h3>
@@ -57,7 +60,6 @@ const telasCelestine = {
             </div>
         </section>
     `,
-
     'atelie': `
         <section class="atelie-page-section">
             <div class="atelie-container">
@@ -69,12 +71,12 @@ const telasCelestine = {
                     <div class="atelie-text-block">
                         <h3>🌌 Como Pensamos</h3>
                         <p>No Celestine Ateliê, nós acreditamos firmemente que a alta costura não deve se limitar às fronteiras da Terra. Cada silhueta que moldamos, cada tecido que cortamos e cada ponto que alinhamos nascem de um desejo profundo de desafiar a mesmice e orbitar na alta sociedade universal.</p>
-                        <p>Nossa mente trabalha sintonizada na frequência dos mistérios cósmicos. Enxergamos constelações onde outros vêem apenas padrões de costura, e desenhamos trajes pensados para quem carrega o brilho estelar na alma.</p>
+                        <p>Nossa mente trabalha sintonizada na frequência dos mistérios cósmicos. Enxergamos constelações onde outros vêem apenas padrões de costura, e desenhagem trajes pensados para quem carrega o brilho estelar na alma.</p>
                     </div>
                     <div class="atelie-text-block">
                         <h3>✂️ Nossa Forma de Trabalhar</h3>
                         <p>Nossos processos unem o respeito à alfaiataria clássica tradicional com a inovação conceitual do design futurista. Não produzimos em massa. Confeccionamos exclusivamente <strong>peças únicas, artísticas e autorais</strong>.</p>
-                        <p>Cada manto de luxo passa por uma triagem criativa minuciosa, onde analisamos a gravidade, a fluidez do movimento e o magnetismo do caimento no corpo. Vestir uma obra do Celestine é fazer um salto hiperespacial rumo à sua melhor versão.</p>
+                        <p>Cada manto de luxo passa por uma triagem criativa minuciosa, onde analizamos a gravidade, a fluidez do movimento e o magnetismo do caimento no corpo. Vestir uma obra do Celestine é fazer um salto hiperespacial rumo à sua melhor versão.</p>
                     </div>
                 </div>
                 <div class="atelie-manifesto-highlight">
@@ -86,137 +88,134 @@ const telasCelestine = {
             </div>
         </section>
     `,
+
     'colecoes': `
-   <section class="catalogo-exclusivo-section">
-        <div class="catalogo-header">
-            <h2>Boutique Interplanetária: Peças Únicas</h2>
-            <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
-        </div>
-        
-        <!-- PÁGINA 1: EXIBE APENAS AS 6 PRIMEIRAS -->
-        <div id="galeria-p1" class="gallery galeria-orbital ativa">
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/conjunto macaquinho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Vestido Eclipse Total</h4>
-                    <p>Veludo negro profundo com detalhes em branco puro.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/macaquinho rosa.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Terno Alinhamento Astral</h4>
-                    <p>Cortes assimétricos com reflexos furta-cor de nebulosas.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido rosa.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Corset Aurora Lunar</h4>
-                    <p>Estrutura translúcida banhada a pó de pérola cósmica.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido japones.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Manto Estelar Andromeda</h4>
-                    <p>Tule importado salpicado com poeira de diamante estelar.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido negro.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Casaco Horizonte de Eventos</h4>
-                    <p>Lã negra densa capaz de absorver reflexos de luz.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <!-- SUBSTITUÍDO: Entrou a primeira imagem enviada -->
-                <div class="product-thumb"><img src="img/vestido branco.jpeg"></div>
-                <div class="product-info-block">
-                    <h4>Mangas Nebulosa de Primavera</h4>
-                    <p>Mangas bufantes removíveis em tule translúcido com apliques de flores rosadas 3D.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-        </div>
+        <section class="catalogo-exclusivo-section">
+            <div class="catalogo-header">
+                <h2>Boutique Interplanetária: Peças Únicas</h2>
+                <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
+            </div>
+            
+            <!-- PÁGINA 1: EXIBE AS 6 PRIMEIRAS -->
+            <div id="galeria-p1" class="gallery galeria-orbital ativa">
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/conjunto macaquinho.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Vestido Eclipse Total</h4>
+                        <p>Veludo negro profundo com detalhes em branco puro.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/macaquinho rosa.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Terno Alinhamento Astral</h4>
+                        <p>Cortes assimétricos com reflexos furta-cor de nebulosas.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/vestido rosa.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Corset Aurora Lunar</h4>
+                        <p>Estrutura translúcida banhada a pó de pérola cósmica.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/vestido japoes.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Manto Estelar Andromeda</h4>
+                        <p>Tule importado salaimado com poeira de diamante estelar.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/vestido negro.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Casaco Horizonte de Eventos</h4>
+                        <p>Lã negra densa capaz de absorver reflexos de luz.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/vestido branco.jpeg"></div>
+                    <div class="product-info-block">
+                        <h4>Mangas Nebulosa de Primavera</h4>
+                        <p>Mangas bufantes removíveis em tule translúcido com apliques de flores rosadas 3D.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+            </div>
 
-        <!-- PÁGINA 2: EXIBE AS OUTRAS 6 (FICA INVISÍVEL ATÉ CLICAR NO BOTÃO) -->
-        <div id="galeria-p2" class="gallery galeria-orbital">
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno beje.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Capa Nebulosa Escura</h4>
-                    <p>Fios de fibra óptica ativos que imitam pulsares galácticos.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno branco e vermelho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Túnica Gravidade Zero</h4>
-                    <p>Seda plissada reativa ao magnetismo local.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno vermelho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Diadema Estelar</h4>
-                    <p>Cristais lapidados sob a pressão de meteoritos brutos.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno azul escuro.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Vestido Radiação Cósmica</h4>
-                    <p>Tecido holográfico mutável dependendo do ângulo orbital.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/xale.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Smoking Anéis de Saturno</h4>
-                    <p>Lapelas circulares com costuras finas douradas.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/corset verde masc.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Ombreiras Cinturão de Asteroides</h4>
-                    <p>Placas geométricas com fragmentos minerais brutos lapidados.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-        </div>
+            <!-- PÁGINA 2: EXIBE AS OUTRAS 6 -->
+            <div id="galeria-p2" class="gallery galeria-orbital">
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/terno beje.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Capa Nebulosa Escura</h4>
+                        <p>Fios de fibra óptica ativos que imitam pulsares galácticos.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/terno branco e vermelho.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Túnica Gravidade Zero</h4>
+                        <p>Seda plissada reativa ao magnetismo local.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/terno vermelho.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Diadema Estelar</h4>
+                        <p>Cristais lapidados sob a pressão de meteoritos brutos.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/terno azul escuro.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Vestido Radiação Cósmica</h4>
+                        <p>Tecido holográfico mutável dependendo do ângulo orbital.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/xale.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Smoking Anéis de Saturno</h4>
+                        <p>Lapelas circulares com costuras finas douradas.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+                <article class="product-item">
+                    <div class="product-thumb"><img src="img/corset verde masc.jpeg" alt=""></div>
+                    <div class="product-info-block">
+                        <h4>Ombreiras Cinturão de Asteroides</h4>
+                        <p>Placas geométricas com fragmentos minerais brutos lapidados.</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
+                    </div>
+                </article>
+            </div>
 
-        <!-- CONTROLES DE PAGINAÇÃO ORBITAL -->
-        <div class="paginacao-container">
-            <button type="button" id="btn-voltar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(1)" disabled>◀ Ciclo Anterior</button>
-            <span id="indicador-orbita" class="indicador-pagina">Órbita 1 de 2</span>
-            <button type="button" id="btn-avancar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(2)">Próximo Ciclo ▶</button>
-        </div>
+            <div class="paginacao-container">
+                <button type="button" id="btn-voltar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(1)" disabled>◀ Ciclo Anterior</button>
+                <span id="indicador-orbita" class="indicador-pagina">Órbita 1 de 2</span>
+                <button type="button" id="btn-avancar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(2)">Próximo Ciclo ▶</button>
+            </div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
-        </div>
-</section>
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+            </div>
+`};
+/* ==========================================================================
+   2. INICIALIZAÇÃO DO SISTEMA E CAPTURA DINÂMICA DE LINKS (ROTEADOR SPA)
+   ========================================================================== */
 
-    `,
-
-
-};
-
-// 2. Inicialização do sistema assim que a página carrega
 document.addEventListener("DOMContentLoaded", () => {
+    // Registra o estado HTML nativo da main
     telasCelestine['orbita'] = document.querySelector('main').innerHTML;
     configurarGatilhosNavegacao();
 });
@@ -233,7 +232,6 @@ function configurarGatilhosNavegacao() {
         linkAtelie.setAttribute('onclick', "event.preventDefault(); mudarTela('atelie');");
     }
 
-    // AJUSTE: Mapeando o clique do novo texto do link de Ciclos Lunares para abrir a tela de agendamentos
     const linkCiclosLunares = document.querySelector('nav.desktop-nav a[href="#Agendamento"]');
     if (linkCiclosLunares) {
         linkCiclosLunares.setAttribute('onclick', "event.preventDefault(); mudarTela('agendamento');");
@@ -247,13 +245,15 @@ function configurarGatilhosNavegacao() {
     const btnJornada = document.querySelector('.hero-content button');
     if (btnJornada) btnJornada.setAttribute('onclick', "mudarTela('login')");
 
-        // Faz o link "Coleções" carregar a nova tela em vez de rolar a página
-        const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
-        if (linkColecoes) {
-            linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
-        }
-    
+    const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
+    if (linkColecoes) {
+        linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
+    }
 }
+
+/* ==========================================================================
+   3. NAVEGAÇÃO ENTRE TELAS E MECÂNICA DE PAGINAÇÃO DA BOUTIQUE
+   ========================================================================== */
 
 function mudarTela(nomeDaTela) {
     const containerPrincipal = document.querySelector('main');
@@ -276,6 +276,42 @@ function mudarTela(nomeDaTela) {
         }, 200);
     }
 }
+
+function alternarPaginaColecao(numeroPagina) {
+    const p1 = document.getElementById('galeria-p1');
+    const p2 = document.getElementById('galeria-p2');
+    const btnVoltar = document.getElementById('btn-voltar-ciclo');
+    const btnAvancar = document.getElementById('btn-avancar-ciclo');
+    const indicador = document.getElementById('indicador-orbita');
+
+    if (!p1 || !p2) return;
+
+    if (numeroPagina === 2) {
+        p1.classList.remove('ativa');
+        setTimeout(() => {
+            p2.classList.add('ativa');
+            indicador.textContent = "Órbita 2 de 2";
+            if(btnVoltar) btnVoltar.removeAttribute('disabled');
+            if(btnAvancar) btnAvancar.setAttribute('disabled', 'true');
+        }, 250);
+    } else {
+        p2.classList.remove('ativa');
+        setTimeout(() => {
+            p1.classList.add('ativa');
+            indicador.textContent = "Órbita 1 de 2";
+            if(btnVoltar) btnVoltar.setAttribute('disabled', 'true');
+            if(btnAvancar) btnAvancar.removeAttribute('disabled');
+        }, 250);
+    }
+
+    const topoBoutique = document.querySelector('.catalogo-header');
+    if (topoBoutique) {
+        topoBoutique.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+/* ==========================================================================
+   4. MANIPULAÇÃO DE FORMULÁRIOS E SINCRONIZAÇÃO DE ASSINATURAS DO CLIENTE
+   ========================================================================== */
 
 function processarAgendamentoEspacial(event) {
     event.preventDefault();
@@ -322,7 +358,29 @@ function autenticarTripulante(event) {
     alert(`Tripulante ${email} autenticado com sucesso!`);
     mudarTela('orbita');
 }
-// Efeito de rolagem orbital no cabeçalho
+
+/* ==========================================================================
+   5. EXTENSÕES DO ACERVO (EFEITO REVELAR CASCATA) E INTERATIVIDADE SCROLL
+   ========================================================================== */
+
+function revelarMantosEscondidos() {
+    const cardsExtras = document.querySelectorAll('.card-oculto');
+    const botaoVerMais = document.getElementById('btn-ver-mais');
+
+    cardsExtras.forEach((card, index) => {
+        card.classList.add('revelado');
+        card.style.transitionDelay = `${index * 150}ms`;
+    });
+
+    if (botaoVerMais) {
+        botaoVerMais.style.opacity = '0';
+        botaoVerMais.style.pointerEvents = 'none';
+        setTimeout(() => {
+            botaoVerMais.remove();
+        }, 400);
+    }
+}
+
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
     if (window.scrollY > 50) {
@@ -337,7 +395,11 @@ window.addEventListener('scroll', () => {
         header.style.boxShadow = 'none';
     }
 });
-// Rastro de Fótons Estelares no cursor
+
+/* ==========================================================================
+   6. LUXO VISUAL: PARTICULAS E RASTRO DE FÓTONS ESTELARES NO CURSOR
+   ========================================================================== */
+
 document.addEventListener('mousemove', (e) => {
     const star = document.createElement('div');
     star.innerHTML = '✦';
@@ -363,94 +425,3 @@ document.addEventListener('mousemove', (e) => {
         star.remove();
     }, 800);
 });
-function revelarMantosEscondidos() {
-    // Seleciona todos os cards que possuem a classe oculta
-    const cardsExtras = document.querySelectorAll('.card-oculto');
-    const botaoVerMais = document.getElementById('btn-ver-mais');
-
-    cardsExtras.forEach((card, index) => {
-        // Revela o elemento no fluxo do HTML mudando o display via classe
-        card.classList.add('revelado');
-        
-        // Efeito Cascata: Adiciona um atraso milimétrico para cada card aparecer um depois do outro
-        card.style.transitionDelay = `${index * 150}ms`;
-    });
-
-    // Desintegra o botão de Ver Mais suavemente já que todo o acervo foi revelado
-    if (botaoVerMais) {
-        botaoVerMais.style.opacity = '0';
-        botaoVerMais.style.pointerEvents = 'none';
-        setTimeout(() => {
-            botaoVerMais.remove();
-        }, 400);
-    }
-}
-function alternarPaginaColecao(numeroPagina) {
-    const p1 = document.getElementById('galeria-p1');
-    const p2 = document.getElementById('galeria-p2');
-    const btnVoltar = document.getElementById('btn-voltar-ciclo');
-    const btnAvancar = document.getElementById('btn-avancar-ciclo');
-    const indicador = document.getElementById('indicador-orbita');
-
-    if (!p1 || !p2) return;
-
-    if (numeroPagina === 2) {
-        // Transição para a Página 2
-        p1.classList.remove('ativa');
-        setTimeout(() => {
-            p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
-            btnVoltar.removeAttribute('disabled');
-            btnAvancar.setAttribute('disabled', 'true');
-        }, 300);
-    } else {
-        // Retorno para a Página 1
-        p2.classList.remove('ativa');
-        setTimeout(() => {
-            p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
-            btnVoltar.setAttribute('disabled', 'true');
-            btnAvancar.removeAttribute('disabled');
-        }, 300);
-    }
-
-    // Move o foco de rolagem suavemente para o início do acervo
-    const topoColecoes = document.querySelector('.catalogo-header');
-    if (topoColecoes) topoColecoes.scrollIntoView({ behavior: 'smooth' });
-}
-function alternarPaginaColecao(numeroPagina) {
-    const p1 = document.getElementById('galeria-p1');
-    const p2 = document.getElementById('galeria-p2');
-    const btnVoltar = document.getElementById('btn-voltar-ciclo');
-    const btnAvancar = document.getElementById('btn-avancar-ciclo');
-    const indicador = document.getElementById('indicador-orbita');
-
-    // Validação de segurança se os elementos estão renderizados na tela
-    if (!p1 || !p2) return;
-
-    if (numeroPagina === 2) {
-        // Desativa a página 1 e aguarda a transição de opacidade para ligar a página 2
-        p1.classList.remove('ativa');
-        setTimeout(() => {
-            p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
-            if(btnVoltar) btnVoltar.removeAttribute('disabled');
-            if(btnAvancar) btnAvancar.setAttribute('disabled', 'true');
-        }, 250);
-    } else {
-        // Desativa a página 2 e volta para a página 1
-        p2.classList.remove('ativa');
-        setTimeout(() => {
-            p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
-            if(btnVoltar) btnVoltar.setAttribute('disabled', 'true');
-            if(btnAvancar) btnAvancar.removeAttribute('disabled');
-        }, 250);
-    }
-
-    // Rola a tela suavemente de volta para o topo da boutique após a mudança
-    const topoBoutique = document.querySelector('.catalogo-header');
-    if (topoBoutique) {
-        topoBoutique.scrollIntoView({ behavior: 'smooth' });
-    }
-}
