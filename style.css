@@ -1294,3 +1294,117 @@ form select:focus {
     border-color: var(--saturn-gold);
     color: #ffffff;
 }
+/* ==========================================================================
+   TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
+   ========================================================================== */
+   .produto-detalhe-section {
+    padding: 50px 8%;
+    color: #ffffff;
+}
+
+.produto-detalhe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 45px;
+    align-items: start;
+    background: rgba(22, 24, 33, 0.8);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 35px;
+}
+
+.detalhe-imagem-container {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+}
+
+.detalhe-img-principal {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.detalhe-imagem-container:hover .detalhe-img-principal {
+    transform: scale(1.03);
+}
+
+.detalhe-badge-selo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(15, 16, 22, 0.85);
+    border: 1px solid var(--saturn-gold);
+    color: var(--saturn-gold);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.detalhe-categoria {
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    color: var(--lavender-glow);
+    letter-spacing: 1.5px;
+}
+
+.detalhe-info-container h2 {
+    font-size: 2.2rem;
+    margin: 8px 0 18px 0;
+    color: #ffffff;
+}
+
+.detalhe-preco-box {
+    background: rgba(10, 11, 16, 0.6);
+    padding: 15px 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--saturn-gold);
+    margin-bottom: 20px;
+}
+
+.preco-label {
+    font-size: 0.85rem;
+    color: #a0a5b5;
+    display: block;
+}
+
+.preco-valor {
+    color: var(--saturn-gold);
+    font-size: 1.5rem;
+    margin-top: 4px;
+}
+
+.detalhe-descricao-longa {
+    line-height: 1.6;
+    color: #cbd0df;
+    font-size: 0.98rem;
+    margin-bottom: 25px;
+}
+
+.detalhe-especificacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.espec-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #e0e4f0;
+}
+
+.detalhe-acoes-group {
+    display: flex;
+    flex-direction: column;
+}

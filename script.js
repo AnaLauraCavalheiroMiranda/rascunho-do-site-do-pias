@@ -1,4 +1,11 @@
-// Contadores para simular os IDs INCREMENTAIS do SQLite
+/* ==========================================================================
+   1. VARIÁVEIS GLOBAIS E BASE DE DADOS
+   ========================================================================== */
+
+// Variável global para armazenar a lista de produtos carregada do JSON
+let produtosGlobais = [];
+
+// Contadores para simular IDs incrementais do SQLite
 let proximoIdCliente = 7; 
 let proximoIdAgendamento = 5;
 
@@ -72,7 +79,7 @@ const materiaisCelestine = [
     }
 ];
 
-// 1. Guardamos as estruturas das telas organizadas por chaves
+// Mapeamento das estruturas HTML das telas
 const telasCelestine = {
     'orbita': null, 
     
@@ -246,7 +253,10 @@ const telasCelestine = {
     `
 };
 
-// 2. Inicialização do sistema
+/* ==========================================================================
+   2. INICIALIZAÇÃO E GERENCIAMENTO DE TELAS
+   ========================================================================== */
+
 document.addEventListener("DOMContentLoaded", () => {
     telasCelestine['orbita'] = document.querySelector('main').innerHTML;
     configurarGatilhosNavegacao();
@@ -275,7 +285,6 @@ function configurarGatilhosNavegacao() {
     if (linkColecoes) linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
 }
 
-// Alternar entre as telas principais
 function mudarTela(nomeDaTela) {
     const containerPrincipal = document.querySelector('main');
     
@@ -290,13 +299,12 @@ function mudarTela(nomeDaTela) {
         setTimeout(() => {
             containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
             
-            // EXECUÇÃO DAS FUNÇÕES ESPECÍFICAS DE CADA TELA
             if (nomeDaTela === 'orbita') {
                 configurarGatilhosNavegacao();
             } else if (nomeDaTela === 'colecoes') {
                 carregarMantosDoJson();
             } else if (nomeDaTela === 'exploracao') {
-                carregarGuiaMateriais(); // <--- CORRIGIDO: Chamas os materiais ao abrir a tela!
+                carregarGuiaMateriais();
             }
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -305,7 +313,170 @@ function mudarTela(nomeDaTela) {
     }
 }
 
-// Função para renderizar o Guia de Materiais
+/* ==========================================================================
+   3. MÓDULO: COLEÇÕES E DETALHES DO PRODUTO
+   ========================================================================== */
+
+async function carregarMantosDoJson() {
+    try {
+        const resposta = await fetch('produtos.json');
+        produtosGlobais = await resposta.json();
+
+        const p1 = document.getElementById('galeria-p1');
+        const p2 = document.getElementById('galeria-p2');
+
+        if (!p1 || !p2) return;
+
+        p1.innerHTML = '';
+        p2.innerHTML = '';
+
+        produtosGlobais.forEach((produto, index) => {
+            const cardHTML = `
+                <article class="product-item" onclick="verDetalhesProduto(${index})" style="cursor: pointer;">
+                    <div class="product-thumb">
+                        <img src="${produto.imagem}" alt="${produto.alt}">
+                    </div>
+                    <div class="product-info-block">
+                        <h4>${produto.titulo}</h4>
+                        <p>${produto.descricao}</p>
+                        <button type="button" class="btn-buy" onclick="event.stopPropagation(); verDetalhesProduto(${index})">
+                            ✨ Ver Detalhes & Reservar
+                        </button>
+                    </div>
+                </article>
+            `;
+
+            if (index < 6) {
+                p1.innerHTML += cardHTML;
+            } else {
+                p2.innerHTML += cardHTML;
+            }
+        });
+    } catch (erro) {
+        console.error('Erro ao sintonizar o arquivo JSON de mantos:', erro);
+    }
+}
+
+function verDetalhesProduto(index) {
+    const produto = produtosGlobais[index];
+    if (!produto) return;
+
+    const containerPrincipal = document.querySelector('main');
+    const precoEstimado = produto.preco || "R$ 1.850,00 - R$ 2.400,00 (Sob Medida)";
+    const tempoConfeccao = produto.tempo || "15 a 20 Dias Orbitais";
+
+    const htmlDetalhes = `
+        <section class="produto-detalhe-section">
+            <button class="btn-back-home" style="margin-bottom: 25px;" onclick="mudarTela('colecoes')">
+                ◀ Voltar às Coleções
+            </button>
+
+            <div class="produto-detalhe-grid">
+                <div class="detalhe-imagem-container">
+                    <img src="${produto.imagem}" alt="${produto.alt}" class="detalhe-img-principal">
+                    <div class="detalhe-badge-selo">🌌 Peça Autoral Exclusiva</div>
+                </div>
+
+                <div class="detalhe-info-container">
+                    <span class="detalhe-categoria">Boutique Interplanetária</span>
+                    <h2>${produto.titulo}</h2>
+                    
+                    <div class="detalhe-preco-box">
+                        <span class="preco-label">Investimento Médio Estimado:</span>
+                        <h3 class="preco-valor">${precoEstimado}</h3>
+                    </div>
+
+                    <p class="detalhe-descricao-longa">
+                        ${produto.descricao} Confeccionado com técnicas de alfaiataria de alta precisão e modelagem ergonômica ajustada às frequências de movimento do tripulante.
+                    </p>
+
+                    <div class="detalhe-especificacoes">
+                        <div class="espec-item">
+                            <span>⏳ <strong>Tempo de Confecção:</strong></span>
+                            <span>${tempoConfeccao}</span>
+                        </div>
+                        <div class="espec-item">
+                            <span>✂️ <strong>Ajustes:</strong></span>
+                            <span>Provas Presenciais / Virtuais</span>
+                        </div>
+                        <div class="espec-item">
+                            <span>📡 <strong>Atendimento:</strong></span>
+                            <span>Personal Stylist Dedicado</span>
+                        </div>
+                    </div>
+
+                    <div class="detalhe-acoes-group">
+                        <button type="button" class="btn-submit-quiz" onclick="iniciarAgendamentoComProduto('${produto.titulo}')">
+                            🌙 Agendar Prova & Medidas Desta Peça
+                        </button>
+                        
+                        <button type="button" class="btn-interagir-material" style="margin-top: 12px; padding: 14px;" onclick="acionarAtendimentoPersonalizado('${produto.titulo}')">
+                            💬 Acionar Atendimento do Ateliê (WhatsApp)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    `;
+
+    containerPrincipal.style.opacity = 0;
+    setTimeout(() => {
+        containerPrincipal.innerHTML = htmlDetalhes;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        containerPrincipal.style.opacity = 1;
+    }, 200);
+}
+
+function alternarPaginaColecao(numeroPagina) {
+    const p1 = document.getElementById('galeria-p1');
+    const p2 = document.getElementById('galeria-p2');
+    const btnVoltar = document.getElementById('btn-voltar-ciclo');
+    const btnAvancar = document.getElementById('btn-avancar-ciclo');
+    const indicador = document.getElementById('indicador-orbita');
+
+    if (!p1 || !p2) return;
+
+    if (numeroPagina === 2) {
+        p1.classList.remove('ativa');
+        setTimeout(() => {
+            p2.classList.add('ativa');
+            indicador.textContent = "Órbita 2 de 2";
+            if (btnVoltar) btnVoltar.removeAttribute('disabled');
+            if (btnAvancar) btnAvancar.setAttribute('disabled', 'true');
+        }, 250);
+    } else {
+        p2.classList.remove('ativa');
+        setTimeout(() => {
+            p1.classList.add('ativa');
+            indicador.textContent = "Órbita 1 de 2";
+            if (btnVoltar) btnVoltar.setAttribute('disabled', 'true');
+            if (btnAvancar) btnAvancar.removeAttribute('disabled');
+        }, 250);
+    }
+
+    const topoBoutique = document.querySelector('.catalogo-header');
+    if (topoBoutique) {
+        topoBoutique.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function iniciarAgendamentoComProduto(nomeProduto) {
+    mudarTela('agendamento');
+    setTimeout(() => {
+        alert(`✨ Manto "${nomeProduto}" selecionado! Complete o formulário para agendar sua sessão de confecção.`);
+    }, 300);
+}
+
+function acionarAtendimentoPersonalizado(nomeProduto) {
+    const mensagem = encodeURIComponent(`Olá, equipe Celestine Ateliê! Gostaria de mais detalhes e atendimento sobre o manto: ${nomeProduto}`);
+    const urlWhatsapp = `https://api.whatsapp.com/send?phone=5541999999999&text=${mensagem}`;
+    window.open(urlWhatsapp, '_blank');
+}
+
+/* ==========================================================================
+   4. MÓDULO: EXPLORAÇÃO, QUIZ E MATERIAIS
+   ========================================================================== */
+
 function carregarGuiaMateriais() {
     const grid = document.getElementById('grid-materiais');
     if (!grid) return;
@@ -349,7 +520,6 @@ function carregarGuiaMateriais() {
     });
 }
 
-// Lógica do Quiz
 function calcularResultadoQuiz(event) {
     event.preventDefault();
 
@@ -406,77 +576,9 @@ function refazerQuiz() {
     document.getElementById('form-quiz').reset();
 }
 
-// Carregar Coleções do JSON
-async function carregarMantosDoJson() {
-    try {
-        const resposta = await fetch('produtos.json');
-        const produtos = await resposta.json();
-
-        const p1 = document.getElementById('galeria-p1');
-        const p2 = document.getElementById('galeria-p2');
-
-        if (!p1 || !p2) return;
-
-        p1.innerHTML = '';
-        p2.innerHTML = '';
-
-        produtos.forEach((produto, index) => {
-            const cardHTML = `
-                <article class="product-item">
-                    <div class="product-thumb">
-                        <img src="${produto.imagem}" alt="${produto.alt}">
-                    </div>
-                    <div class="product-info-block">
-                        <h4>${produto.titulo}</h4>
-                        <p>${produto.descricao}</p>
-                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida com ${produto.titulo}...')">Adquirir Manto</button>
-                    </div>
-                </article>
-            `;
-
-            if (index < 6) {
-                p1.innerHTML += cardHTML;
-            } else {
-                p2.innerHTML += cardHTML;
-            }
-        });
-    } catch (erro) {
-        console.error('Erro ao sintonizar o arquivo JSON de mantos:', erro);
-    }
-}
-
-function alternarPaginaColecao(numeroPagina) {
-    const p1 = document.getElementById('galeria-p1');
-    const p2 = document.getElementById('galeria-p2');
-    const btnVoltar = document.getElementById('btn-voltar-ciclo');
-    const btnAvancar = document.getElementById('btn-avancar-ciclo');
-    const indicador = document.getElementById('indicador-orbita');
-
-    if (!p1 || !p2) return;
-
-    if (numeroPagina === 2) {
-        p1.classList.remove('ativa');
-        setTimeout(() => {
-            p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
-            if (btnVoltar) btnVoltar.removeAttribute('disabled');
-            if (btnAvancar) btnAvancar.setAttribute('disabled', 'true');
-        }, 250);
-    } else {
-        p2.classList.remove('ativa');
-        setTimeout(() => {
-            p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
-            if (btnVoltar) btnVoltar.setAttribute('disabled', 'true');
-            if (btnAvancar) btnAvancar.removeAttribute('disabled');
-        }, 250);
-    }
-
-    const topoBoutique = document.querySelector('.catalogo-header');
-    if (topoBoutique) {
-        topoBoutique.scrollIntoView({ behavior: 'smooth' });
-    }
-}
+/* ==========================================================================
+   5. MÓDULO: FORMULÁRIOS E AUTENTICAÇÃO
+   ========================================================================== */
 
 function processarAgendamentoEspacial(event) {
     event.preventDefault();
@@ -524,7 +626,11 @@ function autenticarTripulante(event) {
     mudarTela('orbita');
 }
 
-// Efeito de rolagem orbital no cabeçalho
+/* ==========================================================================
+   6. EFEITOS VISUAIS E ANIMAÇÕES
+   ========================================================================== */
+
+// Efeito de rolagem no cabeçalho
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
     if (!header) return;
