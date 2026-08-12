@@ -86,133 +86,96 @@ const telasCelestine = {
             </div>
         </section>
     `,
-    'colecoes': `
-   <section class="catalogo-exclusivo-section">
-        <div class="catalogo-header">
-            <h2>Boutique Interplanetária: Peças Únicas</h2>
-            <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
-        </div>
-        
-        <!-- PÁGINA 1: EXIBE APENAS AS 6 PRIMEIRAS -->
-        <div id="galeria-p1" class="gallery galeria-orbital ativa">
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/conjunto macaquinho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Vestido Eclipse Total</h4>
-                    <p>Um body translúcido de alta-costura, esculpido com ramos tridimensionais que simulam a flora exótica nascendo no coração de uma galáxia distante.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/macaquinho rosa.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Terno Alinhamento Astral</h4>
-                    <p>Para completar o visual, as mangas bufantes removíveis em tule trazem a fluidez dos gases cósmicos, flutuando como a atmosfera etérea dessa nebulosa primaveril.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido rosa.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Corset Aurora Lunar</h4>
-                    <p>Vestido sereia rosa-quartzo com corpete estruturado e amarrações imperiais.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido japones.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Manto Estelar Andromeda</h4>
-                    <p>Conjunto de alta-costura futurista inspirado na flora exótica de uma nebulosa distante.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/vestido negro.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Casaco Horizonte de Eventos</h4>
-                    <p>Vestido de gala esculpido no preto absoluto do horizonte de eventos de um buraco negro.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <!-- SUBSTITUÍDO: Entrou a primeira imagem enviada -->
-                <div class="product-thumb"><img src="img/vestido branco.jpeg"></div>
-                <div class="product-info-block">
-                    <h4>Mangas Nebulosa de Primavera</h4>
-                    <p>Vestido de gala bicolor esculpido no contraste absoluto entre a luz estelar e o vazio do espaço.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-        </div>
 
-        <!-- PÁGINA 2: EXIBE AS OUTRAS 6 (FICA INVISÍVEL ATÉ CLICAR NO BOTÃO) -->
-        <div id="galeria-p2" class="gallery galeria-orbital">
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno beje.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Capa Nebulosa Escura</h4>
-                    <p>Terno unissex de alta-costura sci-fi desenhado com fechos ornamentais para a alta sociedade do universo.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno branco e vermelho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Túnica Gravidade Zero</h4>
-                    <p>Traje de gala espacial estruturado com correntes de titânio estelar e amarrações que desafiam a gravidade.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno vermelho.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Diadema Estelar</h4>
-                    <p>Sobretudo longo em veludo carmesim profundo inspirado no brilho intenso de uma estrela anâ vermelha.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/terno azul escuro.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Vestido Radiação Cósmica</h4>
-                    <p>Traje diplomático cósmico rico em detalhes metálicos e punhos brocados que simulam relíquias de uma antiga galáxia.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/xale.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Smoking Anéis de Saturno</h4>
-                    <p>Malha celestial tecida com a própria essência do firmamento noturno.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-            <article class="product-item">
-                <div class="product-thumb"><img src="img/corset verde masc.jpeg" alt=""></div>
-                <div class="product-info-block">
-                    <h4>Ombreiras Cinturão de Asteroides</h4>
-                    <p>Colete de alta-costura em jacquard azul-noturno com arabescos que imitam órbitas de uma galáxia antiga.</p>
-                    <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida...')">Adquirir Manto</button>
-                </div>
-            </article>
-        </div>
+   'colecoes': `
+        <section class="catalogo-exclusivo-section">
+            <div class="catalogo-header">
+                <h2>Boutique Interplanetária: Peças Únicas</h2>
+                <p>Nossos mantos autorais confeccionados sob a gravidade sutil do cosmos. Peças exclusivas de alta costura prontas para órbita.</p>
+            </div>
+            
+            <div id="galeria-p1" class="gallery galeria-orbital ativa"></div>
 
-        <!-- CONTROLES DE PAGINAÇÃO ORBITAL -->
-        <div class="paginacao-container">
-            <button type="button" id="btn-voltar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(1)" disabled>◀ Ciclo Anterior</button>
-            <span id="indicador-orbita" class="indicador-pagina">Órbita 1 de 2</span>
-            <button type="button" id="btn-avancar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(2)">Próximo Ciclo ▶</button>
-        </div>
+            <div id="galeria-p2" class="gallery galeria-orbital"></div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
-        </div>
-</section>
+            <div class="paginacao-container">
+                <button type="button" id="btn-voltar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(1)" disabled>◀ Ciclo Anterior</button>
+                <span id="indicador-orbita" class="indicador-pagina">Órbita 1 de 2</span>
+                <button type="button" id="btn-avancar-ciclo" class="btn-paginacao" onclick="alternarPaginaColecao(2)">Próximo Ciclo ▶</button>
+            </div>
 
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+            </div>
+        </section>
     `,
+'exploracao': `
+        <section class="exploracao-section">
+            <div class="exploracao-header">
+                <h2>🛰️ Centro de Exploração Cósmica</h2>
+                <p>Descubra a matéria-prima do universo e sintonize seu manto autoral ideal.</p>
+            </div>
 
+            <div class="quiz-card-container">
+                <div class="quiz-header">
+                    <h3>✨ Scanner da Aura & Estilo</h3>
+                    <p>Responda às frequências orbitais para identificar seu estilo e o tecido perfeito para seu manto.</p>
+                </div>
 
+                <div id="quiz-corpo">
+                    <form id="form-quiz" onsubmit="calcularResultadoQuiz(event)">
+                        <div class="pergunta-group">
+                            <label>1. Como você prefere se destacar em um evento na galáxia?</label>
+                            <select id="p1" required>
+                                <option value="" disabled selected>Selecione uma sintonia...</option>
+                                <option value="misterio">Misterioso(a) e imponente como um Eclipse</option>
+                                <option value="brilho">Radiante e expansivo(a) como uma Supernova</option>
+                                <option value="fluidez">Elegante, fluido(a) e etéreo(a) como uma Nebulosa</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta-group">
+                            <label>2. Qual sensação tátil você busca em um traje de alta costura?</label>
+                            <select id="p2" required>
+                                <option value="" disabled selected>Selecione uma sensação...</option>
+                                <option value="misterio">Veludo denso que absorve a luz e envolve o corpo</option>
+                                <option value="brilho">Texturas metálicas com reflexos de poeira estelar</option>
+                                <option value="fluidez">Seda leve que flutua como em gravidade zero</option>
+                            </select>
+                        </div>
+
+                        <div class="pergunta-group">
+                            <label>3. Qual o seu ambiente espacial dos sonhos?</label>
+                            <select id="p3" required>
+                                <option value="" disabled selected>Selecione seu destino...</option>
+                                <option value="misterio">O horizonte de eventos de um buraco negro</option>
+                                <option value="brilho">O centro iluminado da galáxia Via Láctea</option>
+                                <option value="fluidez">Os anéis de poeira e cristais de Saturno</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-submit-quiz">🚀 Iniciar Mapeamento da Aura</button>
+                    </form>
+                </div>
+
+                <div id="quiz-resultado" class="resultado-oculto" style="display: none;"></div>
+            </div>
+
+            <div class="materiais-guia-container">
+                <div class="materiais-header">
+                    <h3>🧪 Enciclopédia de Tecidos & Matéria-Prima</h3>
+                    <p>Conheça a física e o caimento dos tecidos raros tecidos no ateliê.</p>
+                </div>
+
+                <div id="grid-materiais" class="materiais-grid">
+                    </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+            </div>
+        </section>
+    `,
 };
 
 // 2. Inicialização do sistema assim que a página carrega
@@ -239,10 +202,11 @@ function configurarGatilhosNavegacao() {
         linkCiclosLunares.setAttribute('onclick', "event.preventDefault(); mudarTela('agendamento');");
     }
 
-    const linkExploracao = document.querySelector('nav.desktop-nav a[href="#Exploracao"]');
-    if (linkExploracao) {
-        linkExploracao.setAttribute('onclick', "event.preventDefault(); alert('Iniciando rastreamento de estoque confeccionado... Nova aba em desenvolvimento.');");
-    }
+    // No seu configurarGatilhosNavegacao():
+const linkExploracao = document.querySelector('nav.desktop-nav a[href="#Exploracao"]');
+if (linkExploracao) {
+    linkExploracao.setAttribute('onclick', "event.preventDefault(); mudarTela('exploracao');");
+}
 
     const btnJornada = document.querySelector('.hero-content button');
     if (btnJornada) btnJornada.setAttribute('onclick', "mudarTela('login')");
@@ -254,7 +218,45 @@ function configurarGatilhosNavegacao() {
         }
     
 }
+// ⚡ Função que consome o JSON e gera os mantos dinamicamente
+async function carregarMantosDoJson() {
+    try {
+        const resposta = await fetch('produtos.json');
+        const produtos = await resposta.json();
 
+        const p1 = document.getElementById('galeria-p1');
+        const p2 = document.getElementById('galeria-p2');
+
+        if (!p1 || !p2) return;
+
+        p1.innerHTML = '';
+        p2.innerHTML = '';
+
+        produtos.forEach((produto, index) => {
+            const cardHTML = `
+                <article class="product-item">
+                    <div class="product-thumb">
+                        <img src="${produto.imagem}" alt="${produto.alt}">
+                    </div>
+                    <div class="product-info-block">
+                        <h4>${produto.titulo}</h4>
+                        <p>${produto.descricao}</p>
+                        <button type="button" class="btn-buy" onclick="alert('Conexão quântica estabelecida com ${produto.titulo}...')">Adquirir Manto</button>
+                    </div>
+                </article>
+            `;
+
+            // Distribui 6 itens na primeira página e o restante na segunda
+            if (index < 6) {
+                p1.innerHTML += cardHTML;
+            } else {
+                p2.innerHTML += cardHTML;
+            }
+        });
+    } catch (erro) {
+        console.error('Erro ao sintonizar o arquivo JSON de mantos:', erro);
+    }
+}
 function mudarTela(nomeDaTela) {
     const containerPrincipal = document.querySelector('main');
     
@@ -268,15 +270,18 @@ function mudarTela(nomeDaTela) {
         
         setTimeout(() => {
             containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
+            
             if (nomeDaTela === 'orbita') {
                 configurarGatilhosNavegacao();
+            } else if (nomeDaTela === 'colecoes') {
+                carregarMantosDoJson(); // <--- INJEÇÃO DO JSON AQUI!
             }
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
             containerPrincipal.style.opacity = 1;
         }, 200);
     }
 }
-
 function processarAgendamentoEspacial(event) {
     event.preventDefault();
 
@@ -452,5 +457,117 @@ function alternarPaginaColecao(numeroPagina) {
     const topoBoutique = document.querySelector('.catalogo-header');
     if (topoBoutique) {
         topoBoutique.scrollIntoView({ behavior: 'smooth' });
+        
+    } else if (nomeDaTela === 'colecoes') {
+    carregarMantosDoJson();
+}
+}
+// Base de dados do Guia de Materiais
+const materiaisCelestine = [
+    {
+        id: "misterio",
+        nome: "Veludo Negro de Buraco Negro",
+        icone: "🌑",
+        descricao: "Um veludo de alta densidade capaz de absorver 99% da luz ambiente. Confere toque aveludado, estrutura marcante e mistério absoluto.",
+        caimento: "Estruturado / Pesado",
+        origem: "Sintetizado sob alta pressão na Órbita de Cygnus X-1."
+    },
+    {
+        id: "brilho",
+        nome: "Jacquard de Titânio & Ouro Saturniano",
+        icone: "🪐",
+        descricao: "Fios metálicos trançados com fibras nobres. Reflete gradientes dourados conforme a luz do ambiente muda.",
+        caimento: "Rígido / Nobre",
+        origem: "Tecido artesanal nos anéis internos de Saturno."
+    },
+    {
+        id: "fluidez",
+        nome: "Seda Flutuante de Nebulosa",
+        icone: "✨",
+        descricao: "Seda ultraleve translúcida que reage ao menor movimento do ar. Imita o fluxo contínuo dos gases cósmicos em gravidade zero.",
+        caimento: "Esvoaçante / Leve",
+        origem: "Mapeado no coração da Nebulosa de Órion."
     }
+];
+// 1. Função que renderiza a lista de materiais
+function carregarGuiaMateriais() {
+    const grid = document.getElementById('grid-materiais');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    materiaisCelestine.forEach(mat => {
+        grid.innerHTML += `
+            <article class="material-card">
+                <div class="material-icon">${mat.icone}</div>
+                <h4>${mat.nome}</h4>
+                <p class="material-desc">${mat.descricao}</p>
+                <div class="material-specs">
+                    <span><strong>Caimento:</strong> ${mat.caimento}</span>
+                    <span><strong>Origem:</strong> ${mat.origem}</span>
+                </div>
+            </article>
+        `;
+    });
+}
+
+// 2. Lógica do Quiz: Calcula a resposta predominante e revela o resultado
+function calcularResultadoQuiz(event) {
+    event.preventDefault();
+
+    const p1 = document.getElementById('p1').value;
+    const p2 = document.getElementById('p2').value;
+    const p3 = document.getElementById('p3').value;
+
+    // Contagem de votos para cada perfil
+    const contagem = { misterio: 0, brilho: 0, fluidez: 0 };
+    contagem[p1]++;
+    contagem[p2]++;
+    contagem[p3]++;
+
+    // Descobre qual categoria teve mais escolhas
+    let perfilVencedor = 'misterio';
+    if (contagem.brilho > contagem[perfilVencedor]) perfilVencedor = 'brilho';
+    if (contagem.fluidez > contagem[perfilVencedor]) perfilVencedor = 'fluidez';
+
+    // Busca o material associado
+    const materialRecomendado = materiaisCelestine.find(m => m.id === perfilVencedor);
+
+    // Títulos de estilo baseados no resultado
+    const titulosEstilo = {
+        misterio: "🌘 Aura Eclipse (Misteriosa & Sobria)",
+        brilho: "🪐 Aura Saturniana (Extravagante & Magnética)",
+        fluidez: "✨ Aura Etérea (Fluida & Iluminada)"
+    };
+
+    const containerResultado = document.getElementById('quiz-resultado');
+    const corpoQuiz = document.getElementById('quiz-corpo');
+
+    corpoQuiz.style.display = 'none'; // Oculta o formulário
+
+    containerResultado.innerHTML = `
+        <div class="resultado-box">
+            <h4>Seu Mapeamento Orbital:</h4>
+            <h2 class="estilo-titulo">${titulosEstilo[perfilVencedor]}</h2>
+            
+            <div class="tecido-recomendado-card">
+                <p><strong>Tecido Estelar Recomendado para a sua Aura:</strong></p>
+                <h3>${materialRecomendado.icone} ${materialRecomendado.nome}</h3>
+                <p>${materialRecomendado.descricao}</p>
+            </div>
+
+            <div class="resultado-acoes">
+                <button type="button" class="btn-submit-login" onclick="mudarTela('agendamento')">🌙 Agendar Manto com este Tecido</button>
+                <button type="button" class="btn-back-home" style="margin-top: 10px;" onclick="refazerQuiz()">🔄 Refazer Scanner</button>
+            </div>
+        </div>
+    `;
+
+    containerResultado.style.display = 'block';
+}
+
+function refazerQuiz() {
+    document.getElementById('quiz-corpo').style.display = 'block';
+    document.getElementById('quiz-resultado').style.display = 'none';
+    document.getElementById('form-quiz').reset();
 }

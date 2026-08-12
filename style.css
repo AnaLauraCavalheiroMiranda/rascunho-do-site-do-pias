@@ -1082,3 +1082,95 @@ form select:focus {
         font-size: 5.4rem;
     }
 }
+/* ==========================================================================
+   SEÇÃO DE EXPLORAÇÃO (QUIZ + GUIA DE MATERIAIS)
+   ========================================================================== */
+.exploracao-section {
+    padding: 60px 8%;
+    color: #ffffff;
+}
+
+.exploracao-header, .quiz-header, .materiais-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.quiz-card-container {
+    background: rgba(25, 27, 34, 0.75);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 35px;
+    max-width: 650px;
+    margin: 0 auto 60px auto;
+}
+
+.pergunta-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pergunta-group select {
+    background: rgba(15, 16, 22, 0.8);
+    border: 1px solid var(--glass-border);
+    color: #ffffff;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.btn-submit-quiz {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--saturn-gold), #c59b27);
+    border: none;
+    border-radius: 10px;
+    color: #121318;
+    font-weight: bold;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-top: 15px;
+}
+
+.btn-submit-quiz:hover {
+    transform: translateY(-2px);
+}
+
+/* Grid do Guia de Materiais */
+.materiais-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.material-card {
+    background: rgba(38, 41, 52, 0.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.material-card:hover {
+    border-color: var(--saturn-gold);
+    transform: translateY(-5px);
+}
+
+.material-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.tecido-recomendado-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--saturn-gold);
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: left;
+}
