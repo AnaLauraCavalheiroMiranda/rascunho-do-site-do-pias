@@ -2,6 +2,76 @@
 let proximoIdCliente = 7; 
 let proximoIdAgendamento = 5;
 
+// Base de dados do Guia de Materiais
+const materiaisCelestine = [
+    {
+        id: "misterio",
+        nome: "Veludo Negro de Buraco Negro",
+        icone: "🌑",
+        tag: "Alta Densidade",
+        descricao: "Tecido de estrutura densa capaz de absorver 99% da luz ambiente. Projetado para trajes de alta imponência e presença marcante.",
+        caimento: "Estruturado / Pesado",
+        origem: "Órbita de Cygnus X-1",
+        brilho: "0% (Absorção Total)",
+        raridade: "Lendário"
+    },
+    {
+        id: "brilho",
+        nome: "Jacquard de Ouro Saturniano",
+        icone: "🪐",
+        tag: "Fios Metálicos",
+        descricao: "Fios de titânio e microcristais trançados com fibras nobres. Reflete gradientes dourados vibrantes conforme a luz do ambiente oscila.",
+        caimento: "Rígido / Imponente",
+        origem: "Anéis Internos de Saturno",
+        brilho: "95% (Reflexo Angular)",
+        raridade: "Raro"
+    },
+    {
+        id: "fluidez",
+        nome: "Seda Flutuante de Nebulosa",
+        icone: "✨",
+        tag: "Gravidade Zero",
+        descricao: "Seda ultraleve e translúcida que responde ao menor fluxo de ar, simulação visual contínua de gases cósmicos em flutuação.",
+        caimento: "Esvoaçante / Ultra Leve",
+        origem: "Nebulosa de Órion",
+        brilho: "60% (Suave / Etéreo)",
+        raridade: "Épico"
+    },
+    {
+        id: "plasma",
+        nome: "Manta Magnética Aurora",
+        icone: "🌌",
+        tag: "Termocrômico",
+        descricao: "Tecido inteligente que altera sua tonalidade entre tons de lavanda e ciano de acordo com a temperatura corporal do tripulante.",
+        caimento: "Moldável / Ajustável",
+        origem: "Magnetosfera Polar",
+        brilho: "80% (Iridescente)",
+        raridade: "Exclusivo"
+    },
+    {
+        id: "cristal",
+        nome: "Tule de Poeira Estelar",
+        icone: "💎",
+        tag: "Transparência",
+        descricao: "Tule finíssimo incrustado com micropartículas de quartzo estelar. Cria uma ilusão de constelações flutuando sobre a pele.",
+        caimento: "Vaporoso / Delicado",
+        origem: "Cinturão de Kuiper",
+        brilho: "100% (Ponto de Luz)",
+        raridade: "Raro"
+    },
+    {
+        id: "couro",
+        nome: "Couro Sintético de Asteroide",
+        icone: "☄️",
+        tag: "Escudo Térmico",
+        descricao: "Textura em relevo tridimensional com acabamento fosco. Oferece visual futurista urbano e proteção contra variações térmicas.",
+        caimento: "Firme / Esculpido",
+        origem: "Ateliê Orbital 09",
+        brilho: "15% (Acabamento Satim)",
+        raridade: "Comum"
+    }
+];
+
 // 1. Guardamos as estruturas das telas organizadas por chaves
 const telasCelestine = {
     'orbita': null, 
@@ -31,7 +101,6 @@ const telasCelestine = {
         </section>
     `,
 
-    // TELA REAJUSTADA: Títulos e subtítulos atualizados para focar no Pedido/Reserva
     'agendamento': `
         <section id="Agendamento" class="agendamento-section">
             <h3>🌙 Ciclos Lunares: Reservar Atendimento</h3>
@@ -87,7 +156,7 @@ const telasCelestine = {
         </section>
     `,
 
-   'colecoes': `
+    'colecoes': `
         <section class="catalogo-exclusivo-section">
             <div class="catalogo-header">
                 <h2>Boutique Interplanetária: Peças Únicas</h2>
@@ -95,7 +164,6 @@ const telasCelestine = {
             </div>
             
             <div id="galeria-p1" class="gallery galeria-orbital ativa"></div>
-
             <div id="galeria-p2" class="gallery galeria-orbital"></div>
 
             <div class="paginacao-container">
@@ -109,7 +177,8 @@ const telasCelestine = {
             </div>
         </section>
     `,
-'exploracao': `
+
+    'exploracao': `
         <section class="exploracao-section">
             <div class="exploracao-header">
                 <h2>🛰️ Centro de Exploração Cósmica</h2>
@@ -154,7 +223,7 @@ const telasCelestine = {
                             </select>
                         </div>
 
-                        <button type="submit" class="btn-submit-quiz">🚀 Iniciar Mapeamento da Aura</button>
+                        <button type="submit" class="btn-submit-quiz">🚀 Iniciar Mapeamento da Órbita</button>
                     </form>
                 </div>
 
@@ -167,18 +236,17 @@ const telasCelestine = {
                     <p>Conheça a física e o caimento dos tecidos raros tecidos no ateliê.</p>
                 </div>
 
-                <div id="grid-materiais" class="materiais-grid">
-                    </div>
+                <div id="grid-materiais" class="materiais-grid"></div>
             </div>
 
             <div style="text-align: center; margin-top: 50px;">
                 <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
             </div>
         </section>
-    `,
+    `
 };
 
-// 2. Inicialização do sistema assim que a página carrega
+// 2. Inicialização do sistema
 document.addEventListener("DOMContentLoaded", () => {
     telasCelestine['orbita'] = document.querySelector('main').innerHTML;
     configurarGatilhosNavegacao();
@@ -192,33 +260,153 @@ function configurarGatilhosNavegacao() {
     if (linkOrbita) linkOrbita.setAttribute('onclick', "event.preventDefault(); mudarTela('orbita');");
 
     const linkAtelie = document.querySelector('nav.desktop-nav a[href="#atelie"]');
-    if (linkAtelie) {
-        linkAtelie.setAttribute('onclick', "event.preventDefault(); mudarTela('atelie');");
-    }
+    if (linkAtelie) linkAtelie.setAttribute('onclick', "event.preventDefault(); mudarTela('atelie');");
 
-    // AJUSTE: Mapeando o clique do novo texto do link de Ciclos Lunares para abrir a tela de agendamentos
     const linkCiclosLunares = document.querySelector('nav.desktop-nav a[href="#Agendamento"]');
-    if (linkCiclosLunares) {
-        linkCiclosLunares.setAttribute('onclick', "event.preventDefault(); mudarTela('agendamento');");
-    }
+    if (linkCiclosLunares) linkCiclosLunares.setAttribute('onclick', "event.preventDefault(); mudarTela('agendamento');");
 
-    // No seu configurarGatilhosNavegacao():
-const linkExploracao = document.querySelector('nav.desktop-nav a[href="#Exploracao"]');
-if (linkExploracao) {
-    linkExploracao.setAttribute('onclick', "event.preventDefault(); mudarTela('exploracao');");
-}
+    const linkExploracao = document.querySelector('nav.desktop-nav a[href="#Exploracao"]');
+    if (linkExploracao) linkExploracao.setAttribute('onclick', "event.preventDefault(); mudarTela('exploracao');");
 
     const btnJornada = document.querySelector('.hero-content button');
     if (btnJornada) btnJornada.setAttribute('onclick', "mudarTela('login')");
 
-        // Faz o link "Coleções" carregar a nova tela em vez de rolar a página
-        const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
-        if (linkColecoes) {
-            linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
-        }
-    
+    const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
+    if (linkColecoes) linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
 }
-// ⚡ Função que consome o JSON e gera os mantos dinamicamente
+
+// Alternar entre as telas principais
+function mudarTela(nomeDaTela) {
+    const containerPrincipal = document.querySelector('main');
+    
+    if (telasCelestine[nomeDaTela]) {
+        const sidePanel = document.getElementById('sidePanel');
+        if (sidePanel && sidePanel.classList.contains('open')) {
+            sidePanel.classList.remove('open');
+        }
+
+        containerPrincipal.style.opacity = 0;
+        
+        setTimeout(() => {
+            containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
+            
+            // EXECUÇÃO DAS FUNÇÕES ESPECÍFICAS DE CADA TELA
+            if (nomeDaTela === 'orbita') {
+                configurarGatilhosNavegacao();
+            } else if (nomeDaTela === 'colecoes') {
+                carregarMantosDoJson();
+            } else if (nomeDaTela === 'exploracao') {
+                carregarGuiaMateriais(); // <--- CORRIGIDO: Chamas os materiais ao abrir a tela!
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            containerPrincipal.style.opacity = 1;
+        }, 200);
+    }
+}
+
+// Função para renderizar o Guia de Materiais
+function carregarGuiaMateriais() {
+    const grid = document.getElementById('grid-materiais');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    materiaisCelestine.forEach(mat => {
+        const raridadeClasse = mat.raridade ? mat.raridade.toLowerCase() : 'comum';
+
+        grid.innerHTML += `
+            <article class="material-card">
+                <div class="material-card-header">
+                    <span class="material-badge ${raridadeClasse}">${mat.raridade || 'Raro'}</span>
+                    <span class="material-tag">${mat.tag || 'Exclusivo'}</span>
+                </div>
+
+                <div class="material-icon">${mat.icone}</div>
+                <h4>${mat.nome}</h4>
+                <p class="material-desc">${mat.descricao}</p>
+
+                <div class="material-specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Caimento</span>
+                        <span class="spec-value">${mat.caimento}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Origem</span>
+                        <span class="spec-value">${mat.origem}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Luminosidade</span>
+                        <span class="spec-value">${mat.brilho || '100%'}</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-interagir-material" onclick="alert('⚡ Sintonizando amostra tátil de ${mat.nome}...')">
+                    🔍 Examinar Textura
+                </button>
+            </article>
+        `;
+    });
+}
+
+// Lógica do Quiz
+function calcularResultadoQuiz(event) {
+    event.preventDefault();
+
+    const p1 = document.getElementById('p1').value;
+    const p2 = document.getElementById('p2').value;
+    const p3 = document.getElementById('p3').value;
+
+    const contagem = { misterio: 0, brilho: 0, fluidez: 0 };
+    contagem[p1]++;
+    contagem[p2]++;
+    contagem[p3]++;
+
+    let perfilVencedor = 'misterio';
+    if (contagem.brilho > contagem[perfilVencedor]) perfilVencedor = 'brilho';
+    if (contagem.fluidez > contagem[perfilVencedor]) perfilVencedor = 'fluidez';
+
+    const materialRecomendado = materiaisCelestine.find(m => m.id === perfilVencedor) || materiaisCelestine[0];
+
+    const titulosEstilo = {
+        misterio: "🌘 Aura Eclipse (Misteriosa & Sóbria)",
+        brilho: "🪐 Aura Saturniana (Extravagante & Magnética)",
+        fluidez: "✨ Aura Etérea (Fluida & Iluminada)"
+    };
+
+    const containerResultado = document.getElementById('quiz-resultado');
+    const corpoQuiz = document.getElementById('quiz-corpo');
+
+    corpoQuiz.style.display = 'none';
+
+    containerResultado.innerHTML = `
+        <div class="resultado-box">
+            <h4>Seu Mapeamento Orbital:</h4>
+            <h2 class="estilo-titulo">${titulosEstilo[perfilVencedor]}</h2>
+            
+            <div class="tecido-recomendado-card">
+                <p><strong>Tecido Estelar Recomendado para a sua Aura:</strong></p>
+                <h3>${materialRecomendado.icone} ${materialRecomendado.nome}</h3>
+                <p>${materialRecomendado.descricao}</p>
+            </div>
+
+            <div class="resultado-acoes">
+                <button type="button" class="btn-submit-login" onclick="mudarTela('agendamento')">🌙 Agendar Manto com este Tecido</button>
+                <button type="button" class="btn-back-home" style="margin-top: 10px;" onclick="refazerQuiz()">🔄 Refazer Scanner</button>
+            </div>
+        </div>
+    `;
+
+    containerResultado.style.display = 'block';
+}
+
+function refazerQuiz() {
+    document.getElementById('quiz-corpo').style.display = 'block';
+    document.getElementById('quiz-resultado').style.display = 'none';
+    document.getElementById('form-quiz').reset();
+}
+
+// Carregar Coleções do JSON
 async function carregarMantosDoJson() {
     try {
         const resposta = await fetch('produtos.json');
@@ -246,7 +434,6 @@ async function carregarMantosDoJson() {
                 </article>
             `;
 
-            // Distribui 6 itens na primeira página e o restante na segunda
             if (index < 6) {
                 p1.innerHTML += cardHTML;
             } else {
@@ -257,31 +444,40 @@ async function carregarMantosDoJson() {
         console.error('Erro ao sintonizar o arquivo JSON de mantos:', erro);
     }
 }
-function mudarTela(nomeDaTela) {
-    const containerPrincipal = document.querySelector('main');
-    
-    if (telasCelestine[nomeDaTela]) {
-        const sidePanel = document.getElementById('sidePanel');
-        if (sidePanel && sidePanel.classList.contains('open')) {
-            sidePanel.classList.remove('open');
-        }
 
-        containerPrincipal.style.opacity = 0;
-        
+function alternarPaginaColecao(numeroPagina) {
+    const p1 = document.getElementById('galeria-p1');
+    const p2 = document.getElementById('galeria-p2');
+    const btnVoltar = document.getElementById('btn-voltar-ciclo');
+    const btnAvancar = document.getElementById('btn-avancar-ciclo');
+    const indicador = document.getElementById('indicador-orbita');
+
+    if (!p1 || !p2) return;
+
+    if (numeroPagina === 2) {
+        p1.classList.remove('ativa');
         setTimeout(() => {
-            containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
-            
-            if (nomeDaTela === 'orbita') {
-                configurarGatilhosNavegacao();
-            } else if (nomeDaTela === 'colecoes') {
-                carregarMantosDoJson(); // <--- INJEÇÃO DO JSON AQUI!
-            }
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            containerPrincipal.style.opacity = 1;
-        }, 200);
+            p2.classList.add('ativa');
+            indicador.textContent = "Órbita 2 de 2";
+            if (btnVoltar) btnVoltar.removeAttribute('disabled');
+            if (btnAvancar) btnAvancar.setAttribute('disabled', 'true');
+        }, 250);
+    } else {
+        p2.classList.remove('ativa');
+        setTimeout(() => {
+            p1.classList.add('ativa');
+            indicador.textContent = "Órbita 1 de 2";
+            if (btnVoltar) btnVoltar.setAttribute('disabled', 'true');
+            if (btnAvancar) btnAvancar.removeAttribute('disabled');
+        }, 250);
+    }
+
+    const topoBoutique = document.querySelector('.catalogo-header');
+    if (topoBoutique) {
+        topoBoutique.scrollIntoView({ behavior: 'smooth' });
     }
 }
+
 function processarAgendamentoEspacial(event) {
     event.preventDefault();
 
@@ -327,9 +523,12 @@ function autenticarTripulante(event) {
     alert(`Tripulante ${email} autenticado com sucesso!`);
     mudarTela('orbita');
 }
+
 // Efeito de rolagem orbital no cabeçalho
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
+    if (!header) return;
+    
     if (window.scrollY > 50) {
         header.style.padding = '14px 6%';
         header.style.background = 'rgba(25, 27, 34, 0.96)';
@@ -342,6 +541,7 @@ window.addEventListener('scroll', () => {
         header.style.boxShadow = 'none';
     }
 });
+
 // Rastro de Fótons Estelares no cursor
 document.addEventListener('mousemove', (e) => {
     const star = document.createElement('div');
@@ -368,206 +568,3 @@ document.addEventListener('mousemove', (e) => {
         star.remove();
     }, 800);
 });
-function revelarMantosEscondidos() {
-    // Seleciona todos os cards que possuem a classe oculta
-    const cardsExtras = document.querySelectorAll('.card-oculto');
-    const botaoVerMais = document.getElementById('btn-ver-mais');
-
-    cardsExtras.forEach((card, index) => {
-        // Revela o elemento no fluxo do HTML mudando o display via classe
-        card.classList.add('revelado');
-        
-        // Efeito Cascata: Adiciona um atraso milimétrico para cada card aparecer um depois do outro
-        card.style.transitionDelay = `${index * 150}ms`;
-    });
-
-    // Desintegra o botão de Ver Mais suavemente já que todo o acervo foi revelado
-    if (botaoVerMais) {
-        botaoVerMais.style.opacity = '0';
-        botaoVerMais.style.pointerEvents = 'none';
-        setTimeout(() => {
-            botaoVerMais.remove();
-        }, 400);
-    }
-}
-function alternarPaginaColecao(numeroPagina) {
-    const p1 = document.getElementById('galeria-p1');
-    const p2 = document.getElementById('galeria-p2');
-    const btnVoltar = document.getElementById('btn-voltar-ciclo');
-    const btnAvancar = document.getElementById('btn-avancar-ciclo');
-    const indicador = document.getElementById('indicador-orbita');
-
-    if (!p1 || !p2) return;
-
-    if (numeroPagina === 2) {
-        // Transição para a Página 2
-        p1.classList.remove('ativa');
-        setTimeout(() => {
-            p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
-            btnVoltar.removeAttribute('disabled');
-            btnAvancar.setAttribute('disabled', 'true');
-        }, 300);
-    } else {
-        // Retorno para a Página 1
-        p2.classList.remove('ativa');
-        setTimeout(() => {
-            p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
-            btnVoltar.setAttribute('disabled', 'true');
-            btnAvancar.removeAttribute('disabled');
-        }, 300);
-    }
-
-    // Move o foco de rolagem suavemente para o início do acervo
-    const topoColecoes = document.querySelector('.catalogo-header');
-    if (topoColecoes) topoColecoes.scrollIntoView({ behavior: 'smooth' });
-}
-function alternarPaginaColecao(numeroPagina) {
-    const p1 = document.getElementById('galeria-p1');
-    const p2 = document.getElementById('galeria-p2');
-    const btnVoltar = document.getElementById('btn-voltar-ciclo');
-    const btnAvancar = document.getElementById('btn-avancar-ciclo');
-    const indicador = document.getElementById('indicador-orbita');
-
-    // Validação de segurança se os elementos estão renderizados na tela
-    if (!p1 || !p2) return;
-
-    if (numeroPagina === 2) {
-        // Desativa a página 1 e aguarda a transição de opacidade para ligar a página 2
-        p1.classList.remove('ativa');
-        setTimeout(() => {
-            p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
-            if(btnVoltar) btnVoltar.removeAttribute('disabled');
-            if(btnAvancar) btnAvancar.setAttribute('disabled', 'true');
-        }, 250);
-    } else {
-        // Desativa a página 2 e volta para a página 1
-        p2.classList.remove('ativa');
-        setTimeout(() => {
-            p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
-            if(btnVoltar) btnVoltar.setAttribute('disabled', 'true');
-            if(btnAvancar) btnAvancar.removeAttribute('disabled');
-        }, 250);
-    }
-
-    // Rola a tela suavemente de volta para o topo da boutique após a mudança
-    const topoBoutique = document.querySelector('.catalogo-header');
-    if (topoBoutique) {
-        topoBoutique.scrollIntoView({ behavior: 'smooth' });
-        
-    } else if (nomeDaTela === 'colecoes') {
-    carregarMantosDoJson();
-}
-}
-// Base de dados do Guia de Materiais
-const materiaisCelestine = [
-    {
-        id: "misterio",
-        nome: "Veludo Negro de Buraco Negro",
-        icone: "🌑",
-        descricao: "Um veludo de alta densidade capaz de absorver 99% da luz ambiente. Confere toque aveludado, estrutura marcante e mistério absoluto.",
-        caimento: "Estruturado / Pesado",
-        origem: "Sintetizado sob alta pressão na Órbita de Cygnus X-1."
-    },
-    {
-        id: "brilho",
-        nome: "Jacquard de Titânio & Ouro Saturniano",
-        icone: "🪐",
-        descricao: "Fios metálicos trançados com fibras nobres. Reflete gradientes dourados conforme a luz do ambiente muda.",
-        caimento: "Rígido / Nobre",
-        origem: "Tecido artesanal nos anéis internos de Saturno."
-    },
-    {
-        id: "fluidez",
-        nome: "Seda Flutuante de Nebulosa",
-        icone: "✨",
-        descricao: "Seda ultraleve translúcida que reage ao menor movimento do ar. Imita o fluxo contínuo dos gases cósmicos em gravidade zero.",
-        caimento: "Esvoaçante / Leve",
-        origem: "Mapeado no coração da Nebulosa de Órion."
-    }
-];
-// 1. Função que renderiza a lista de materiais
-function carregarGuiaMateriais() {
-    const grid = document.getElementById('grid-materiais');
-    if (!grid) return;
-
-    grid.innerHTML = '';
-
-    materiaisCelestine.forEach(mat => {
-        grid.innerHTML += `
-            <article class="material-card">
-                <div class="material-icon">${mat.icone}</div>
-                <h4>${mat.nome}</h4>
-                <p class="material-desc">${mat.descricao}</p>
-                <div class="material-specs">
-                    <span><strong>Caimento:</strong> ${mat.caimento}</span>
-                    <span><strong>Origem:</strong> ${mat.origem}</span>
-                </div>
-            </article>
-        `;
-    });
-}
-
-// 2. Lógica do Quiz: Calcula a resposta predominante e revela o resultado
-function calcularResultadoQuiz(event) {
-    event.preventDefault();
-
-    const p1 = document.getElementById('p1').value;
-    const p2 = document.getElementById('p2').value;
-    const p3 = document.getElementById('p3').value;
-
-    // Contagem de votos para cada perfil
-    const contagem = { misterio: 0, brilho: 0, fluidez: 0 };
-    contagem[p1]++;
-    contagem[p2]++;
-    contagem[p3]++;
-
-    // Descobre qual categoria teve mais escolhas
-    let perfilVencedor = 'misterio';
-    if (contagem.brilho > contagem[perfilVencedor]) perfilVencedor = 'brilho';
-    if (contagem.fluidez > contagem[perfilVencedor]) perfilVencedor = 'fluidez';
-
-    // Busca o material associado
-    const materialRecomendado = materiaisCelestine.find(m => m.id === perfilVencedor);
-
-    // Títulos de estilo baseados no resultado
-    const titulosEstilo = {
-        misterio: "🌘 Aura Eclipse (Misteriosa & Sobria)",
-        brilho: "🪐 Aura Saturniana (Extravagante & Magnética)",
-        fluidez: "✨ Aura Etérea (Fluida & Iluminada)"
-    };
-
-    const containerResultado = document.getElementById('quiz-resultado');
-    const corpoQuiz = document.getElementById('quiz-corpo');
-
-    corpoQuiz.style.display = 'none'; // Oculta o formulário
-
-    containerResultado.innerHTML = `
-        <div class="resultado-box">
-            <h4>Seu Mapeamento Orbital:</h4>
-            <h2 class="estilo-titulo">${titulosEstilo[perfilVencedor]}</h2>
-            
-            <div class="tecido-recomendado-card">
-                <p><strong>Tecido Estelar Recomendado para a sua Aura:</strong></p>
-                <h3>${materialRecomendado.icone} ${materialRecomendado.nome}</h3>
-                <p>${materialRecomendado.descricao}</p>
-            </div>
-
-            <div class="resultado-acoes">
-                <button type="button" class="btn-submit-login" onclick="mudarTela('agendamento')">🌙 Agendar Manto com este Tecido</button>
-                <button type="button" class="btn-back-home" style="margin-top: 10px;" onclick="refazerQuiz()">🔄 Refazer Scanner</button>
-            </div>
-        </div>
-    `;
-
-    containerResultado.style.display = 'block';
-}
-
-function refazerQuiz() {
-    document.getElementById('quiz-corpo').style.display = 'block';
-    document.getElementById('quiz-resultado').style.display = 'none';
-    document.getElementById('form-quiz').reset();
-}

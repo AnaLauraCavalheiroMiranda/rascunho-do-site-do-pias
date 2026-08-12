@@ -1174,3 +1174,123 @@ form select:focus {
     border-radius: 8px;
     text-align: left;
 }
+/* --- GUIA DE MATERIAIS EXPANDIDO --- */
+.materiais-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 25px;
+}
+
+.material-card {
+    background: rgba(22, 24, 33, 0.75);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.35s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.material-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--saturn-gold);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.15);
+}
+
+.material-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.material-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+.material-badge.lendário { background: rgba(255, 0, 128, 0.2); color: #ff3399; border: 1px solid #ff3399; }
+.material-badge.épico { background: rgba(157, 78, 221, 0.2); color: #c77dff; border: 1px solid #c77dff; }
+.material-badge.raro { background: rgba(212, 175, 55, 0.2); color: var(--saturn-gold); border: 1px solid var(--saturn-gold); }
+.material-badge.exclusivo { background: rgba(0, 240, 255, 0.2); color: #00f0ff; border: 1px solid #00f0ff; }
+.material-badge.comum { background: rgba(255, 255, 255, 0.1); color: #ccc; border: 1px solid #666; }
+
+.material-tag {
+    font-size: 0.8rem;
+    color: var(--lavender-glow);
+    font-style: italic;
+}
+
+.material-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin: 10px 0;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
+.material-card h4 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.material-desc {
+    font-size: 0.9rem;
+    color: #b3b8c8;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.material-specs-grid {
+    background: rgba(10, 11, 16, 0.5);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spec-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+}
+
+.spec-label {
+    color: #8a8f9e;
+}
+
+.spec-value {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.btn-interagir-material {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--lavender-glow);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-interagir-material:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--saturn-gold);
+    color: #ffffff;
+}
