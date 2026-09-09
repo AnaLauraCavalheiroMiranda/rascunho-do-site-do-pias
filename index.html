@@ -156,5 +156,51 @@
             sidePanel.classList.toggle('open');
         }
     </script>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Celestine Ateliê - Confecção Orbital</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    
+        <!-- CABEÇALHO COM MENU HAMBÚRGUER -->
+        <header class="header-container">
+            <div class="logo" onclick="mudarTela('orbita')">
+                <span>✨</span> Celestine Ateliê
+            </div>
+    
+            <nav class="desktop-nav">
+                <button onclick="mudarTela('orbita')">🪐 Início</button>
+                <button onclick="mudarTela('colecoes')">🌌 Coleções</button>
+                <button onclick="mudarTela('pedidos')">📦 Caixa de Pedidos</button>
+                <button onclick="mudarTela('agendamento')">🌙 Agendar</button>
+            </nav>
+    
+            <button class="btn-hamburger" id="hamburgerBtn" onclick="toggleMenu()">☰</button>
+        </header>
+    
+        <!-- MENU PAINEL LATERAL (MOBILE) -->
+        <div id="sidePanel" class="side-panel">
+            <button class="btn-close" onclick="toggleMenu()">×</button>
+            <nav class="mobile-nav">
+                <a href="#" onclick="mudarTela('orbita'); toggleMenu();">🪐 Início</a>
+                <a href="#" onclick="mudarTela('colecoes'); toggleMenu();">🌌 Coleções</a>
+                <a href="#" onclick="mudarTela('pedidos'); toggleMenu();">📦 Caixa de Pedidos</a>
+                <a href="#" onclick="mudarTela('agendamento'); toggleMenu();">🌙 Agendar Atendimento</a>
+            </nav>
+        </div>
+    
+        <!-- CONTEÚDO DINÂMICO DA APLICAÇÃO -->
+        <main id="main-content">
+            <!-- O conteúdo será renderizado dinamicamente pelo script.js -->
+        </main>
+    
+        <script src="script.js"></script>
+    </body>
+    </html>
+</section>
 </body>
 </html>

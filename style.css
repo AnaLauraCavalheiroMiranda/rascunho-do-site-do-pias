@@ -1408,3 +1408,341 @@ form select:focus {
     display: flex;
     flex-direction: column;
 }
+
+
+:root {
+    --bg-dark: #0a0b10;
+    --card-bg: rgba(22, 24, 33, 0.85);
+    --saturn-gold: #d4af37;
+    --lavender: #c8b6ff;
+    --glass-border: rgba(212, 175, 55, 0.25);
+    --text-light: #e0e4f0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+}
+
+/* HEADER & NAVBAR */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+    background: rgba(10, 11, 16, 0.9);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--saturn-gold);
+    cursor: pointer;
+}
+
+.desktop-nav button {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    margin-left: 20px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.desktop-nav button:hover {
+    color: var(--saturn-gold);
+}
+
+.btn-hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--saturn-gold);
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+/* SIDE PANEL MOBILE */
+.side-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 250px;
+    height: 100%;
+    background: var(--bg-dark);
+    border-left: 1px solid var(--saturn-gold);
+    padding: 30px 20px;
+    transition: right 0.3s ease;
+    z-index: 200;
+}
+
+.side-panel.active {
+    right: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: var(--saturn-gold);
+    font-size: 2rem;
+    float: right;
+    cursor: pointer;
+}
+
+.mobile-nav {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mobile-nav a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+/* SEÇÃO HERO (INÍCIO) */
+.hero-section {
+    text-align: center;
+    padding: 100px 5%;
+}
+
+.hero-section h1 {
+    font-size: 2.8rem;
+    color: var(--saturn-gold);
+    margin-bottom: 15px;
+}
+
+.hero-section p {
+    font-size: 1.1rem;
+    color: #a0a5b5;
+    margin-bottom: 30px;
+}
+
+/* BOTÕES GERAIS */
+.btn-primary, .btn-secondary, .btn-submit {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.btn-primary, .btn-submit {
+    background: var(--saturn-gold);
+    color: #000;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--saturn-gold);
+    color: var(--saturn-gold);
+    margin-left: 10px;
+}
+
+.btn-primary:hover, .btn-submit:hover {
+    transform: scale(1.03);
+}
+
+/* CARDS DE PRODUTOS (VITRINE) */
+.colecoes-section, .pedidos-section, .agendamento-section, .detalhes-section {
+    padding: 50px 8%;
+}
+
+.subtitulo {
+    color: #a0a5b5;
+    margin-top: 5px;
+    margin-bottom: 30px;
+}
+
+.grid-produtos, .pedidos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.manto-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.manto-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--saturn-gold);
+}
+
+.manto-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.manto-info {
+    padding: 20px;
+}
+
+.manto-info h3 {
+    color: var(--saturn-gold);
+    margin-bottom: 8px;
+}
+
+.manto-info p {
+    color: #b0b5c5;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.manto-preco {
+    font-weight: bold;
+    color: #fff;
+}
+
+/* FORMULÁRIO DE AGENDAMENTO */
+.form-card {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--saturn-gold);
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.form-card h2 {
+    color: var(--saturn-gold);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.campo-grupo label {
+    font-size: 0.88rem;
+    margin-bottom: 5px;
+    color: var(--lavender);
+}
+
+.campo-grupo input, .campo-grupo select {
+    padding: 10px;
+    border-radius: 6px;
+    background: rgba(10, 11, 16, 0.8);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+}
+
+/* TELA DE DETALHES */
+.detalhes-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.detalhes-container img {
+    max-width: 400px;
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.detalhes-conteudo {
+    flex: 1;
+}
+
+.btn-voltar {
+    background: none;
+    border: none;
+    color: var(--saturn-gold);
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+/* TELA DE COMPROVANTE DE AGENDAMENTO */
+.confirmacao-section {
+    display: flex;
+    justify-content: center;
+    padding: 60px 5%;
+}
+
+.confirmacao-card {
+    max-width: 550px;
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--saturn-gold);
+    border-radius: 15px;
+    padding: 35px;
+    text-align: center;
+}
+
+.comprovante-box {
+    background: rgba(10, 11, 16, 0.7);
+    border: 1px dashed var(--glass-border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.comprovante-box p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+/* CAIXA DE PEDIDOS */
+.pedido-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.pedido-card-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.status-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--saturn-gold);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.pedido-vazio-card, .erro-msg {
+    text-align: center;
+    padding: 40px;
+    color: #a0a5b5;
+}
+
+@media (max-width: 768px) {
+    .desktop-nav { display: none; }
+    .btn-hamburger { display: block; }
+}
