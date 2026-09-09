@@ -1,193 +1,125 @@
-const http = require('http');
+const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const app = express();
 
-const hostname = '127.0.0.1';
-const port = 3000;
+// Middlewares
+app.use(express.json());
+app.use(express.static('.')); // Servir os arquivos HTML/CSS/JS do front-end
 
-const db = new sqlite3.Database('./enderecos.db');
+// Conexão com o banco de dados SQLite
+const db = new sqlite3.Database('./database.db', (err) => {
+    if (err) {
+        console.error('Erro ao conectar ao banco de dados:', err.message);
+    } else {
+        console.log('⚡ Conectado ao banco de dados SQLite!');
+    }
+});
 
-// Inicialização e criação do schema de banco de dados
+// Criar as tabelas no banco de dados se não existirem
 db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS endereco (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        rua TEXT NOT NULL,
-        numero INTEGER NOT NULL
-    )`);
-
+    // Tabela de Clientes
     db.run(`CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        gmail TEXT NOT NULL UNIQUE,
-        data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP,
-        endereco_id INTEGER NOT NULL,
-        FOREIGN KEY (endereco_id) REFERENCES endereco(id)
+        email TEXT UNIQUE NOT NULL
     )`);
 
-    db.run(`CREATE TABLE IF NOT EXISTS produtos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        preco REAL NOT NULL CHECK(preco >= 0),
-        estoque INTEGER NOT NULL DEFAULT 0
-    )`);
-
+    // Tabela de Pedidos
     db.run(`CREATE TABLE IF NOT EXISTS pedidos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente_id INTEGER NOT NULL,
-        data_pedido TEXT DEFAULT CURRENT_TIMESTAMP,
-        total REAL NOT NULL DEFAULT 0.0,
-        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
-    )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS itens_pedido (
-        pedido_id INTEGER NOT NULL,
-        produto_id INTEGER NOT NULL,
-        quantidade INTEGER NOT NULL CHECK(quantidade > 0),
-        preco_unitario REAL NOT NULL,
-        PRIMARY KEY (pedido_id, produto_id),
-        FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
-        FOREIGN KEY (produto_id) REFERENCES produtos(id)
-    )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS agendamento (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente_id INTEGER NOT NULL,
-        endereco_id INTEGER NOT NULL,
-        estilo_preferencia TEXT NOT NULL CHECK(estilo_preferencia IN ('minimalista', 'brilhante', 'futurista')),
-        data_solicitacao TEXT DEFAULT CURRENT_TIMESTAMP,
-        status_triagem TEXT DEFAULT 'Pendente' CHECK(status_triagem IN ('Pendente', 'Confirmado', 'Em Orbita')),
-        FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-        FOREIGN KEY (endereco_id) REFERENCES endereco(id) ON DELETE CASCADE
+        nome_cliente TEXT NOT NULL,
+        email TEXT NOT NULL,
+        estilo TEXT NOT NULL,
+        data DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 });
 
-const server = http.createServer((req, res) => {
-    // Configurações de CORS para integração com o front-end
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+// ==========================================
+// ROTAS DE CLIENTES
+// ==========================================
 
-    if (req.method === 'OPTIONS') {
-        res.statusCode = 204;
-        res.end();
-        return;
+// POST: Cadastrar um novo cliente diretamente
+app.post('/api/clientes', (req, res) => {
+    const { nome, email } = req.body;
+
+    if (!nome || !email) {
+        return res.status(400).json({ erro: 'Por favor, informe nome e e-mail.' });
     }
 
-    // ROTA GET /pedidos
-    if (req.method === 'GET' && req.url === '/pedidos') {
-        const sql = `
-            SELECT 
-                p.id AS numero_pedido,
-                c.nome AS cliente,
-                prod.nome AS produto,
-                ip.quantidade,
-                ip.preco_unitario,
-                (ip.quantidade * ip.preco_unitario) AS subtotal_item
-            FROM pedidos p
-            INNER JOIN clientes c ON p.cliente_id = c.id
-            INNER JOIN itens_pedido ip ON p.id = ip.pedido_id
-            INNER JOIN produtos prod ON ip.produto_id = prod.id
-            ORDER BY p.id ASC;
-        `;
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                res.statusCode = 500;
-                res.end(JSON.stringify({ erro: err.message }));
-                return;
+    const sql = 'INSERT INTO clientes (nome, email) VALUES (?, ?)';
+    db.run(sql, [nome, email], function (err) {
+        if (err) {
+            if (err.message.includes('UNIQUE')) {
+                return res.status(400).json({ erro: 'Este e-mail já está cadastrado!' });
             }
-            res.statusCode = 200;
-            res.end(JSON.stringify(rows));
+            return res.status(500).json({ erro: 'Erro ao cadastrar cliente.', detalhes: err.message });
+        }
+
+        res.status(201).json({
+            mensagem: 'Cliente cadastrado com sucesso!',
+            id: this.lastID,
+            nome,
+            email
         });
-    } 
-    // ROTA GET /agendamentos
-    else if (req.method === 'GET' && req.url === '/agendamentos') {
-        const sql = `
-            SELECT 
-                a.id AS protocolo,
-                c.nome AS nome_cliente,
-                c.gmail AS frequencia_digital,
-                CASE 
-                    WHEN a.estilo_preferencia = 'minimalista' THEN '🌘 Eclipse (Minimalista)'
-                    WHEN a.estilo_preferencia = 'brilhante' THEN '🪐 Saturniano (Brilhante)'
-                    WHEN a.estilo_preferencia = 'futurista' THEN '✨ Via Láctea (Futurista)'
-                    ELSE a.estilo_preferencia
-                END AS armadura_escolhida,
-                a.data_solicitacao AS data_sinal,
-                a.status_triagem AS status_missao
-            FROM agendamento a
-            INNER JOIN clientes c ON a.cliente_id = c.id
-            ORDER BY a.data_solicitacao ASC;
-        `;
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                res.statusCode = 500;
-                res.end(JSON.stringify({ erro: err.message }));
-                return;
-            }
-            res.statusCode = 200;
-            res.end(JSON.stringify(rows));
-        });
-    }
-    // ROTA POST /agendamentos
-    else if (req.method === 'POST' && req.url === '/agendamentos') {
-        let body = '';
-        req.on('data', chunk => { body += chunk; });
-        req.on('end', () => {
-            try {
-                const { nome, gmail, rua, numero, estilo_preferencia } = JSON.parse(body);
-
-                // Garante que a preferência seja tratada em minúsculo
-                let estiloValido = (estilo_preferencia || 'minimalista').toLowerCase();
-                if (!['minimalista', 'brilhante', 'futurista'].includes(estiloValido)) {
-                    estiloValido = 'minimalista';
-                }
-
-                db.run(`INSERT INTO endereco (rua, numero) VALUES (?, ?)`, [rua || 'Rua Orbitada', parseInt(numero) || 100], function (err) {
-                    if (err) {
-                        res.statusCode = 500;
-                        return res.end(JSON.stringify({ erro: err.message }));
-                    }
-                    const enderecoId = this.lastID;
-
-                    db.run(`INSERT INTO clientes (nome, gmail, endereco_id) VALUES (?, ?, ?)`, [nome, gmail, enderecoId], function (err) {
-                        let clienteId = this ? this.lastID : null;
-
-                        const registrarAgendamento = (cId) => {
-                            const sqlAgendamento = `INSERT INTO agendamento (cliente_id, endereco_id, estilo_preferencia, status_triagem) VALUES (?, ?, ?, 'Pendente')`;
-                            db.run(sqlAgendamento, [cId, enderecoId, estiloValido], function (err) {
-                                if (err) {
-                                    res.statusCode = 500;
-                                    return res.end(JSON.stringify({ erro: err.message }));
-                                }
-                                res.statusCode = 201;
-                                res.end(JSON.stringify({ status: 'Sucesso', agendamento_id: this.lastID }));
-                            });
-                        };
-
-                        if (err) {
-                            db.get(`SELECT id FROM clientes WHERE gmail = ?`, [gmail], (err, row) => {
-                                if (err || !row) {
-                                    res.statusCode = 500;
-                                    return res.end(JSON.stringify({ erro: 'Erro ao encontrar registro de cliente.' }));
-                                }
-                                registrarAgendamento(row.id);
-                            });
-                        } else {
-                            registrarAgendamento(clienteId);
-                        }
-                    });
-                });
-            } catch (e) {
-                res.statusCode = 400;
-                res.end(JSON.stringify({ erro: 'Formato JSON inválido.' }));
-            }
-        });
-    } else {
-        res.statusCode = 404;
-        res.end(JSON.stringify({ erro: 'Rota não encontrada.' }));
-    }
+    });
 });
 
-server.listen(port, hostname, () => {
-    console.log(`✨ Servidor do Celestine Ateliê rodando em http://${hostname}:${port}/`);
+// GET: Consultar todos os clientes (para o Modal de Clientes)
+app.get('/api/clientes', (req, res) => {
+    const sql = 'SELECT * FROM clientes ORDER BY id DESC';
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao consultar clientes.', detalhes: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+// ==========================================
+// ROTAS DE PEDIDOS
+// ==========================================
+
+// POST: Criar novo pedido (e auto-cadastrar cliente se não existir)
+app.post('/api/pedidos', (req, res) => {
+    const { nome, email, estilo } = req.body;
+
+    if (!nome || !email || !estilo) {
+        return res.status(400).json({ erro: 'Por favor, preencha todos os campos do pedido.' });
+    }
+
+    // 1. Cadastra o cliente automaticamente se ainda não existir
+    db.run('INSERT OR IGNORE INTO clientes (nome, email) VALUES (?, ?)', [nome, email]);
+
+    // 2. Grava o pedido na tabela pedidos
+    const sqlPedido = 'INSERT INTO pedidos (nome_cliente, email, estilo) VALUES (?, ?, ?)';
+    db.run(sqlPedido, [nome, email, estilo], function (err) {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao salvar pedido.', detalhes: err.message });
+        }
+
+        res.status(201).json({
+            mensagem: 'Pedido registrado com sucesso!',
+            id: this.lastID,
+            nome_cliente: nome,
+            email,
+            estilo
+        });
+    });
+});
+
+// GET: Consultar todos os pedidos (para o Modal de Pedidos)
+app.get('/api/pedidos', (req, res) => {
+    const sql = 'SELECT * FROM pedidos ORDER BY id DESC';
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao consultar pedidos.', detalhes: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+// Inicialização do servidor
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
