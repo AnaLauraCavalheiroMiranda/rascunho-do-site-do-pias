@@ -1491,3 +1491,54 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     color: #ffd700;
     border: 1px solid #ffd700;
 }
+.nav-admin-link {
+    color: #ffc107 !important;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-admin-link:hover {
+    background: rgba(255, 193, 7, 0.2);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}
+.badge-status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-pendente {
+    background: #ffd70022;
+    color: #ffd700;
+    border: 1px solid #ffd700;
+}
+
+.badge-aprovado {
+    background: #28a74522;
+    color: #2ebd59;
+    border: 1px solid #2ebd59;
+}
+
+.badge-recusado {
+    background: #dc354522;
+    color: #ff5252;
+    border: 1px solid #ff5252;
+}
+
+.nav-admin-link {
+    color: #ffc107 !important;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.nav-admin-link:hover {
+    background: rgba(255, 193, 7, 0.2);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}

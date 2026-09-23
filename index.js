@@ -42,7 +42,7 @@ db.serialize(() => {
 // ROTAS DE CLIENTES
 // ==========================================
 
-// POST: Cadastrar um novo cliente diretamente
+// POST: Cadastrar um novo cliente
 app.post('/api/clientes', (req, res) => {
     const { nome, email } = req.body;
 
@@ -80,10 +80,10 @@ app.get('/api/clientes', (req, res) => {
 });
 
 // ==========================================
-// ROTAS DE PEDIDOS
+// ROTAS DE PEDIDOS E ADMIN
 // ==========================================
 
-// POST: Criar novo pedido (e auto-cadastrar cliente se não existir)
+// POST: Criar novo pedido
 app.post('/api/pedidos', (req, res) => {
     const { nome, email, estilo } = req.body;
 
@@ -91,10 +91,6 @@ app.post('/api/pedidos', (req, res) => {
         return res.status(400).json({ erro: 'Por favor, preencha todos os campos do pedido.' });
     }
 
-    // 1. Cadastra o cliente automaticamente se ainda não existir
-    db.run('INSERT OR IGNORE INTO clientes (nome, email) VALUES (?, ?)', [nome, email]);
-
-    // 2. Grava o pedido na tabela pedidos
     const sqlPedido = 'INSERT INTO pedidos (nome_cliente, email, estilo) VALUES (?, ?, ?)';
     db.run(sqlPedido, [nome, email, estilo], function (err) {
         if (err) {
@@ -122,7 +118,40 @@ app.get('/api/pedidos', (req, res) => {
     });
 });
 
-// Inicialização do servidor
+// PUT: Alterar o status do pedido (Aprovado / Recusado / Pendente)
+app.put('/api/pedidos/:id/status', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const query = `UPDATE pedidos SET status = ? WHERE id = ?`;
+    db.run(query, [status, id], function (err) {
+        if (err) {
+            return res.status(500).json({ erro: err.message });
+        }
+        res.json({ mensagem: `Pedido #${id} alterado para ${status}!` });
+    });
+});
+
+// GET: Estatísticas para o painel admin e gráfico
+app.get('/api/admin/estatisticas', (req, res) => {
+    const query = `
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'Pendente' OR status IS NULL THEN 1 ELSE 0 END) as pendentes,
+            SUM(CASE WHEN status = 'Aprovado' THEN 1 ELSE 0 END) as aprovados,
+            SUM(CASE WHEN status = 'Recusado' THEN 1 ELSE 0 END) as recusados
+        FROM pedidos
+    `;
+
+    db.get(query, [], (err, row) => {
+        if (err) {
+            return res.status(500).json({ erro: err.message });
+        }
+        res.json(row || { total: 0, pendentes: 0, aprovados: 0, recusados: 0 });
+    });
+});
+
+// Inicialização do servidor no final do arquivo
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);

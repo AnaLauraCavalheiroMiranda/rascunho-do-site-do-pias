@@ -84,7 +84,55 @@ const materiaisCelestine = [
 
 const telasCelestine = {
     'orbita': null, 
-    
+    'admin' : `
+    <section class="admin-dashboard-section" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="admin-header" style="text-align: center; margin-bottom: 30px;">
+            <h2>🛸 Centro de Comando Orbital (Admin)</h2>
+            <p>Gerenciamento de chamados, fluxo do mês e aprovação de encomendas.</p>
+        </div>
+
+        <!-- CARDS DE MÉTRICAS -->
+        <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border); text-align: center;">
+                <small>Total de Pedidos</small>
+                <h3 id="metric-total" style="font-size: 2em; margin: 5px 0;">0</h3>
+            </div>
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #ffc107; text-align: center;">
+                <small>⌛ Pendentes</small>
+                <h3 id="metric-pendentes" style="font-size: 2em; margin: 5px 0; color: #ffc107;">0</h3>
+            </div>
+            <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #28a745; text-align: center;">
+                <small>✅ Aprovados</small>
+                <h3 id="metric-aprovados" style="font-size: 2em; margin: 5px 0; color: #28a745;">0</h3>
+            </div>
+        </div>
+
+        <!-- PAINEL DUPLO: GRÁFICO E CALENDÁRIO -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <!-- GRÁFICO -->
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <h3>📊 Distribuição dos Pedidos</h3>
+                <canvas id="graficoPedidos" style="max-height: 250px;"></canvas>
+            </div>
+
+            <!-- CALENDÁRIO MENSAL -->
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <h3 id="titulo-calendario">🗓️ Calendário de Atendimento</h3>
+                <div id="grid-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; text-align: center;"></div>
+            </div>
+        </div>
+
+        <!-- TABELA DE GESTÃO DE PEDIDOS -->
+        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+            <h3>📜 Pedidos Cadastrados</h3>
+            <div id="tabela-pedidos-admin" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+        </div>
+    </section>
+`,
     'login': `
         <section class="login-section">
             <div class="login-box">
@@ -253,6 +301,7 @@ const telasCelestine = {
             </div>
         </section>
     `
+    
 };
 
 // ==========================================
@@ -276,6 +325,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (linkClientes) {
         linkClientes.setAttribute('onclick', "event.preventDefault(); abrirCaixaDeClientes();");
     }
+
+    const linkAdmin = document.querySelector('a[href="#admin"]');
+    if (linkAdmin) linkAdmin.setAttribute('onclick', "event.preventDefault(); mudarTela('admin');");
+
 });
 
 function configurarGatilhosNavegacao() {
@@ -321,7 +374,9 @@ function mudarTela(nomeDaTela) {
                 carregarMantosDoJson();
             } else if (nomeDaTela === 'exploracao') {
                 carregarGuiaMateriais();
-            }
+            } else if (nomeDaTela === 'admin') {
+                carregarPainelAdmin();
+}
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
             containerPrincipal.style.opacity = 1;
@@ -783,4 +838,125 @@ async function carregarClientesDoBanco() {
     } catch (erro) {
         container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao consultar a lista de clientes.</p>';
     }
+}
+// Função principal para carregar o Painel Admin
+async function carregarPainelAdmin() {
+    await carregarMetricasEGrafico();
+    await carregarTabelaAdmin();
+    gerarCalendarioOrbital();
+}
+
+// 1. Carrega métricas e renderiza o gráfico com Chart.js
+async function carregarMetricasEGrafico() {
+    try {
+        const res = await fetch(`${API_URL}/admin/estatisticas`);
+        const dados = await res.json();
+
+        document.getElementById('metric-total').innerText = dados.total || 0;
+        document.getElementById('metric-pendentes').innerText = dados.pendentes || 0;
+        document.getElementById('metric-aprovados').innerText = dados.aprovados || 0;
+
+        const ctx = document.getElementById('graficoPedidos');
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pendentes', 'Aprovados', 'Recusados'],
+                datasets: [{
+                    data: [dados.pendentes || 0, dados.aprovados || 0, dados.recusados || 0],
+                    backgroundColor: ['#ffc107', '#28a745', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#ffffff' } }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Erro ao carregar estatísticas:', err);
+    }
+}
+
+// 2. Carrega lista de pedidos com botões de Aprovar / Recusar
+async function carregarTabelaAdmin() {
+    const container = document.getElementById('tabela-pedidos-admin');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`${API_URL}/pedidos`);
+        const pedidos = await res.json();
+
+        if (pedidos.length === 0) {
+            container.innerHTML = '<p style="text-align:center;">Nenhum pedido encontrado.</p>';
+            return;
+        }
+
+        container.innerHTML = pedidos.map(p => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                <div>
+                    <strong>#${p.id} - ${p.nome_cliente}</strong> (${p.email})<br>
+                    <small>✨ Estilo: ${p.estilo} | Status: <b>${p.status || 'Pendente'}</b></small>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">✅ Aprovar</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">❌ Recusar</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        container.innerHTML = '<p style="color: #ff6b6b;">Erro ao buscar pedidos.</p>';
+    }
+}
+
+// 3. Atualizar status no banco de dados SQLite
+async function atualizarStatusPedido(id, novoStatus) {
+    try {
+        const res = await fetch(`${API_URL}/pedidos/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: novoStatus })
+        });
+
+        if (res.ok) {
+            alert(`Pedido #${id} ${novoStatus} com sucesso!`);
+            carregarPainelAdmin(); // Recarrega os dados sem atualizar a página
+        } else {
+            alert('Erro ao atualizar o status.');
+        }
+    } catch (err) {
+        alert('Falha na conexão com o servidor.');
+    }
+}
+
+// 4. Renderiza o calendário do mês atual
+function gerarCalendarioOrbital() {
+    const container = document.getElementById('grid-calendario');
+    const titulo = document.getElementById('titulo-calendario');
+    if (!container) return;
+
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = agora.getMonth();
+
+    const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    titulo.innerText = `🗓️ ${nomesMeses[mes]} / ${ano}`;
+
+    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const hoje = agora.getDate();
+
+    let html = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => `<strong style="font-size:0.8em; opacity:0.7;">${d}</strong>`).join('');
+
+    for (let dia = 1; dia <= diasNoMes; dia++) {
+        const isHoje = dia === hoje;
+        const bg = isHoje ? 'var(--saturn-gold, #ffd700)' : 'rgba(255,255,255,0.05)';
+        const corTexto = isHoje ? '#000' : '#fff';
+
+        html += `<div style="background: ${bg}; color: ${corTexto}; padding: 8px 0; border-radius: 4px; font-weight: bold; font-size: 0.9em;">${dia}</div>`;
+    }
+
+    container.innerHTML = html;
 }
