@@ -1,3 +1,10 @@
+// ==========================================
+// 1. VARIÁVEIS GLOBAIS E BASE DE DADOS
+// ==========================================
+
+const API_URL = 'http://localhost:3000/api';
+let produtosGlobais = [];
+
 // Função do Menu Lateral
 function toggleMenu() {
     const sidePanel = document.getElementById('sidePanel');
@@ -5,13 +12,6 @@ function toggleMenu() {
         sidePanel.classList.toggle('open');
     }
 }
-/* ==========================================================================
-   1. VARIÁVEIS GLOBAIS E BASE DE DADOS
-   ========================================================================== */
-
-let produtosGlobais = [];
-let proximoIdCliente = 7; 
-let proximoIdAgendamento = 5;
 
 const materiaisCelestine = [
     {
@@ -94,14 +94,14 @@ const telasCelestine = {
                 </div>
                 <form id="form-login" onsubmit="autenticarTripulante(event)">
                     <div class="input-group">
+                        <label for="login-nome">👤 Nome do Tripulante</label>
+                        <input type="text" id="login-nome" required placeholder="Comandante Silva">
+                    </div>
+                    <div class="input-group">
                         <label for="login-email">📡 Frequência Digital Coordenada (E-mail)</label>
                         <input type="email" id="login-email" required placeholder="comandante@galaxia.com">
                     </div>
-                    <div class="input-group">
-                        <label for="login-password">🔑 Chave Criptográfica Estelar (Senha)</label>
-                        <input type="password" id="password" required placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="btn-submit-login">Autenticar Assinatura</button>
+                    <button type="submit" class="btn-submit-login">Cadastrar / Autenticar Assinatura</button>
                 </form>
                 <div class="login-footer">
                     <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
@@ -255,13 +255,27 @@ const telasCelestine = {
     `
 };
 
-/* ==========================================================================
-   2. INICIALIZAÇÃO E GERENCIAMENTO DE TELAS
-   ========================================================================== */
+// ==========================================
+// 2. INICIALIZAÇÃO E GERENCIAMENTO DE TELAS
+// ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    telasCelestine['orbita'] = document.querySelector('main').innerHTML;
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+        telasCelestine['orbita'] = mainEl.innerHTML;
+    }
     configurarGatilhosNavegacao();
+    
+    // Atualizar os links do menu lateral
+    const linkPedidos = document.querySelector('aside#sidePanel a[href="#pedidos"]');
+    if (linkPedidos) {
+        linkPedidos.setAttribute('onclick', "event.preventDefault(); abrirCaixaDePedidos();");
+    }
+
+    const linkClientes = document.querySelector('aside#sidePanel a[href="#clientes"]');
+    if (linkClientes) {
+        linkClientes.setAttribute('onclick', "event.preventDefault(); abrirCaixaDeClientes();");
+    }
 });
 
 function configurarGatilhosNavegacao() {
@@ -315,9 +329,9 @@ function mudarTela(nomeDaTela) {
     }
 }
 
-/* ==========================================================================
-   3. MÓDULO: COLEÇÕES E DETALHES DO PRODUTO
-   ========================================================================== */
+// ==========================================
+// 3. COLEÇÕES E DETALHES DO PRODUTO
+// ==========================================
 
 async function carregarMantosDoJson() {
     try {
@@ -475,9 +489,9 @@ function acionarAtendimentoPersonalizado(nomeProduto) {
     window.open(urlWhatsapp, '_blank');
 }
 
-/* ==========================================================================
-   4. MÓDULO: EXPLORAÇÃO, QUIZ E MATERIAIS
-   ========================================================================== */
+// ==========================================
+// 4. EXPLORAÇÃO, QUIZ E MATERIAIS
+// ==========================================
 
 function carregarGuiaMateriais() {
     const grid = document.getElementById('grid-materiais');
@@ -578,59 +592,67 @@ function refazerQuiz() {
     document.getElementById('form-quiz').reset();
 }
 
-/* ==========================================================================
-   5. MÓDULO: FORMULÁRIOS E AUTENTICAÇÃO
-   ========================================================================== */
+// ==========================================
+// 5. ENVIO DE FORMULÁRIOS & AUTENTICAÇÃO
+// ==========================================
 
-function processarAgendamentoEspacial(event) {
+// Enviar pedido para o banco de dados SQLite
+async function processarAgendamentoEspacial(event) {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const estilo = document.getElementById('Estilo').value;
 
-    const dadosClienteSimulados = {
-        id_cliente: proximoIdCliente++,
-        nome_cliente: nome,
-        frequencia_digital: email
-    };
+    try {
+        const resposta = await fetch(`${API_URL}/pedidos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, estilo })
+        });
 
-    const dadosAgendamentoSimulados = {
-        id_agendamento: proximoIdAgendamento++,
-        cliente_id: dadosClienteSimulados.id_cliente,
-        armadura_escolhida: estilo,
-        data_sinal: new Date().toLocaleDateString('pt-BR'),
-        status_missao: 'Pendente'
-    };
+        const dados = await resposta.json();
 
-    let estiloFormatado = '';
-    if (estilo === 'minimalista') estiloFormatado = '🌘 Eclipse (Minimalista e Escuro)';
-    if (estilo === 'brilhante') estiloFormatado = '🪐 Saturniano (Anéis e Camadas)';
-    if (estilo === 'futurista') estiloFormatado = '✨ Via Láctea (Brilho Máximo e Cristais)';
-
-    alert(
-        `🚀 [CONEXÃO SQLITE SIMULADA COM SUCESSO]\n\n` +
-        `• id_agendamento: ${dadosAgendamentoSimulados.id_agendamento}\n` +
-        `• id_cliente: ${dadosClienteSimulados.id_cliente}\n` +
-        `• nome_cliente: ${dadosClienteSimulados.nome_cliente}\n` +
-        `• frequencia_digital: ${dadosClienteSimulados.frequencia_digital}\n` +
-        `• armadura_escolhida: ${estiloFormatado}\n` +
-        `• status_missao: ${dadosAgendamentoSimulados.status_missao}`
-    );
-
-    mudarTela('orbita');
+        if (resposta.ok) {
+            alert('🚀 Pedido gravado no banco SQLite com sucesso!');
+            mudarTela('orbita');
+        } else {
+            alert(`❌ Erro ao salvar o pedido: ${dados.erro || 'Erro desconhecido'}`);
+        }
+    } catch (erro) {
+        alert('❌ Falha na conexão com o servidor Node.js.');
+    }
 }
 
-function autenticarTripulante(event) {
+// Cadastrar / Autenticar cliente no SQLite
+async function autenticarTripulante(event) {
     event.preventDefault();
+    const nome = document.getElementById('login-nome').value;
     const email = document.getElementById('login-email').value;
-    alert(`Tripulante ${email} autenticado com sucesso!`);
-    mudarTela('orbita');
+
+    try {
+        const resposta = await fetch(`${API_URL}/clientes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email })
+        });
+
+        const dados = await resposta.json();
+
+        if (resposta.ok) {
+            alert(`⚡ Tripulante ${nome} cadastrado/autenticado com sucesso!`);
+            mudarTela('orbita');
+        } else {
+            alert(`⚠️ aviso: ${dados.erro}`);
+        }
+    } catch (erro) {
+        alert('❌ Falha ao conectar ao servidor Node.js.');
+    }
 }
 
-/* ==========================================================================
-   6. EFEITOS VISUAIS E ANIMAÇÕES
-   ========================================================================== */
+// ==========================================
+// 6. EFEITOS VISUAIS E ANIMAÇÕES
+// ==========================================
 
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
@@ -674,94 +696,60 @@ document.addEventListener('mousemove', (e) => {
         star.remove();
     }, 800);
 });
-/* ==========================================================================
-   7. INTEGRAÇÃO REAL COM BACKEND NODE.JS + SQLITE
-   ========================================================================== */
 
-   const API_URL = 'http://127.0.0.1:3000/api';
+// ==========================================
+// 7. CONSULTAS AO BANCO DE DADOS (MODAIS)
+// ==========================================
 
-   // Atualizar o clique do link no menu lateral
-   document.addEventListener('DOMContentLoaded', () => {
-       const linkPedidos = document.querySelector('aside#sidePanel a[href="#pedidos"]');
-       if (linkPedidos) {
-           linkPedidos.setAttribute('onclick', "event.preventDefault(); abrirCaixaDePedidos();");
-       }
-   });
-   
-   // Abrir e carregar a lista de pedidos
-   async function abrirCaixaDePedidos() {
-       toggleMenu(); // Fecha o painel lateral
-       const modal = document.getElementById('modalPedidos');
-       if (modal) modal.style.display = 'flex';
-   
-       await carregarPedidosDoBanco();
-   }
-   
-   function fecharModalPedidos() {
-       const modal = document.getElementById('modalPedidos');
-       if (modal) modal.style.display = 'none';
-   }
-   
-   // Buscar pedidos via fetch da API Node.js
-   async function carregarPedidosDoBanco() {
-       const container = document.getElementById('lista-pedidos-container');
-       if (!container) return;
-   
-       try {
-           const resposta = await fetch(`${API_URL}/pedidos`);
-           const pedidos = await resposta.json();
-   
-           if (pedidos.length === 0) {
-               container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum pedido registrado no cosmos ainda.</p>';
-               return;
-           }
-   
-           container.innerHTML = pedidos.map(p => `
-               <div class="card-pedido-item">
-                   <div class="pedido-id">#${p.id}</div>
-                   <div class="pedido-dados">
-                       <strong>${p.nome_cliente}</strong>
-                       <span>📡 ${p.email}</span>
-                       <small>✨ Estilo: ${p.estilo}</small>
-                   </div>
-                   <span class="badge-status ${p.status.toLowerCase()}">${p.status}</span>
-               </div>
-           `).join('');
-       } catch (erro) {
-           container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao conectar com o banco SQLite. O servidor node está rodando?</p>';
-       }
-   }
-   
-   // Substituição da função de agendamento para salvar no SQLite real
-   async function processarAgendamentoEspacial(event) {
-       event.preventDefault();
-   
-       const nome = document.getElementById('nome').value;
-       const email = document.getElementById('email').value;
-       const estilo = document.getElementById('Estilo').value;
-   
-       try {
-           const resposta = await fetch(`${API_URL}/pedidos`, {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ nome, email, estilo })
-           });
-   
-           if (resposta.ok) {
-               alert('🚀 Pedido gravado no banco SQLite com sucesso!');
-               mudarTela('orbita');
-           } else {
-               alert('❌ Erro ao salvar o pedido.');
-           }
-       } catch (erro) {
-           alert('❌ Falha na conexão com o servidor Node.js.');
-       }
-   }
-   // --- FUNÇÕES DE CONSULTA DE CLIENTES ---
+// --- CONSULTA DE PEDIDOS ---
+async function abrirCaixaDePedidos() {
+    toggleMenu(); 
+    const modal = document.getElementById('modalPedidos');
+    if (modal) modal.style.display = 'flex';
+
+    await carregarPedidosDoBanco();
+}
+
+function fecharModalPedidos() {
+    const modal = document.getElementById('modalPedidos');
+    if (modal) modal.style.display = 'none';
+}
+
+async function carregarPedidosDoBanco() {
+    const container = document.getElementById('lista-pedidos-container');
+    if (!container) return;
+
+    try {
+        const resposta = await fetch(`${API_URL}/pedidos`);
+        const pedidos = await resposta.json();
+
+        if (pedidos.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum pedido registrado no cosmos ainda.</p>';
+            return;
+        }
+
+        container.innerHTML = pedidos.map(p => `
+            <div class="card-pedido-item">
+                <div class="pedido-id">#${p.id}</div>
+                <div class="pedido-dados">
+                    <strong>${p.nome_cliente}</strong>
+                    <span>📡 ${p.email}</span>
+                    <small>✨ Estilo: ${p.estilo}</small>
+                </div>
+                <span class="badge-status ${p.status ? p.status.toLowerCase() : 'pendente'}">${p.status || 'Pendente'}</span>
+            </div>
+        `).join('');
+    } catch (erro) {
+        container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao conectar com o banco SQLite. O servidor Node está rodando?</p>';
+    }
+}
+
+// --- CONSULTA DE CLIENTES ---
 async function abrirCaixaDeClientes() {
     if (typeof toggleMenu === 'function') toggleMenu();
     const modal = document.getElementById('modalClientes');
     if (modal) modal.style.display = 'flex';
+
     await carregarClientesDoBanco();
 }
 
@@ -775,7 +763,7 @@ async function carregarClientesDoBanco() {
     if (!container) return;
 
     try {
-        const resposta = await fetch('http://127.0.0.1:3000/api/clientes');
+        const resposta = await fetch(`${API_URL}/clientes`);
         const clientes = await resposta.json();
 
         if (!clientes.length) {
@@ -789,7 +777,6 @@ async function carregarClientesDoBanco() {
                 <div class="pedido-dados">
                     <strong>${c.nome}</strong>
                     <span>✉️ E-mail: ${c.email}</span>
-                    <small>📞 Telefone: ${c.telefone || 'Não informado'}</small>
                 </div>
             </div>
         `).join('');

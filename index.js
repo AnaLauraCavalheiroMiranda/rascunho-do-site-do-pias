@@ -1,8 +1,11 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const cors = require('cors');
+
 const app = express();
 
 // Middlewares
+app.use(cors());
 app.use(express.json());
 app.use(express.static('.')); // Servir os arquivos HTML/CSS/JS do front-end
 
@@ -27,9 +30,10 @@ db.serialize(() => {
     // Tabela de Pedidos
     db.run(`CREATE TABLE IF NOT EXISTS pedidos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_cliente TEXT NOT NULL,
-        email TEXT NOT NULL,
-        estilo TEXT NOT NULL,
+        nome_cliente TEXT,
+        email TEXT,
+        estilo TEXT,
+        status TEXT DEFAULT 'Pendente',
         data DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 });
@@ -64,7 +68,7 @@ app.post('/api/clientes', (req, res) => {
     });
 });
 
-// GET: Consultar todos os clientes (para o Modal de Clientes)
+// GET: Consultar todos os clientes
 app.get('/api/clientes', (req, res) => {
     const sql = 'SELECT * FROM clientes ORDER BY id DESC';
     db.all(sql, [], (err, rows) => {
@@ -107,7 +111,7 @@ app.post('/api/pedidos', (req, res) => {
     });
 });
 
-// GET: Consultar todos os pedidos (para o Modal de Pedidos)
+// GET: Consultar todos os pedidos
 app.get('/api/pedidos', (req, res) => {
     const sql = 'SELECT * FROM pedidos ORDER BY id DESC';
     db.all(sql, [], (err, rows) => {
