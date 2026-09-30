@@ -770,6 +770,7 @@ function fecharModalPedidos() {
     if (modal) modal.style.display = 'none';
 }
 
+// --- CONSULTA DE PEDIDOS (MODAL) ---
 async function carregarPedidosDoBanco() {
     const container = document.getElementById('lista-pedidos-container');
     if (!container) return;
@@ -778,24 +779,30 @@ async function carregarPedidosDoBanco() {
         const resposta = await fetch(`${API_URL}/pedidos`);
         const pedidos = await resposta.json();
 
-        if (pedidos.length === 0) {
+        if (!pedidos || pedidos.length === 0) {
             container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum pedido registrado no cosmos ainda.</p>';
             return;
         }
 
-        container.innerHTML = pedidos.map(p => `
-            <div class="card-pedido-item">
-                <div class="pedido-id">#${p.id}</div>
-                <div class="pedido-dados">
-                    <strong>${p.nome_cliente}</strong>
-                    <span>📡 ${p.email}</span>
-                    <small>✨ Estilo: ${p.estilo}</small>
+        container.innerHTML = pedidos.map(p => {
+            const statusAtual = p.status || 'Pendente';
+            const classeStatus = statusAtual.toLowerCase(); // 'aprovado', 'recusado', 'pendente'
+
+            return `
+                <div class="card-pedido-item">
+                    <div class="pedido-id">#${p.id}</div>
+                    <div class="pedido-dados">
+                        <strong>${p.nome_cliente || p.nome}</strong>
+                        <span>📡 ${p.email}</span>
+                        <small>✨ Estilo: ${p.estilo}</small>
+                    </div>
+                    <span class="badge-status ${classeStatus}">${statusAtual}</span>
                 </div>
-                <span class="badge-status ${p.status ? p.status.toLowerCase() : 'pendente'}">${p.status || 'Pendente'}</span>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (erro) {
-        container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao conectar com o banco SQLite. O servidor Node está rodando?</p>';
+        console.error('Erro ao carregar pedidos:', erro);
+        container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao conectar com o banco SQLite.</p>';
     }
 }
 
@@ -882,6 +889,7 @@ async function carregarMetricasEGrafico() {
 }
 
 // 2. Carrega lista de pedidos com botões de Aprovar / Recusar
+// --- PAINEL ADMIN (TABELA DE GESTÃO) ---
 async function carregarTabelaAdmin() {
     const container = document.getElementById('tabela-pedidos-admin');
     if (!container) return;
@@ -890,25 +898,32 @@ async function carregarTabelaAdmin() {
         const res = await fetch(`${API_URL}/pedidos`);
         const pedidos = await res.json();
 
-        if (pedidos.length === 0) {
-            container.innerHTML = '<p style="text-align:center;">Nenhum pedido encontrado.</p>';
+        if (!pedidos || pedidos.length === 0) {
+            container.innerHTML = '<p style="text-align:center;">Nenhum pedido encontrado no banco de dados.</p>';
             return;
         }
 
-        container.innerHTML = pedidos.map(p => `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                <div>
-                    <strong>#${p.id} - ${p.nome_cliente}</strong> (${p.email})<br>
-                    <small>✨ Estilo: ${p.estilo} | Status: <b>${p.status || 'Pendente'}</b></small>
+        container.innerHTML = pedidos.map(p => {
+            const statusAtual = p.status || 'Pendente';
+            const classeStatus = statusAtual.toLowerCase(); // 'aprovado', 'recusado', 'pendente'
+
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <strong>#${p.id} - ${p.nome_cliente || p.nome}</strong> (${p.email})<br>
+                        <small>✨ Estilo: ${p.estilo} | Status: <span class="badge-status ${classeStatus}">${statusAtual}</span></small>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">✅ Aprovar</button>
+                        <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">❌ Recusar</button>
+                        <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.1); color: #ffc107; border: 1px solid #ffc107; padding: 6px 10px; border-radius: 4px; cursor: pointer;">⏳ Pendente</button>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">✅ Aprovar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">❌ Recusar</button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (err) {
-        container.innerHTML = '<p style="color: #ff6b6b;">Erro ao buscar pedidos.</p>';
+        console.error('Erro ao buscar pedidos:', err);
+        container.innerHTML = '<p style="color: #ff6b6b;">Erro ao carregar lista de pedidos.</p>';
     }
 }
 

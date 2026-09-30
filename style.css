@@ -1542,3 +1542,53 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     background: rgba(255, 193, 7, 0.2);
     box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
 }
+/* ==========================================
+   BADGES DE STATUS DOS PEDIDOS
+   ========================================== */
+
+   .badge-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+/* Status: Pendente (Amarelo / Dourado) */
+.badge-status.pendente,
+.badge-status.badge-pendente {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+}
+
+/* Status: Aprovado (Verde) */
+.badge-status.aprovado,
+.badge-status.badge-aprovado {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+/* Status: Recusado (Vermelho) */
+.badge-status.recusado,
+.badge-status.badge-recusado {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Garante que fique por cima do menu e do conteúdo */
+}
