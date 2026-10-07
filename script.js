@@ -961,9 +961,15 @@ function gerarCalendarioOrbital() {
     titulo.innerText = `🗓️ ${nomesMeses[mes]} / ${ano}`;
 
     const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const primeiroDiaDaSemana = new Date(ano, mes, 1).getDay(); // 0 = Dom, 1 = Seg, ..., 4 = Qui, etc.
     const hoje = agora.getDate();
 
     let html = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => `<strong style="font-size:0.8em; opacity:0.7;">${d}</strong>`).join('');
+
+    // Insere células vazias para empurrar o dia 1 até a coluna correta da semana
+    for (let i = 0; i < primeiroDiaDaSemana; i++) {
+        html += `<div></div>`;
+    }
 
     for (let dia = 1; dia <= diasNoMes; dia++) {
         const isHoje = dia === hoje;
@@ -975,3 +981,22 @@ function gerarCalendarioOrbital() {
 
     container.innerHTML = html;
 }
+// Coloque este código no escopo principal do script.js (fora de qualquer outra função)
+document.addEventListener('click', function (event) {
+    // Verifica se o elemento clicado (ou seus pais) é o botão de admin
+    const btnAdmin = event.target.closest('#btn-admin'); // Substitua '#btn-admin' pelo ID ou classe do seu botão
+
+    if (btnAdmin) {
+        event.preventDefault();
+        
+        const modalAdmin = document.getElementById('modal-admin'); // Substitua pelo ID do seu modal/painel admin
+        
+        if (modalAdmin) {
+            // Exemplo de como abrir o modal (ajuste conforme o seu código usa: 'active', 'block', etc.)
+            modalAdmin.style.display = 'flex'; 
+            // ou: modalAdmin.classList.add('ativo');
+        } else {
+            console.error('Modal de Admin não encontrado no HTML!');
+        }
+    }
+});
