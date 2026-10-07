@@ -156,3 +156,36 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
+// ==========================================
+// ROTA DE LOGIN DE CLIENTE EXISTENTE
+// ==========================================
+app.post('/api/clientes/login', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
+    }
+
+    const sql = 'SELECT * FROM clientes WHERE email = ?';
+    db.get(sql, [email], (err, cliente) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao consultar o banco de dados.', detalhes: err.message });
+        }
+        if (!cliente) {
+            return res.status(404).json({ erro: 'Conta não encontrada! Verifique o e-mail ou faça um novo cadastro.' });
+        }
+        res.json({ mensagem: 'Sintonizado com sucesso!', cliente });
+    });
+});
+
+// GET: Consultar pedidos de um cliente específico pelo e-mail
+app.get('/api/pedidos/cliente/:email', (req, res) => {
+    const { email } = req.params;
+    const sql = 'SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC';
+    db.all(sql, [email], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao consultar pedidos do tripulante.', detalhes: err.message });
+        }
+        res.json(rows);
+    });
+});

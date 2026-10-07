@@ -9,6 +9,7 @@ let produtosGlobais = [];
 function toggleMenu() {
     const sidePanel = document.getElementById('sidePanel');
     if (sidePanel) {
+        atualizarVisibilidadeMenuLateral(); // <--- Atualiza quais botões exibir antes de abrir a gaveta
         sidePanel.classList.toggle('open');
     }
 }
@@ -1000,3 +1001,474 @@ document.addEventListener('click', function (event) {
         }
     }
 });
+// Adicione a nova tela 'cliente' e atualize a tela 'login' no objeto telasCelestine:
+
+telasCelestine['cliente'] = `
+    <section class="cliente-perfil-section" style="max-width: 900px; margin: 40px auto; padding: 20px;">
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; backdrop-filter: blur(15px);">
+            <div style="font-size: 3.5rem; margin-bottom: 10px;">👨‍🚀</div>
+            <h2 id="perfil-nome" style="font-size: 2.2rem; color: #fff;">Perfil do Tripulante</h2>
+            <p id="perfil-email" style="color: var(--lavender-glow); margin-bottom: 15px;">frequencia@galaxia.com</p>
+            <span class="badge-status aprovado" style="font-size: 0.85rem;">Sintonizado em Órbita</span>
+            
+            <div style="margin-top: 35px; border-top: 1px solid var(--glass-border); padding-top: 25px; text-align: left;">
+                <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">📦 Meus Pedidos & Encomendas Estelares</h3>
+                <div id="lista-pedidos-cliente" style="display: flex; flex-direction: column; gap: 12px;">
+                    <p style="text-align: center; color: var(--lavender-glow);">Sincronizando seus registros...</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <button class="btn-submit-login" onclick="mudarTela('agendamento')" style="max-width: 250px;">🌙 Fazer Novo Pedido</button>
+                <button class="btn-back-home" onclick="desconectarTripulante()" style="border-color: #ff5252 !important; color: #ff5252 !important; margin: 0;">🚪 Desconectar / Sair</button>
+            </div>
+        </div>
+    </section>
+`;
+
+telasCelestine['login'] = `
+    <section class="login-section">
+        <div class="login-box">
+            <div class="login-header">
+                <h2 id="titulo-login-form">Identificação de Tripulante</h2>
+                <p id="subtitulo-login-form">Sincronize seus dados orbitais para acessar seus mantos cósmicos privados.</p>
+            </div>
+
+            <!-- FORMULÁRIO DE CADASTRO -->
+            <form id="form-cadastro" onsubmit="autenticarTripulante(event)">
+                <div class="input-group">
+                    <label for="login-nome">👤 Nome do Tripulante</label>
+                    <input type="text" id="login-nome" required placeholder="Comandante Silva">
+                </div>
+                <div class="input-group">
+                    <label for="login-email">📡 Frequência Digital (E-mail)</label>
+                    <input type="email" id="login-email" required placeholder="comandante@galaxia.com">
+                </div>
+                <button type="submit" class="btn-submit-login">Cadastrar / Autenticar Assinatura</button>
+            </form>
+
+            <!-- FORMULÁRIO DE LOGIN (OCULTO POR PADRÃO) -->
+            <form id="form-login-existente" onsubmit="fazerLoginTripulante(event)" style="display: none;">
+                <div class="input-group">
+                    <label for="login-existente-email">📡 Frequência Digital Registrada (E-mail)</label>
+                    <input type="email" id="login-existente-email" required placeholder="comandante@galaxia.com">
+                </div>
+                <button type="submit" class="btn-submit-login">🚀 Acessar Minha Conta</button>
+            </form>
+
+            <div class="login-footer">
+                <p id="texto-alternar-login" style="margin-bottom: 15px;">
+                    Já possui registro no ateliê? 
+                    <a href="#" onclick="event.preventDefault(); alternarModoLogin('login');">Entrar com conta existente</a>
+                </p>
+                <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+            </div>
+        </div>
+    </section>
+`;
+document.addEventListener("DOMContentLoaded", () => {
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+        telasCelestine['orbita'] = mainEl.innerHTML;
+    }
+    configurarGatilhosNavegacao();
+    atualizarBotaoSessaoCabecalho(); // <--- Verifica se o usuário já está logado ao carregar
+});
+
+// Verifica se há cliente salvo no navegador e altera a ação do botão do topo
+function configurarGatilhosNavegacao() {
+    atualizarBotaoSessaoCabecalho();
+
+    function atualizarBotaoSessaoCabecalho() {
+        atualizarVisibilidadeMenuLateral(); // <--- Garante atualização ao carregar/logar/deslogar
+    
+        const btnLogin = document.querySelector('.btn-space-login');
+        if (!btnLogin) return;
+    
+        const clienteLogado = obterClienteLogado();
+        if (clienteLogado) {
+            btnLogin.innerHTML = `👤 ${clienteLogado.nome.split(' ')[0]}`;
+            btnLogin.setAttribute('onclick', "mudarTela('cliente')");
+        } else {
+            btnLogin.innerHTML = 'Entrar no Espaço';
+            btnLogin.setAttribute('onclick', "mudarTela('login')");
+        }
+    }
+
+    const linkOrbita = document.querySelector('nav.desktop-nav a[href="#inicio"]');
+    if (linkOrbita) linkOrbita.setAttribute('onclick', "event.preventDefault(); mudarTela('orbita');");
+
+    const linkAtelie = document.querySelector('nav.desktop-nav a[href="#atelie"]');
+    if (linkAtelie) linkAtelie.setAttribute('onclick', "event.preventDefault(); mudarTela('atelie');");
+
+    const linkCiclosLunares = document.querySelector('nav.desktop-nav a[href="#Agendamento"]');
+    if (linkCiclosLunares) linkCiclosLunares.setAttribute('onclick', "event.preventDefault(); mudarTela('agendamento');");
+
+    const linkExploracao = document.querySelector('nav.desktop-nav a[href="#Exploracao"]');
+    if (linkExploracao) linkExploracao.setAttribute('onclick', "event.preventDefault(); mudarTela('exploracao');");
+
+    const linkColecoes = document.querySelector('nav.desktop-nav a[href="#colecoes"]');
+    if (linkColecoes) linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
+}
+
+function atualizarBotaoSessaoCabecalho() {
+    const btnLogin = document.querySelector('.btn-space-login');
+    if (!btnLogin) return;
+
+    const clienteLogado = obterClienteLogado();
+    if (clienteLogado) {
+        btnLogin.innerHTML = `👤 ${clienteLogado.nome.split(' ')[0]}`;
+        btnLogin.setAttribute('onclick', "mudarTela('cliente')");
+    } else {
+        btnLogin.innerHTML = 'Entrar no Espaço';
+        btnLogin.setAttribute('onclick', "mudarTela('login')");
+    }
+}
+
+function obterClienteLogado() {
+    const dados = localStorage.getItem('celestine_cliente');
+    return dados ? JSON.parse(dados) : null;
+}
+function mudarTela(nomeDaTela) {
+    const containerPrincipal = document.querySelector('main');
+    
+    if (telasCelestine[nomeDaTela]) {
+        const sidePanel = document.getElementById('sidePanel');
+        if (sidePanel && sidePanel.classList.contains('open')) {
+            sidePanel.classList.remove('open');
+        }
+
+        containerPrincipal.style.opacity = 0;
+        
+        setTimeout(() => {
+            containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
+            
+            if (nomeDaTela === 'orbita') {
+                configurarGatilhosNavegacao();
+            } else if (nomeDaTela === 'colecoes') {
+                carregarMantosDoJson();
+            } else if (nomeDaTela === 'exploracao') {
+                carregarGuiaMateriais();
+            } else if (nomeDaTela === 'admin') {
+                carregarPainelAdmin();
+            } else if (nomeDaTela === 'cliente') {
+                carregarPerfilCliente(); // <--- Preenche perfil e histórico do cliente
+            } else if (nomeDaTela === 'agendamento') {
+                preencherFormularioAgendamentoSeLogado();
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            containerPrincipal.style.opacity = 1;
+        }, 200);
+    }
+}
+// Alternar visualmente no formulário entre Cadastro e Login existente
+function alternarModoLogin(modo) {
+    const formCadastro = document.getElementById('form-cadastro');
+    const formLogin = document.getElementById('form-login-existente');
+    const titulo = document.getElementById('titulo-login-form');
+    const subtitulo = document.getElementById('subtitulo-login-form');
+    const textoAlternar = document.getElementById('texto-alternar-login');
+
+    if (modo === 'login') {
+        formCadastro.style.display = 'none';
+        formLogin.style.display = 'flex';
+        titulo.innerText = "Acessar Conta de Tripulante";
+        subtitulo.innerText = "Digite seu e-mail cadastrado para sintonizar sua sessão.";
+        textoAlternar.innerHTML = `Não tem uma assinatura ainda? <a href="#" onclick="event.preventDefault(); alternarModoLogin('cadastro');">Criar novo cadastro</a>`;
+    } else {
+        formCadastro.style.display = 'flex';
+        formLogin.style.display = 'none';
+        titulo.innerText = "Identificação de Tripulante";
+        subtitulo.innerText = "Sincronize seus dados orbitais para acessar seus mantos cósmicos privados.";
+        textoAlternar.innerHTML = `Já possui registro no ateliê? <a href="#" onclick="event.preventDefault(); alternarModoLogin('login');">Entrar com conta existente</a>`;
+    }
+}
+
+// 1. Ação de Cadastro
+async function autenticarTripulante(event) {
+    event.preventDefault();
+    const nome = document.getElementById('login-nome').value;
+    const email = document.getElementById('login-email').value;
+
+    try {
+        const resposta = await fetch(`${API_URL}/clientes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email })
+        });
+
+        const dados = await resposta.json();
+
+        if (resposta.ok) {
+            const cliente = { id: dados.id, nome, email };
+            localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
+            atualizarBotaoSessaoCabecalho();
+            alert(`⚡ Tripulante ${nome} cadastrado com sucesso!`);
+            mudarTela('cliente');
+        } else {
+            alert(`⚠️ Aviso: ${dados.erro}`);
+        }
+    } catch (erro) {
+        alert('❌ Falha ao conectar ao servidor Node.js.');
+    }
+}
+
+// 2. Ação de Login em Conta Existente
+async function fazerLoginTripulante(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-existente-email').value;
+
+    try {
+        const resposta = await fetch(`${API_URL}/clientes/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        const dados = await resposta.json();
+
+        if (resposta.ok) {
+            localStorage.setItem('celestine_cliente', JSON.stringify(dados.cliente));
+            atualizarBotaoSessaoCabecalho();
+            alert(`🚀 Bem-vindo(a) de volta, Comandante ${dados.cliente.nome}!`);
+            mudarTela('cliente');
+        } else {
+            alert(`❌ ${dados.erro}`);
+        }
+    } catch (erro) {
+        alert('❌ Falha na conexão com o servidor.');
+    }
+}
+
+// 3. Renderiza os dados do perfil e os pedidos do cliente logado
+async function carregarPerfilCliente() {
+    const cliente = obterClienteLogado();
+    if (!cliente) {
+        mudarTela('login');
+        return;
+    }
+
+    const elNome = document.getElementById('perfil-nome');
+    const elEmail = document.getElementById('perfil-email');
+    const containerPedidos = document.getElementById('lista-pedidos-cliente');
+
+    if (elNome) elNome.innerText = cliente.nome;
+    if (elEmail) elEmail.innerText = `📡 ${cliente.email}`;
+
+    if (!containerPedidos) return;
+
+    try {
+        const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(cliente.email)}`);
+        const pedidos = await res.json();
+
+        if (!pedidos || pedidos.length === 0) {
+            containerPedidos.innerHTML = '<p style="text-align:center; padding: 15px; color: var(--lavender-glow);">Você ainda não realizou nenhum pedido no cosmos.</p>';
+            return;
+        }
+
+        containerPedidos.innerHTML = pedidos.map(p => {
+            const statusClass = (p.status || 'Pendente').toLowerCase();
+            return `
+                <div class="card-pedido-item">
+                    <div class="pedido-id">#${p.id}</div>
+                    <div class="pedido-dados">
+                        <strong>✨ Estilo: ${p.estilo}</strong>
+                        <small style="color: var(--lavender-glow);">Data do Sinal: ${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recentemente'}</small>
+                    </div>
+                    <span class="badge-status ${statusClass}">${p.status || 'Pendente'}</span>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        containerPedidos.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao carregar histórico de pedidos.</p>';
+    }
+}
+
+// Auto-preenche o formulário de agendamento se o cliente estiver logado
+function preencherFormularioAgendamentoSeLogado() {
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    const inputNome = document.getElementById('nome');
+    const inputEmail = document.getElementById('email');
+
+    if (inputNome) inputNome.value = cliente.nome;
+    if (inputEmail) inputEmail.value = cliente.email;
+}
+
+// 4. Logout do Cliente
+function desconectarTripulante() {
+    localStorage.removeItem('celestine_cliente');
+    atualizarBotaoSessaoCabecalho();
+    alert('🚪 Sessão encerrada com sucesso.');
+    mudarTela('orbita');
+}
+// Controla quais botões aparecem no menu lateral conforme o estado de login
+function atualizarVisibilidadeMenuLateral() {
+    const itemPedidos = document.getElementById('menu-item-pedidos');
+    const itemClientes = document.getElementById('menu-item-clientes');
+    const itemAdmin = document.getElementById('menu-item-admin');
+
+    const clienteLogado = obterClienteLogado();
+
+    if (clienteLogado) {
+        // 🔒 SE ESTIVER LOGADO COMO CLIENTE: Oculta os 3 botões
+        if (itemPedidos) itemPedidos.style.display = 'none';
+        if (itemClientes) itemClientes.style.display = 'none';
+        if (itemAdmin) itemAdmin.style.display = 'none';
+    } else {
+        // 🔓 SE ESTIVER DESLOGADO: Mostra tudo normalmente
+        if (itemPedidos) itemPedidos.style.display = 'block';
+        if (itemClientes) itemClientes.style.display = 'block';
+        if (itemAdmin) itemAdmin.style.display = 'block';
+    }
+}
+// ==========================================
+// CONSULTA E PERSISTÊNCIA DE PEDIDOS
+// ==========================================
+
+// --- CONSULTA DE PEDIDOS (MODAL DE QUALQUER TELA) ---
+async function abrirCaixaDePedidos() {
+    if (typeof toggleMenu === 'function') toggleMenu(); 
+    const modal = document.getElementById('modalPedidos');
+    if (modal) modal.style.display = 'flex';
+
+    await carregarPedidosDoBanco();
+}
+
+function fecharModalPedidos() {
+    const modal = document.getElementById('modalPedidos');
+    if (modal) modal.style.display = 'none';
+}
+
+async function carregarPedidosDoBanco() {
+    const container = document.getElementById('lista-pedidos-container');
+    if (!container) return;
+
+    let pedidos = [];
+
+    try {
+        const resposta = await fetch(`${API_URL}/pedidos`);
+        if (resposta.ok) {
+            pedidos = await resposta.json();
+            // Salva cópia local para não perder nada se a página recarregar sem servidor
+            localStorage.setItem('celestine_pedidos_backup', JSON.stringify(pedidos));
+        } else {
+            throw new Error('Servidor indisponível');
+        }
+    } catch (erro) {
+        // Fallback: carrega do backup local se o servidor estiver off
+        const backup = localStorage.getItem('celestine_pedidos_backup');
+        pedidos = backup ? JSON.parse(backup) : [];
+    }
+
+    if (!pedidos || pedidos.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum pedido registrado no cosmos ainda.</p>';
+        return;
+    }
+
+    container.innerHTML = pedidos.map(p => {
+        const statusAtual = p.status || 'Pendente';
+        const classeStatus = statusAtual.toLowerCase();
+
+        return `
+            <div class="card-pedido-item">
+                <div class="pedido-id">#${p.id}</div>
+                <div class="pedido-dados">
+                    <strong>${p.nome_cliente || p.nome}</strong>
+                    <span>📡 ${p.email}</span>
+                    <small>✨ Estilo: ${p.estilo}</small>
+                </div>
+                <span class="badge-status ${classeStatus}">${statusAtual}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Enviar pedido gravando no SQLite + Backup Local
+async function processarAgendamentoEspacial(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    const estilo = document.getElementById('Estilo').value;
+
+    const novoPedido = { nome, email, estilo, status: 'Pendente', data: new Date().toISOString() };
+
+    try {
+        const resposta = await fetch(`${API_URL}/pedidos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, estilo })
+        });
+
+        if (resposta.ok) {
+            const dados = await resposta.json();
+            novoPedido.id = dados.id;
+        }
+    } catch (erro) {
+        console.warn('Servidor offline. Gravando localmente...');
+        novoPedido.id = Date.now();
+    }
+
+    // Atualiza o backup local imediatamente
+    const backup = JSON.parse(localStorage.getItem('celestine_pedidos_backup') || '[]');
+    backup.unshift(novoPedido);
+    localStorage.setItem('celestine_pedidos_backup', JSON.stringify(backup));
+
+    alert('🚀 Pedido gravado e sincronizado com sucesso!');
+    mudarTela('orbita');
+}
+
+// ==========================================
+// CONSULTA E PERSISTÊNCIA DE CLIENTES
+// ==========================================
+
+async function abrirCaixaDeClientes() {
+    if (typeof toggleMenu === 'function') toggleMenu();
+    const modal = document.getElementById('modalClientes');
+    if (modal) modal.style.display = 'flex';
+
+    await carregarClientesDoBanco();
+}
+
+function fecharModalClientes() {
+    const modal = document.getElementById('modalClientes');
+    if (modal) modal.style.display = 'none';
+}
+
+async function carregarClientesDoBanco() {
+    const container = document.getElementById('lista-clientes-container');
+    if (!container) return;
+
+    let clientes = [];
+
+    try {
+        const resposta = await fetch(`${API_URL}/clientes`);
+        if (resposta.ok) {
+            clientes = await resposta.json();
+            localStorage.setItem('celestine_clientes_backup', JSON.stringify(clientes));
+        } else {
+            throw new Error('Servidor indisponível');
+        }
+    } catch (erro) {
+        const backup = localStorage.getItem('celestine_clientes_backup');
+        clientes = backup ? JSON.parse(backup) : [];
+    }
+
+    if (!clientes.length) {
+        container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum cliente cadastrado no site ainda.</p>';
+        return;
+    }
+
+    container.innerHTML = clientes.map(c => `
+        <div class="card-pedido-item">
+            <div class="pedido-id">#${c.id}</div>
+            <div class="pedido-dados">
+                <strong>${c.nome}</strong>
+                <span>✉️ E-mail: ${c.email}</span>
+            </div>
+        </div>
+    `).join('');
+}
