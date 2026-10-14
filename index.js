@@ -6,8 +6,9 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
-app.use(express.static('.')); // Servir os arquivos HTML/CSS/JS do front-end
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.static('.'));
 
 // Conexão com o banco de dados SQLite
 const db = new sqlite3.Database('./database.db', (err) => {
@@ -20,12 +21,16 @@ const db = new sqlite3.Database('./database.db', (err) => {
 
 // Criar as tabelas no banco de dados se não existirem
 db.serialize(() => {
-    // Tabela de Clientes
+    // Tabela de Clientes com suporte a foto
     db.run(`CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL
+        email TEXT UNIQUE NOT NULL,
+        foto TEXT
     )`);
+
+    // Tenta adicionar a coluna foto caso o banco já existisse antes
+    db.run(`ALTER TABLE clientes ADD COLUMN foto TEXT`, () => {});
 
     // Tabela de Pedidos
     db.run(`CREATE TABLE IF NOT EXISTS pedidos (
@@ -151,11 +156,7 @@ app.get('/api/admin/estatisticas', (req, res) => {
     });
 });
 
-// Inicialização do servidor no final do arquivo
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-});
+
 // ==========================================
 // ROTA DE LOGIN DE CLIENTE EXISTENTE
 // ==========================================
@@ -188,4 +189,45 @@ app.get('/api/pedidos/cliente/:email', (req, res) => {
         }
         res.json(rows);
     });
+});
+// Rota para salvar a foto de perfil do cliente
+app.put('/api/clientes/:id/foto', (req, res) => {
+    const { id } = req.params;
+    const { foto } = req.body;
+
+    db.run('UPDATE clientes SET foto = ? WHERE id = ?', [foto, id], function (err) {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao salvar a foto de perfil.' });
+        }
+        res.json({ mensagem: 'Foto atualizada com sucesso!' });
+    });
+});
+
+// Rota de login de cliente
+app.post('/api/clientes/login', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
+    }
+
+    db.get('SELECT * FROM clientes WHERE email = ?', [email], (err, cliente) => {
+        if (err) return res.status(500).json({ erro: 'Erro no banco de dados.' });
+        if (!cliente) return res.status(404).json({ erro: 'Conta não encontrada.' });
+        res.json({ cliente });
+    });
+});
+
+// Rota para buscar os pedidos de um cliente específico pelo e-mail
+app.get('/api/pedidos/cliente/:email', (req, res) => {
+    const { email } = req.params;
+    db.all('SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC', [email], (err, rows) => {
+        if (err) return res.status(500).json({ erro: 'Erro ao buscar pedidos.' });
+        res.json(rows || []);
+    });
+});
+// Inicialização do servidor no final do arquivo
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });

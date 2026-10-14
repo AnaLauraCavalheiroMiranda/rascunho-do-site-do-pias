@@ -377,8 +377,9 @@ function mudarTela(nomeDaTela) {
                 carregarGuiaMateriais();
             } else if (nomeDaTela === 'admin') {
                 carregarPainelAdmin();
-}
-            
+            } else if (nomeDaTela === 'cliente') {
+                carregarPerfilCliente();
+            }  
             window.scrollTo({ top: 0, behavior: 'smooth' });
             containerPrincipal.style.opacity = 1;
         }, 200);
@@ -1004,27 +1005,41 @@ document.addEventListener('click', function (event) {
 // Adicione a nova tela 'cliente' e atualize a tela 'login' no objeto telasCelestine:
 
 telasCelestine['cliente'] = `
-    <section class="cliente-perfil-section" style="max-width: 900px; margin: 40px auto; padding: 20px;">
-        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; backdrop-filter: blur(15px);">
-            <div style="font-size: 3.5rem; margin-bottom: 10px;">👨‍🚀</div>
-            <h2 id="perfil-nome" style="font-size: 2.2rem; color: #fff;">Perfil do Tripulante</h2>
-            <p id="perfil-email" style="color: var(--lavender-glow); margin-bottom: 15px;">frequencia@galaxia.com</p>
-            <span class="badge-status aprovado" style="font-size: 0.85rem;">Sintonizado em Órbita</span>
-            
-            <div style="margin-top: 35px; border-top: 1px solid var(--glass-border); padding-top: 25px; text-align: left;">
-                <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">📦 Meus Pedidos & Encomendas Estelares</h3>
-                <div id="lista-pedidos-cliente" style="display: flex; flex-direction: column; gap: 12px;">
-                    <p style="text-align: center; color: var(--lavender-glow);">Sincronizando seus registros...</p>
+        <section class="cliente-perfil-section" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+            <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; backdrop-filter: blur(15px);">
+                
+                <!-- FOTO DE PERFIL INTERATIVA (UNIFICADA NO MESMO CARD) -->
+                <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 15px auto; cursor: pointer;" onclick="document.getElementById('input-foto').click()" title="Clique para alterar sua foto">
+                    <img id="img-perfil" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--saturn-gold); display: none; box-shadow: 0 0 15px var(--saturn-gold-dim);">
+                    <div id="avatar-padrao" style="font-size: 3.5rem; line-height: 110px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 2px dashed var(--saturn-gold);">👨‍🚀</div>
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--saturn-gold); color: #000; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; box-shadow: 0 0 10px rgba(0,0,0,0.5);">📷</div>
+                </div>
+                
+                <!-- INPUT OCULTO PARA SELECIONAR A FOTO -->
+                <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="salvarFotoPerfil(event)">
+                <small style="color: var(--lavender-glow); display: block; margin-top: -5px; margin-bottom: 20px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Clique na foto acima para alterar</small>
+
+                <!-- DADOS DO CLIENTE -->
+                <h2 id="perfil-nome" style="font-size: 2rem; color: #fff; margin-bottom: 5px;">Nome do Tripulante</h2>
+                <p id="perfil-email" style="color: var(--lavender-glow); margin-bottom: 15px;">email@galaxia.com</p>
+                <span class="badge-status aprovado" style="font-size: 0.85rem;">Sintonizado em Órbita</span>
+
+                <!-- LISTA DE PEDIDOS -->
+                <div style="margin-top: 35px; text-align: left; border-top: 1px solid var(--glass-border); padding-top: 25px;">
+                    <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">📦 Meus Pedidos & Encomendas Estelares</h3>
+                    <div id="lista-pedidos-cliente">
+                        <p style="text-align: center; color: var(--lavender-glow);">Buscando pedidos...</p>
+                    </div>
+                </div>
+
+                <!-- BOTÕES DE AÇÃO -->
+                <div style="margin-top: 35px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-submit-login" onclick="mudarTela('agendamento')" style="max-width: 220px; padding: 12px;">🌙 Novo Pedido</button>
+                    <button class="btn-back-home" onclick="desconectarTripulante()" style="border-color: #ff5252 !important; color: #ff5252 !important; margin: 0; padding: 12px 24px;">🚪 Sair da Conta</button>
                 </div>
             </div>
-
-            <div style="margin-top: 40px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <button class="btn-submit-login" onclick="mudarTela('agendamento')" style="max-width: 250px;">🌙 Fazer Novo Pedido</button>
-                <button class="btn-back-home" onclick="desconectarTripulante()" style="border-color: #ff5252 !important; color: #ff5252 !important; margin: 0;">🚪 Desconectar / Sair</button>
-            </div>
-        </div>
-    </section>
-`;
+        </section>
+    `,
 
 telasCelestine['login'] = `
     <section class="login-section">
@@ -1072,28 +1087,12 @@ document.addEventListener("DOMContentLoaded", () => {
         telasCelestine['orbita'] = mainEl.innerHTML;
     }
     configurarGatilhosNavegacao();
-    atualizarBotaoSessaoCabecalho(); // <--- Verifica se o usuário já está logado ao carregar
+    atualizarBotaoSessaoCabecalho(); // <--- Chama a função ao carregar a página
 });
 
-// Verifica se há cliente salvo no navegador e altera a ação do botão do topo
+// Configura os links do menu principal
 function configurarGatilhosNavegacao() {
     atualizarBotaoSessaoCabecalho();
-
-    function atualizarBotaoSessaoCabecalho() {
-        atualizarVisibilidadeMenuLateral(); // <--- Garante atualização ao carregar/logar/deslogar
-    
-        const btnLogin = document.querySelector('.btn-space-login');
-        if (!btnLogin) return;
-    
-        const clienteLogado = obterClienteLogado();
-        if (clienteLogado) {
-            btnLogin.innerHTML = `👤 ${clienteLogado.nome.split(' ')[0]}`;
-            btnLogin.setAttribute('onclick', "mudarTela('cliente')");
-        } else {
-            btnLogin.innerHTML = 'Entrar no Espaço';
-            btnLogin.setAttribute('onclick', "mudarTela('login')");
-        }
-    }
 
     const linkOrbita = document.querySelector('nav.desktop-nav a[href="#inicio"]');
     if (linkOrbita) linkOrbita.setAttribute('onclick', "event.preventDefault(); mudarTela('orbita');");
@@ -1111,23 +1110,88 @@ function configurarGatilhosNavegacao() {
     if (linkColecoes) linkColecoes.setAttribute('onclick', "event.preventDefault(); mudarTela('colecoes');");
 }
 
+// Atualiza o botão do topo (Mostra apenas a foto redondinha quando logado)
 function atualizarBotaoSessaoCabecalho() {
+    if (typeof atualizarVisibilidadeMenuLateral === 'function') atualizarVisibilidadeMenuLateral();
+
     const btnLogin = document.querySelector('.btn-space-login');
     if (!btnLogin) return;
 
     const clienteLogado = obterClienteLogado();
     if (clienteLogado) {
-        btnLogin.innerHTML = `👤 ${clienteLogado.nome.split(' ')[0]}`;
+        // Se o cliente tiver foto salva, mostra a foto circular
+        if (clienteLogado.foto) {
+            btnLogin.innerHTML = `<img src="${clienteLogado.foto}" alt="Perfil" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold); display: block;">`;
+            btnLogin.style.padding = '4px';
+            btnLogin.style.borderRadius = '50%';
+            btnLogin.style.width = '46px';
+            btnLogin.style.height = '46px';
+            btnLogin.style.display = 'flex';
+            btnLogin.style.alignItems = 'center';
+            btnLogin.style.justifyContent = 'center';
+        } else {
+            // Se estiver logado sem foto, mostra o ícone de astronauta
+            btnLogin.innerHTML = `👨‍🚀`;
+            btnLogin.style.padding = '8px 16px';
+            btnLogin.style.borderRadius = '30px';
+            btnLogin.style.width = 'auto';
+            btnLogin.style.height = 'auto';
+        }
         btnLogin.setAttribute('onclick', "mudarTela('cliente')");
     } else {
+        // Estado deslogado padrão
         btnLogin.innerHTML = 'Entrar no Espaço';
+        btnLogin.style.padding = '14px 34px';
+        btnLogin.style.borderRadius = '30px';
+        btnLogin.style.width = 'auto';
+        btnLogin.style.height = 'auto';
         btnLogin.setAttribute('onclick', "mudarTela('login')");
     }
 }
 
+// Busca os dados do cliente salvo no navegador
 function obterClienteLogado() {
     const dados = localStorage.getItem('celestine_cliente');
     return dados ? JSON.parse(dados) : null;
+}
+
+// Troca de telas do site
+function mudarTela(nomeDaTela) {
+    const containerPrincipal = document.querySelector('main');
+    
+    if (telasCelestine[nomeDaTela]) {
+        const sidePanel = document.getElementById('sidePanel');
+        if (sidePanel && sidePanel.classList.contains('open')) {
+            sidePanel.classList.remove('open');
+        }
+
+        containerPrincipal.style.opacity = 0;
+        
+        setTimeout(() => {
+            containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
+            
+            if (nomeDaTela === 'orbita') {
+                configurarGatilhosNavegacao();
+            } else if (nomeDaTela === 'colecoes') {
+                carregarMantosDoJson();
+            } else if (nomeDaTela === 'exploracao') {
+                carregarGuiaMateriais();
+            } else if (nomeDaTela === 'admin') {
+                carregarPainelAdmin();
+            } else if (nomeDaTela === 'cliente') {
+                carregarPerfilCliente();
+            } else if (nomeDaTela === 'agendamento') {
+                if (typeof carregarTelaAgendamento === 'function') {
+                    carregarTelaAgendamento();
+                } else if (typeof preencherFormularioAgendamentoSeLogado === 'function') {
+                    preencherFormularioAgendamentoSeLogado();
+                }
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            containerPrincipal.style.opacity = 1;
+        }, 200);
+    }
 }
 function mudarTela(nomeDaTela) {
     const containerPrincipal = document.querySelector('main');
@@ -1471,4 +1535,94 @@ async function carregarClientesDoBanco() {
             </div>
         </div>
     `).join('');
+}
+function obterClienteLogado() {
+    const dados = localStorage.getItem('celestine_cliente');
+    return dados ? JSON.parse(dados) : null;
+}
+
+async function carregarPerfilCliente() {
+    const cliente = obterClienteLogado();
+    if (!cliente) {
+        mudarTela('login');
+        return;
+    }
+
+    const elNome = document.getElementById('perfil-nome');
+    const elEmail = document.getElementById('perfil-email');
+    const imgPerfil = document.getElementById('img-perfil');
+    const avatarPadrao = document.getElementById('avatar-padrao');
+    const containerPedidos = document.getElementById('lista-pedidos-cliente');
+
+    if (elNome) elNome.innerText = cliente.nome;
+    if (elEmail) elEmail.innerText = cliente.email;
+
+    if (cliente.foto && imgPerfil && avatarPadrao) {
+        imgPerfil.src = cliente.foto;
+        imgPerfil.style.display = 'block';
+        avatarPadrao.style.display = 'none';
+    }
+
+    if (!containerPedidos) return;
+
+    try {
+        const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(cliente.email)}`);
+        const pedidos = await res.json();
+
+        if (!pedidos || pedidos.length === 0) {
+            containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px;">Nenhum pedido registrado nesta conta ainda.</p>';
+            return;
+        }
+
+        containerPedidos.innerHTML = pedidos.map(p => `
+            <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>#${p.id} - ${p.estilo}</strong><br>
+                    <small style="color: var(--lavender-glow);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
+                </div>
+                <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
+            </div>
+        `).join('');
+    } catch (err) {
+        containerPedidos.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao carregar lista de pedidos.</p>';
+    }
+}
+
+function salvarFotoPerfil(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+        const fotoBase64 = e.target.result;
+        const cliente = obterClienteLogado();
+        if (!cliente) return;
+
+        cliente.foto = fotoBase64;
+        localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
+
+        const imgPerfil = document.getElementById('img-perfil');
+        const avatarPadrao = document.getElementById('avatar-padrao');
+        if (imgPerfil && avatarPadrao) {
+            imgPerfil.src = fotoBase64;
+            imgPerfil.style.display = 'block';
+            avatarPadrao.style.display = 'none';
+        }
+
+        try {
+            await fetch(`${API_URL}/clientes/${cliente.id}/foto`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ foto: fotoBase64 })
+            });
+        } catch (err) {
+            console.warn('Foto salva no navegador.');
+        }
+    };
+    reader.readAsDataURL(arquivo);
+}
+
+function desconectarTripulante() {
+    localStorage.removeItem('celestine_cliente');
+    mudarTela('orbita');
 }
