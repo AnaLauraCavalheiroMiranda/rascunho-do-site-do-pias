@@ -1005,27 +1005,51 @@ document.addEventListener('click', function (event) {
 // Adicione a nova tela 'cliente' e atualize a tela 'login' no objeto telasCelestine:
 
 telasCelestine['cliente'] = `
-        <section class="cliente-perfil-section" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+        <section class="cliente-perfil-section" style="max-width: 850px; margin: 40px auto; padding: 20px;">
             <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; backdrop-filter: blur(15px);">
                 
-                <!-- FOTO DE PERFIL INTERATIVA (UNIFICADA NO MESMO CARD) -->
+                <!-- FOTO DE PERFIL -->
                 <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 15px auto; cursor: pointer;" onclick="document.getElementById('input-foto').click()" title="Clique para alterar sua foto">
                     <img id="img-perfil" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--saturn-gold); display: none; box-shadow: 0 0 15px var(--saturn-gold-dim);">
                     <div id="avatar-padrao" style="font-size: 3.5rem; line-height: 110px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 2px dashed var(--saturn-gold);">👨‍🚀</div>
                     <div style="position: absolute; bottom: 0; right: 0; background: var(--saturn-gold); color: #000; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; box-shadow: 0 0 10px rgba(0,0,0,0.5);">📷</div>
                 </div>
-                
-                <!-- INPUT OCULTO PARA SELECIONAR A FOTO -->
                 <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="salvarFotoPerfil(event)">
-                <small style="color: var(--lavender-glow); display: block; margin-top: -5px; margin-bottom: 20px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Clique na foto acima para alterar</small>
+                <small style="color: var(--lavender-glow); display: block; margin-top: -5px; margin-bottom: 20px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Clique na foto para alterar</small>
 
                 <!-- DADOS DO CLIENTE -->
                 <h2 id="perfil-nome" style="font-size: 2rem; color: #fff; margin-bottom: 5px;">Nome do Tripulante</h2>
                 <p id="perfil-email" style="color: var(--lavender-glow); margin-bottom: 15px;">email@galaxia.com</p>
                 <span class="badge-status aprovado" style="font-size: 0.85rem;">Sintonizado em Órbita</span>
 
+                <!-- CARD DE MEDIDAS ESTELARES -->
+                <div style="margin-top: 30px; text-align: left; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;">
+                    <h3 style="color: var(--saturn-gold); margin-bottom: 8px; font-size: 1.1rem;">📏 Minhas Medidas Estelares (Sob Medida)</h3>
+                    <p style="font-size: 0.85rem; color: var(--lavender-glow); margin-bottom: 15px;">Preencha suas medidas para agilizar a confecção sob medida de seus mantos.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: #fff;">Busto (cm):</label>
+                            <input type="number" id="medida-busto" placeholder="ex: 90" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #fff;">Cintura (cm):</label>
+                            <input type="number" id="medida-cintura" placeholder="ex: 70" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #fff;">Quadril (cm):</label>
+                            <input type="number" id="medida-quadril" placeholder="ex: 98" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #fff;">Altura (cm):</label>
+                            <input type="number" id="medida-altura" placeholder="ex: 165" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                        </div>
+                    </div>
+                    <button onclick="salvarMedidasCliente()" style="margin-top: 15px; background: var(--saturn-gold); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer;">✨ Salvar Medidas</button>
+                </div>
+
                 <!-- LISTA DE PEDIDOS -->
-                <div style="margin-top: 35px; text-align: left; border-top: 1px solid var(--glass-border); padding-top: 25px;">
+                <div style="margin-top: 30px; text-align: left; border-top: 1px solid var(--glass-border); padding-top: 25px;">
                     <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">📦 Meus Pedidos & Encomendas Estelares</h3>
                     <div id="lista-pedidos-cliente">
                         <p style="text-align: center; color: var(--lavender-glow);">Buscando pedidos...</p>
@@ -1039,7 +1063,7 @@ telasCelestine['cliente'] = `
                 </div>
             </div>
         </section>
-    `,
+`;
 
 telasCelestine['login'] = `
     <section class="login-section">
@@ -1077,6 +1101,38 @@ telasCelestine['login'] = `
                     <a href="#" onclick="event.preventDefault(); alternarModoLogin('login');">Entrar com conta existente</a>
                 </p>
                 <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
+            </div>
+        </div>
+    </section>
+`;
+telasCelestine['mais-vendidos'] = `
+    <section style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+        <h2 style="text-align: center; color: #fff; font-size: 2.2rem; margin-bottom: 10px;">👑 Mantos Mais Vendidos</h2>
+        <p style="text-align: center; color: var(--lavender-glow); margin-bottom: 40px;">Os modelos autorais preferidos pelos tripulantes da Celestine Ateliê.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+            <div style="background: rgba(38, 41, 52, 0.8); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; text-align: center;">
+                <div style="font-size: 3.5rem; margin-bottom: 10px;">🌘</div>
+                <h3 style="color: #fff;">Manto Eclipse Noturno</h3>
+                <p style="color: var(--lavender-glow); font-size: 0.9rem; margin: 10px 0;">Corte minimalista com caimento pesado e detalhes escuros refinados.</p>
+                <strong style="color: var(--saturn-gold); font-size: 1.2rem; display: block; margin-bottom: 15px;">Sob Medida</strong>
+                <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%;">🌙 Agendar Este Manto</button>
+            </div>
+
+            <div style="background: rgba(38, 41, 52, 0.8); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; text-align: center;">
+                <div style="font-size: 3.5rem; margin-bottom: 10px;">🪐</div>
+                <h3 style="color: #fff;">Vestido Saturniano Imperial</h3>
+                <p style="color: var(--lavender-glow); font-size: 0.9rem; margin: 10px 0;">Anéis e camadas sobrepostas com aplicação de brilho dourado estelar.</p>
+                <strong style="color: var(--saturn-gold); font-size: 1.2rem; display: block; margin-bottom: 15px;">Sob Medida</strong>
+                <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%;">🌙 Agendar Este Manto</button>
+            </div>
+
+            <div style="background: rgba(38, 41, 52, 0.8); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; text-align: center;">
+                <div style="font-size: 3.5rem; margin-bottom: 10px;">✨</div>
+                <h3 style="color: #fff;">Manto Via Láctea Translúcida</h3>
+                <p style="color: var(--lavender-glow); font-size: 0.9rem; margin: 10px 0;">Tece transparência com aplicação manual de microcristais celestes.</p>
+                <strong style="color: var(--saturn-gold); font-size: 1.2rem; display: block; margin-bottom: 15px;">Sob Medida</strong>
+                <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%;">🌙 Agendar Este Manto</button>
             </div>
         </div>
     </section>
@@ -1315,11 +1371,24 @@ async function carregarPerfilCliente() {
 
     const elNome = document.getElementById('perfil-nome');
     const elEmail = document.getElementById('perfil-email');
+    const imgPerfil = document.getElementById('img-perfil');
+    const avatarPadrao = document.getElementById('avatar-padrao');
     const containerPedidos = document.getElementById('lista-pedidos-cliente');
 
     if (elNome) elNome.innerText = cliente.nome;
-    if (elEmail) elEmail.innerText = `📡 ${cliente.email}`;
+    if (elEmail) elEmail.innerText = cliente.email;
 
+    if (cliente.foto && imgPerfil && avatarPadrao) {
+        imgPerfil.src = cliente.foto;
+        imgPerfil.style.display = 'block';
+        avatarPadrao.style.display = 'none';
+    }
+
+    // Preenche as medidas caso o cliente já tenha salvas no cadastro
+    if (cliente.busto && document.getElementById('medida-busto')) document.getElementById('medida-busto').value = cliente.busto;
+    if (cliente.cintura && document.getElementById('medida-cintura')) document.getElementById('medida-cintura').value = cliente.cintura;
+    if (cliente.quadril && document.getElementById('medida-quadril')) document.getElementById('medida-quadril').value = cliente.quadril;
+    if (cliente.altura && document.getElementById('medida-altura')) document.getElementById('medida-altura').value = cliente.altura;
     if (!containerPedidos) return;
 
     try {
@@ -1327,25 +1396,50 @@ async function carregarPerfilCliente() {
         const pedidos = await res.json();
 
         if (!pedidos || pedidos.length === 0) {
-            containerPedidos.innerHTML = '<p style="text-align:center; padding: 15px; color: var(--lavender-glow);">Você ainda não realizou nenhum pedido no cosmos.</p>';
+            containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px;">Nenhum pedido registrado nesta conta ainda.</p>';
             return;
         }
 
-        containerPedidos.innerHTML = pedidos.map(p => {
-            const statusClass = (p.status || 'Pendente').toLowerCase();
-            return `
-                <div class="card-pedido-item">
-                    <div class="pedido-id">#${p.id}</div>
-                    <div class="pedido-dados">
-                        <strong>✨ Estilo: ${p.estilo}</strong>
-                        <small style="color: var(--lavender-glow);">Data do Sinal: ${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recentemente'}</small>
-                    </div>
-                    <span class="badge-status ${statusClass}">${p.status || 'Pendente'}</span>
+        containerPedidos.innerHTML = pedidos.map(p => `
+            <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>#${p.id} - ${p.estilo}</strong><br>
+                    <small style="color: var(--lavender-glow);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
                 </div>
-            `;
-        }).join('');
+                <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
+            </div>
+        `).join('');
     } catch (err) {
-        containerPedidos.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao carregar histórico de pedidos.</p>';
+        containerPedidos.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao carregar lista de pedidos.</p>';
+    }
+}
+
+// Salva as medidas localmente e no banco de dados SQLite
+async function salvarMedidasCliente() {
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    const busto = document.getElementById('medida-busto').value;
+    const cintura = document.getElementById('medida-cintura').value;
+    const quadril = document.getElementById('medida-quadril').value;
+    const altura = document.getElementById('medida-altura').value;
+
+    cliente.busto = busto;
+    cliente.cintura = cintura;
+    cliente.quadril = quadril;
+    cliente.altura = altura;
+
+    localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
+
+    try {
+        await fetch(`${API_URL}/clientes/${cliente.id}/medidas`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ busto, cintura, quadril, altura })
+        });
+        alert('📐 Medidas salvas com sucesso!');
+    } catch (err) {
+        alert('✨ Medidas salvas localmente!');
     }
 }
 

@@ -20,6 +20,11 @@ const db = new sqlite3.Database('./database.db', (err) => {
 });
 
 // Criar as tabelas no banco de dados se não existirem
+// Cole estas linhas dentro do db.serialize no index.js:
+db.run(`ALTER TABLE clientes ADD COLUMN busto TEXT`, () => {});
+db.run(`ALTER TABLE clientes ADD COLUMN cintura TEXT`, () => {});
+db.run(`ALTER TABLE clientes ADD COLUMN quadril TEXT`, () => {});
+db.run(`ALTER TABLE clientes ADD COLUMN altura TEXT`, () => {});
 db.serialize(() => {
     // Tabela de Clientes com suporte a foto
     db.run(`CREATE TABLE IF NOT EXISTS clientes (
@@ -224,6 +229,19 @@ app.get('/api/pedidos/cliente/:email', (req, res) => {
     db.all('SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC', [email], (err, rows) => {
         if (err) return res.status(500).json({ erro: 'Erro ao buscar pedidos.' });
         res.json(rows || []);
+    });
+});
+// Rota para salvar medidas do cliente
+app.put('/api/clientes/:id/medidas', (req, res) => {
+    const { id } = req.params;
+    const { busto, cintura, quadril, altura } = req.body;
+
+    const sql = `UPDATE clientes SET busto = ?, cintura = ?, quadril = ?, altura = ? WHERE id = ?`;
+    db.run(sql, [busto, cintura, quadril, altura, id], function (err) {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao salvar medidas no banco de dados.' });
+        }
+        res.json({ mensagem: 'Medidas salvas com sucesso!' });
     });
 });
 // Inicialização do servidor no final do arquivo

@@ -22,7 +22,7 @@
         <ul>
             <!-- IDs adicionados abaixo: -->
             <li id="menu-item-pedidos"><a href="#pedidos" onclick="event.preventDefault(); abrirCaixaDePedidos();">📦 Caixa de Pedidos</a></li>
-            <li><a href="#mais-vendidos">👑 Mais Vendidos (Clientes)</a></li>
+            <li><a href="#mais-vendidos" onclick="event.preventDefault(); mudarTela('mais-vendidos');">👑 Mais Vendidos (Clientes)</a></li>
             <li><a href="#provador">🪐 Provador de Saturno 3D</a></li>
             <li id="menu-item-clientes"><a href="#clientes" onclick="event.preventDefault(); abrirCaixaDeClientes();">👤 Clientes Registrados</a></li>
             <li id="menu-item-admin"><a href="#admin" class="nav-admin-link" onclick="event.preventDefault(); mudarTela('admin'); carregarPainelAdmin();">🛸 Centro de Comando (Admin)</a></li>
