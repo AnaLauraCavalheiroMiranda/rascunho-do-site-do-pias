@@ -19,23 +19,26 @@ const db = new sqlite3.Database('./database.db', (err) => {
     }
 });
 
-// Criar as tabelas no banco de dados se não existirem
-// Cole estas linhas dentro do db.serialize no index.js:
-db.run(`ALTER TABLE clientes ADD COLUMN busto TEXT`, () => {});
-db.run(`ALTER TABLE clientes ADD COLUMN cintura TEXT`, () => {});
-db.run(`ALTER TABLE clientes ADD COLUMN quadril TEXT`, () => {});
-db.run(`ALTER TABLE clientes ADD COLUMN altura TEXT`, () => {});
+// Criar e atualizar tabelas no banco de dados
 db.serialize(() => {
-    // Tabela de Clientes com suporte a foto
+    // Tabela de Clientes
     db.run(`CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        foto TEXT
+        foto TEXT,
+        busto TEXT,
+        cintura TEXT,
+        quadril TEXT,
+        altura TEXT
     )`);
 
-    // Tenta adicionar a coluna foto caso o banco já existisse antes
+    // Adiciona colunas para compatibilidade com bancos criados anteriormente
     db.run(`ALTER TABLE clientes ADD COLUMN foto TEXT`, () => {});
+    db.run(`ALTER TABLE clientes ADD COLUMN busto TEXT`, () => {});
+    db.run(`ALTER TABLE clientes ADD COLUMN cintura TEXT`, () => {});
+    db.run(`ALTER TABLE clientes ADD COLUMN quadril TEXT`, () => {});
+    db.run(`ALTER TABLE clientes ADD COLUMN altura TEXT`, () => {});
 
     // Tabela de Pedidos
     db.run(`CREATE TABLE IF NOT EXISTS pedidos (
@@ -52,7 +55,7 @@ db.serialize(() => {
 // ROTAS DE CLIENTES
 // ==========================================
 
-// POST: Cadastrar um novo cliente
+// Cadastrar novo cliente
 app.post('/api/clientes', (req, res) => {
     const { nome, email } = req.body;
 
@@ -78,13 +81,49 @@ app.post('/api/clientes', (req, res) => {
     });
 });
 
-// GET: Consultar todos os clientes
+// Login de cliente existente
+app.post('/api/clientes/login', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
+    }
+
+    const sql = 'SELECT * FROM clientes WHERE email = ?';
+    db.get(sql, [email], (err, cliente) => {
+        if (err) return res.status(500).json({ erro: 'Erro no banco de dados.' });
+        if (!cliente) return res.status(404).json({ erro: 'Conta não encontrada! Verifique o e-mail ou cadastre-se.' });
+        res.json({ mensagem: 'Sintonizado com sucesso!', cliente });
+    });
+});
+
+// Atualizar foto do cliente
+app.put('/api/clientes/:id/foto', (req, res) => {
+    const { id } = req.params;
+    const { foto } = req.body;
+
+    db.run('UPDATE clientes SET foto = ? WHERE id = ?', [foto, id], function (err) {
+        if (err) return res.status(500).json({ erro: 'Erro ao salvar foto de perfil.' });
+        res.json({ mensagem: 'Foto atualizada com sucesso!' });
+    });
+});
+
+// Atualizar medidas do cliente
+app.put('/api/clientes/:id/medidas', (req, res) => {
+    const { id } = req.params;
+    const { busto, cintura, quadril, altura } = req.body;
+
+    const sql = `UPDATE clientes SET busto = ?, cintura = ?, quadril = ?, altura = ? WHERE id = ?`;
+    db.run(sql, [busto, cintura, quadril, altura, id], function (err) {
+        if (err) return res.status(500).json({ erro: 'Erro ao salvar medidas no banco de dados.' });
+        res.json({ mensagem: 'Medidas salvas com sucesso!' });
+    });
+});
+
+// Consultar todos os clientes
 app.get('/api/clientes', (req, res) => {
-    const sql = 'SELECT * FROM clientes ORDER BY id DESC';
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao consultar clientes.', detalhes: err.message });
-        }
+    db.all('SELECT * FROM clientes ORDER BY id DESC', [], (err, rows) => {
+        if (err) return res.status(500).json({ erro: 'Erro ao consultar clientes.', detalhes: err.message });
         res.json(rows);
     });
 });
@@ -93,7 +132,7 @@ app.get('/api/clientes', (req, res) => {
 // ROTAS DE PEDIDOS E ADMIN
 // ==========================================
 
-// POST: Criar novo pedido
+// Criar pedido
 app.post('/api/pedidos', (req, res) => {
     const { nome, email, estilo } = req.body;
 
@@ -101,48 +140,42 @@ app.post('/api/pedidos', (req, res) => {
         return res.status(400).json({ erro: 'Por favor, preencha todos os campos do pedido.' });
     }
 
-    const sqlPedido = 'INSERT INTO pedidos (nome_cliente, email, estilo) VALUES (?, ?, ?)';
-    db.run(sqlPedido, [nome, email, estilo], function (err) {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao salvar pedido.', detalhes: err.message });
-        }
-
-        res.status(201).json({
-            mensagem: 'Pedido registrado com sucesso!',
-            id: this.lastID,
-            nome_cliente: nome,
-            email,
-            estilo
-        });
+    const sql = 'INSERT INTO pedidos (nome_cliente, email, estilo) VALUES (?, ?, ?)';
+    db.run(sql, [nome, email, estilo], function (err) {
+        if (err) return res.status(500).json({ erro: 'Erro ao salvar pedido.' });
+        res.status(201).json({ mensagem: 'Pedido registrado com sucesso!', id: this.lastID });
     });
 });
 
-// GET: Consultar todos os pedidos
+// Consultar todos os pedidos
 app.get('/api/pedidos', (req, res) => {
-    const sql = 'SELECT * FROM pedidos ORDER BY id DESC';
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao consultar pedidos.', detalhes: err.message });
-        }
+    db.all('SELECT * FROM pedidos ORDER BY id DESC', [], (err, rows) => {
+        if (err) return res.status(500).json({ erro: 'Erro ao consultar pedidos.' });
         res.json(rows);
     });
 });
 
-// PUT: Alterar o status do pedido (Aprovado / Recusado / Pendente)
+// Consultar pedidos por e-mail do cliente
+app.get('/api/pedidos/cliente/:email', (req, res) => {
+    const { email } = req.params;
+    db.all('SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC', [email], (err, rows) => {
+        if (err) return res.status(500).json({ erro: 'Erro ao buscar pedidos do cliente.' });
+        res.json(rows || []);
+    });
+});
+
+// Atualizar status do pedido (Aprovado / Recusado / Pendente)
 app.put('/api/pedidos/:id/status', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const query = `UPDATE pedidos SET status = ? WHERE id = ?`;
-    db.run(query, [status, id], function (err) {
-        if (err) {
-            return res.status(500).json({ erro: err.message });
-        }
+    db.run('UPDATE pedidos SET status = ? WHERE id = ?', [status, id], function (err) {
+        if (err) return res.status(500).json({ erro: err.message });
         res.json({ mensagem: `Pedido #${id} alterado para ${status}!` });
     });
 });
 
-// GET: Estatísticas para o painel admin e gráfico
+// Estatísticas para o painel admin
 app.get('/api/admin/estatisticas', (req, res) => {
     const query = `
         SELECT 
@@ -154,98 +187,13 @@ app.get('/api/admin/estatisticas', (req, res) => {
     `;
 
     db.get(query, [], (err, row) => {
-        if (err) {
-            return res.status(500).json({ erro: err.message });
-        }
+        if (err) return res.status(500).json({ erro: err.message });
         res.json(row || { total: 0, pendentes: 0, aprovados: 0, recusados: 0 });
     });
 });
 
-
-// ==========================================
-// ROTA DE LOGIN DE CLIENTE EXISTENTE
-// ==========================================
-app.post('/api/clientes/login', (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
-    }
-
-    const sql = 'SELECT * FROM clientes WHERE email = ?';
-    db.get(sql, [email], (err, cliente) => {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao consultar o banco de dados.', detalhes: err.message });
-        }
-        if (!cliente) {
-            return res.status(404).json({ erro: 'Conta não encontrada! Verifique o e-mail ou faça um novo cadastro.' });
-        }
-        res.json({ mensagem: 'Sintonizado com sucesso!', cliente });
-    });
-});
-
-// GET: Consultar pedidos de um cliente específico pelo e-mail
-app.get('/api/pedidos/cliente/:email', (req, res) => {
-    const { email } = req.params;
-    const sql = 'SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC';
-    db.all(sql, [email], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao consultar pedidos do tripulante.', detalhes: err.message });
-        }
-        res.json(rows);
-    });
-});
-// Rota para salvar a foto de perfil do cliente
-app.put('/api/clientes/:id/foto', (req, res) => {
-    const { id } = req.params;
-    const { foto } = req.body;
-
-    db.run('UPDATE clientes SET foto = ? WHERE id = ?', [foto, id], function (err) {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao salvar a foto de perfil.' });
-        }
-        res.json({ mensagem: 'Foto atualizada com sucesso!' });
-    });
-});
-
-// Rota de login de cliente
-app.post('/api/clientes/login', (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
-    }
-
-    db.get('SELECT * FROM clientes WHERE email = ?', [email], (err, cliente) => {
-        if (err) return res.status(500).json({ erro: 'Erro no banco de dados.' });
-        if (!cliente) return res.status(404).json({ erro: 'Conta não encontrada.' });
-        res.json({ cliente });
-    });
-});
-
-// Rota para buscar os pedidos de um cliente específico pelo e-mail
-app.get('/api/pedidos/cliente/:email', (req, res) => {
-    const { email } = req.params;
-    db.all('SELECT * FROM pedidos WHERE email = ? ORDER BY id DESC', [email], (err, rows) => {
-        if (err) return res.status(500).json({ erro: 'Erro ao buscar pedidos.' });
-        res.json(rows || []);
-    });
-});
-// Rota para salvar medidas do cliente
-app.put('/api/clientes/:id/medidas', (req, res) => {
-    const { id } = req.params;
-    const { busto, cintura, quadril, altura } = req.body;
-
-    const sql = `UPDATE clientes SET busto = ?, cintura = ?, quadril = ?, altura = ? WHERE id = ?`;
-    db.run(sql, [busto, cintura, quadril, altura, id], function (err) {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao salvar medidas no banco de dados.' });
-        }
-        res.json({ mensagem: 'Medidas salvas com sucesso!' });
-    });
-});
-// Inicialização do servidor no final do arquivo
+// Inicialização do servidor
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor Celestine Ateliê rodando em http://localhost:${PORT}`);
 });
