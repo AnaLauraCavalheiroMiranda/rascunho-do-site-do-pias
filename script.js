@@ -4,6 +4,7 @@
 
 const API_URL = 'http://localhost:3000/api';
 let produtosGlobais = [];
+let listaClientesCache = [];
 
 // ==========================================
 // 1. BASE DE DADOS DE MATÉRIAS-PRIMAS
@@ -405,44 +406,121 @@ const telasCelestine = {
 
     'admin': `
         <section class="admin-dashboard-section" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
-            <div class="admin-header" style="text-align: center; margin-bottom: 30px;">
-                <h2>🛸 Centro de Comando Orbital (Admin)</h2>
-                <p>Gerenciamento de chamados, fluxo do mês e aprovação de encomendas.</p>
+            <div class="admin-header" style="text-align: center; margin-bottom: 25px;">
+                <h2>🛸 Centro de Comando Admin</h2>
+                <p style="color: var(--lavender-glow);">Painel central de controle do ateliê estelar.</p>
             </div>
 
-            <!-- CARDS DE MÉTRICAS -->
-            <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border); text-align: center;">
-                    <small>Total de Pedidos</small>
-                    <h3 id="metric-total" style="font-size: 2em; margin: 5px 0;">0</h3>
-                </div>
-                <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #ffc107; text-align: center;">
-                    <small>⌛ Pendentes</small>
-                    <h3 id="metric-pendentes" style="font-size: 2em; margin: 5px 0; color: #ffc107;">0</h3>
-                </div>
-                <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #28a745; text-align: center;">
-                    <small>✅ Aprovados</small>
-                    <h3 id="metric-aprovados" style="font-size: 2em; margin: 5px 0; color: #28a745;">0</h3>
-                </div>
+            <!-- SUB-BOTÕES DE NAVEGAÇÃO INTERNA NO ADMIN -->
+            <div class="admin-sub-menu" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; flex-wrap: wrap;">
+                <button class="btn-sub-admin active" onclick="mudarSubAbaAdmin('pedidos')">
+                    📦 Pedidos & Estatísticas
+                </button>
+                <button class="btn-sub-admin" onclick="mudarSubAbaAdmin('consulta')">
+                    📋 Consultar Clientes
+                </button>
+                <button class="btn-sub-admin" onclick="mudarSubAbaAdmin('edicao')">
+                    ✏️ Alterar Dados
+                </button>
             </div>
 
-            <!-- PAINEL DUPLO: GRÁFICO E CALENDÁRIO -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <!-- ABA 1: PEDIDOS, MÉTRICAS E CALENDÁRIO -->
+            <div id="sub-aba-pedidos" class="sub-aba-conteudo" style="display: block;">
+                <!-- CARDS DE MÉTRICAS -->
+                <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border); text-align: center;">
+                        <small style="color: var(--lavender-glow);">Total de Pedidos</small>
+                        <h3 id="metric-total" style="font-size: 2em; margin: 5px 0; color: #fff;">0</h3>
+                    </div>
+                    <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #ffc107; text-align: center;">
+                        <small style="color: #ffc107;">⌛ Pendentes</small>
+                        <h3 id="metric-pendentes" style="font-size: 2em; margin: 5px 0; color: #ffc107;">0</h3>
+                    </div>
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #28a745; text-align: center;">
+                        <small style="color: #28a745;">✅ Aprovados</small>
+                        <h3 id="metric-aprovados" style="font-size: 2em; margin: 5px 0; color: #28a745;">0</h3>
+                    </div>
+                </div>
+
+                <!-- PAINEL DUPLO: GRÁFICO E CALENDÁRIO -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <h3 style="color: #fff; margin-bottom: 15px;">📊 Distribuição dos Pedidos</h3>
+                        <canvas id="graficoPedidos" style="max-height: 250px;"></canvas>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <h3 id="titulo-calendario" style="color: #fff; margin-bottom: 15px;">🗓️ Calendário de Atendimento</h3>
+                        <div id="grid-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; text-align: center;"></div>
+                    </div>
+                </div>
+
+                <!-- TABELA DE GESTÃO DE PEDIDOS -->
                 <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <h3>📊 Distribuição dos Pedidos</h3>
-                    <canvas id="graficoPedidos" style="max-height: 250px;"></canvas>
-                </div>
-
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <h3 id="titulo-calendario">🗓️ Calendário de Atendimento</h3>
-                    <div id="grid-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; text-align: center;"></div>
+                    <h3 style="color: #fff; margin-bottom: 15px;">📜 Aprovação & Gestão de Pedidos</h3>
+                    <div id="tabela-pedidos-admin" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
 
-            <!-- TABELA DE GESTÃO DE PEDIDOS -->
-            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                <h3>📜 Pedidos Cadastrados</h3>
-                <div id="tabela-pedidos-admin" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+            <!-- ABA 2: CONSULTA DE CLIENTES -->
+            <div id="sub-aba-consulta" class="sub-aba-conteudo" style="display: none;">
+                <div style="background: rgba(0,0,0,0.3); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="color: #fff; margin: 0;">👥 Tripulantes Cadastrados</h3>
+                        <input type="text" id="filtro-cliente-admin" placeholder="🔍 Buscar nome ou e-mail..." oninput="filtrarClientesAdmin()" style="padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; width: 260px;">
+                    </div>
+
+                    <div id="tabela-clientes-admin" style="display: flex; flex-direction: column; gap: 12px;">
+                        <p style="text-align: center; color: var(--lavender-glow);">Carregando tripulantes...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 3: ALTERAÇÃO / EDIÇÃO DE CLIENTES -->
+            <div id="sub-aba-edicao" class="sub-aba-conteudo" style="display: none;">
+                <div style="background: rgba(38, 41, 52, 0.95); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px);">
+                    <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">✏️ Formulário de Alteração de Dados</h3>
+                    
+                    <form id="form-edicao-admin" onsubmit="salvarEdicaoClienteAdmin(event)">
+                        <input type="hidden" id="admin-edit-id">
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                            <div>
+                                <label style="color: #fff; font-size: 0.85rem;">Nome Completo:</label>
+                                <input type="text" id="admin-edit-nome" required style="width: 100%; padding: 10px; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="color: #fff; font-size: 0.85rem;">E-mail (Frequência Digital):</label>
+                                <input type="email" id="admin-edit-email" required style="width: 100%; padding: 10px; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--saturn-gold); margin-top: 15px; font-size: 0.95rem;">📏 Medidas Estelares (cm)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 8px;">
+                            <div>
+                                <label style="color: #fff; font-size: 0.8rem;">Busto:</label>
+                                <input type="number" id="admin-edit-busto" placeholder="90" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="color: #fff; font-size: 0.8rem;">Cintura:</label>
+                                <input type="number" id="admin-edit-cintura" placeholder="70" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="color: #fff; font-size: 0.8rem;">Quadril:</label>
+                                <input type="number" id="admin-edit-quadril" placeholder="98" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="color: #fff; font-size: 0.8rem;">Altura:</label>
+                                <input type="number" id="admin-edit-altura" placeholder="165" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button type="submit" class="btn-submit-login" style="padding: 10px 20px;">💾 Salvar Alterações</button>
+                            <button type="button" class="btn-back-home" style="margin: 0;" onclick="mudarSubAbaAdmin('consulta')">❌ Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div style="text-align: center; margin-top: 30px;">
@@ -464,7 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
     configurarGatilhosNavegacao();
     atualizarBotaoSessaoCabecalho();
 
-    // Configura botões adicionais no menu lateral
     const linkPedidos = document.querySelector('aside#sidePanel a[href="#pedidos"]');
     if (linkPedidos) linkPedidos.setAttribute('onclick', "event.preventDefault(); abrirCaixaDePedidos();");
 
@@ -726,8 +803,6 @@ function alternarFavorito(tituloManto, event) {
     }
 
     salvarFavoritosCliente(cliente.email, favoritos);
-
-    // Se estivermos na tela de perfil do cliente, atualiza a lista em tempo real
     carregarFavoritosNoPerfil();
 }
 
@@ -863,10 +938,8 @@ async function carregarPerfilCliente() {
     if (cliente.quadril && document.getElementById('medida-quadril')) document.getElementById('medida-quadril').value = cliente.quadril;
     if (cliente.altura && document.getElementById('medida-altura')) document.getElementById('medida-altura').value = cliente.altura;
 
-    // Carrega seção de favoritos
     carregarFavoritosNoPerfil();
 
-    // Carrega histórico de pedidos do cliente
     if (containerPedidos) {
         try {
             const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(cliente.email)}`);
@@ -878,7 +951,7 @@ async function carregarPerfilCliente() {
                 containerPedidos.innerHTML = pedidos.map(p => `
                     <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <strong>#${p.id} - ${p.estilo}</strong><br>
+                            <strong>#${p.id} ${p.estilo}</strong><br>
                             <small style="color: var(--lavender-glow);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
                         </div>
                         <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
@@ -1010,7 +1083,6 @@ function verDetalhesProduto(index) {
             </div>
         </section>
     `;
-
     containerPrincipal.style.opacity = 0;
     setTimeout(() => {
         containerPrincipal.innerHTML = htmlDetalhes;
@@ -1131,7 +1203,7 @@ function calcularResultadoQuiz(event) {
     const materialRecomendado = materiaisCelestine.find(m => m.id === perfilVencedor) || materiaisCelestine[0];
 
     const titulosEstilo = {
-        misterio: "exe Aura Eclipse (Misteriosa & Sóbria)",
+        misterio: "🌘 Aura Eclipse (Misteriosa & Sóbria)",
         brilho: "🪐 Aura Saturniana (Extravagante & Magnética)",
         fluidez: "✨ Aura Etérea (Fluida & Iluminada)"
     };
@@ -1296,12 +1368,30 @@ async function carregarClientesDoBanco() {
 }
 
 // ==========================================
-// 10. PAINEL ADMIN, CALENDÁRIO & ESTATÍSTICAS
+// 10. PAINEL ADMIN, GESTÃO DE CLIENTES & METROLOGIA
 // ==========================================
+
+function mudarSubAbaAdmin(nomeAba) {
+    document.querySelectorAll('.sub-aba-conteudo').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.btn-sub-admin').forEach(btn => btn.classList.remove('active'));
+
+    const abaAlvo = document.getElementById(`sub-aba-${nomeAba}`);
+    if (abaAlvo) {
+        abaAlvo.style.display = 'block';
+    }
+
+    const btnAtivo = Array.from(document.querySelectorAll('.btn-sub-admin')).find(btn => 
+        btn.getAttribute('onclick').includes(nomeAba)
+    );
+    if (btnAtivo) btnAtivo.classList.add('active');
+
+    if (nomeAba === 'consulta') buscarClientesAPI();
+}
 
 async function carregarPainelAdmin() {
     await carregarMetricasEGrafico();
     await carregarTabelaAdmin();
+    await buscarClientesAPI();
     gerarCalendarioOrbital();
 }
 
@@ -1348,20 +1438,20 @@ async function carregarTabelaAdmin() {
         const pedidos = await res.json();
 
         if (!pedidos || pedidos.length === 0) {
-            container.innerHTML = '<p style="text-align:center;">Nenhum pedido encontrado no banco de dados.</p>';
+            container.innerHTML = '<p style="text-align:center; color: var(--lavender-glow);">Nenhum pedido encontrado no banco de dados.</p>';
             return;
         }
 
         container.innerHTML = pedidos.map(p => `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid var(--glass-border);">
                 <div>
-                    <strong>#${p.id} - ${p.nome_cliente || p.nome}</strong> (${p.email})<br>
-                    <small>✨ Estilo: ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
+                    <strong style="color: #fff;">#${p.id} ${p.nome_cliente || p.nome}</strong> <span style="color: var(--lavender-glow);">(${p.email})</span><br>
+                    <small style="color: var(--saturn-gold);">✨ Estilo: ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">✅ Aprovar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">❌ Recusar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.1); color: #ffc107; border: 1px solid #ffc107; padding: 6px 10px; border-radius: 4px; cursor: pointer;">⏳ Pendente</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">❌ Recusar</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.1); color: #ffc107; border: 1px solid #ffc107; padding: 6px 12px; border-radius: 6px; cursor: pointer;">⏳ Pendente</button>
                 </div>
             </div>
         `).join('');
@@ -1379,13 +1469,124 @@ async function atualizarStatusPedido(id, novoStatus) {
         });
 
         if (res.ok) {
-            alert(`Pedido #${id} ${novoStatus} com sucesso!`);
+            alert(`✨ Pedido #${id} alterado para ${novoStatus}!`);
             carregarPainelAdmin();
         } else {
             alert('Erro ao atualizar o status.');
         }
     } catch (err) {
         alert('Falha na conexão com o servidor.');
+    }
+}
+
+async function buscarClientesAPI() {
+    const container = document.getElementById('tabela-clientes-admin');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`${API_URL}/clientes`);
+        listaClientesCache = await res.json();
+        renderizarListaClientesAdmin(listaClientesCache);
+    } catch (err) {
+        container.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao conectar com o banco de dados.</p>';
+    }
+}
+
+function renderizarListaClientesAdmin(clientes) {
+    const container = document.getElementById('tabela-clientes-admin');
+    if (!container) return;
+
+    if (!clientes || clientes.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--lavender-glow);">Nenhum cliente cadastrado.</p>';
+        return;
+    }
+
+    container.innerHTML = clientes.map(c => `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <strong style="color: #fff; font-size: 1.05rem;">#${c.id} - ${c.nome}</strong><br>
+                <span style="color: var(--lavender-glow); font-size: 0.9rem;">📡 ${c.email}</span>
+                <div style="margin-top: 5px; font-size: 0.8rem; color: var(--saturn-gold);">
+                    📏 Busto: ${c.busto || '-'} cm | Cintura: ${c.cintura || '-'} cm | Quadril: ${c.quadril || '-'} cm | Altura: ${c.altura || '-'} cm
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="prepararEdicaoCliente(${c.id})" style="background: var(--saturn-gold); color: #000; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">
+                    ✏️ Editar
+                </button>
+                <button onclick="excluirClienteAdmin(${c.id})" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                    🗑️ Excluir
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function prepararEdicaoCliente(id) {
+    const cliente = listaClientesCache.find(c => c.id === id);
+    if (!cliente) return;
+
+    document.getElementById('admin-edit-id').value = cliente.id;
+    document.getElementById('admin-edit-nome').value = cliente.nome;
+    document.getElementById('admin-edit-email').value = cliente.email;
+    document.getElementById('admin-edit-busto').value = cliente.busto || '';
+    document.getElementById('admin-edit-cintura').value = cliente.cintura || '';
+    document.getElementById('admin-edit-quadril').value = cliente.quadril || '';
+    document.getElementById('admin-edit-altura').value = cliente.altura || '';
+
+    mudarSubAbaAdmin('edicao');
+}
+
+function filtrarClientesAdmin() {
+    const termo = document.getElementById('filtro-cliente-admin').value.toLowerCase();
+    const filtrados = listaClientesCache.filter(c => 
+        c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo)
+    );
+    renderizarListaClientesAdmin(filtrados);
+}
+
+async function salvarEdicaoClienteAdmin(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('admin-edit-id').value;
+    const dados = {
+        nome: document.getElementById('admin-edit-nome').value,
+        email: document.getElementById('admin-edit-email').value,
+        busto: document.getElementById('admin-edit-busto').value,
+        cintura: document.getElementById('admin-edit-cintura').value,
+        quadril: document.getElementById('admin-edit-quadril').value,
+        altura: document.getElementById('admin-edit-altura').value
+    };
+
+    try {
+        const res = await fetch(`${API_URL}/clientes/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        if (res.ok) {
+            alert(`✨ Dados do tripulante #${id} alterados com sucesso!`);
+            await buscarClientesAPI();
+            mudarSubAbaAdmin('consulta');
+        } else {
+            alert('⚠️ Não foi possível salvar as alterações.');
+        }
+    } catch (err) {
+        alert('❌ Erro de conexão com a API.');
+    }
+}
+
+async function excluirClienteAdmin(id) {
+    if (!confirm(`Deseja realmente remover o cliente #${id}?`)) return;
+
+    try {
+        const res = await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            await buscarClientesAPI();
+        }
+    } catch (err) {
+        alert('❌ Erro ao excluir cliente.');
     }
 }
 

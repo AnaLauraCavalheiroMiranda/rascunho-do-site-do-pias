@@ -1592,3 +1592,26 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     align-items: center;
     z-index: 10000; /* Garante que fique por cima do menu e do conteúdo */
 }
+.btn-sub-admin {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--lavender-glow);
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-sub-admin:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.btn-sub-admin.active {
+    background: var(--saturn-gold);
+    color: #000;
+    font-weight: bold;
+    border-color: var(--saturn-gold);
+    box-shadow: 0 0 12px rgba(230, 190, 138, 0.4);
+}
