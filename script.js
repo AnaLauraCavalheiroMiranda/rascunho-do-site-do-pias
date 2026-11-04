@@ -1669,3 +1669,426 @@ document.addEventListener('mousemove', (e) => {
         star.remove();
     }, 800);
 });
+// ==========================================
+// 10. PAINEL ADMIN: NAVEGAÇÃO, CONSULTA E EDIÇÃO DE CLIENTES
+// ==========================================
+
+// Alterna entre as abas internas do Admin ('pedidos', 'consulta', 'edicao')
+function mudarSubAbaAdmin(nomeAba) {
+    document.querySelectorAll('.sub-aba-conteudo').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.btn-sub-admin').forEach(btn => btn.classList.remove('active'));
+
+    const abaAlvo = document.getElementById(`sub-aba-${nomeAba}`);
+    if (abaAlvo) {
+        abaAlvo.style.display = 'block';
+    }
+
+    // Marca o botão correspondente como ativo
+    const botoes = Array.from(document.querySelectorAll('.btn-sub-admin'));
+    const btnAtivo = botoes.find(btn => {
+        const attr = btn.getAttribute('onclick');
+        return attr && attr.includes(nomeAba);
+    });
+    if (btnAtivo) btnAtivo.classList.add('active');
+
+    // Ao abrir a aba de consulta, recarrega a lista atualizada
+    if (nomeAba === 'consulta') {
+        buscarClientesAPI();
+    }
+}
+
+// Inicializa todos os dados do Painel Admin ao abrir a tela
+async function carregarPainelAdmin() {
+    await carregarMetricasEGrafico();
+    await carregarTabelaAdmin();
+    await buscarClientesAPI();
+    gerarCalendarioOrbital();
+}
+
+// Busca todos os clientes cadastrados na API Node.js
+async function buscarClientesAPI() {
+    const container = document.getElementById('tabela-clientes-admin');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`${API_URL}/clientes`);
+        listaClientesCache = await res.json();
+        renderizarListaClientesAdmin(listaClientesCache);
+    } catch (err) {
+        container.innerHTML = '<p style="color: #ff5252; text-align: center;">❌ Erro ao conectar com o banco de dados.</p>';
+    }
+}
+
+// Renderiza os cards de clientes na sub-aba de consulta
+function renderizarListaClientesAdmin(clientes) {
+    const container = document.getElementById('tabela-clientes-admin');
+    if (!container) return;
+
+    if (!clientes || clientes.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--lavender-glow);">Nenhum tripulante encontrado.</p>';
+        return;
+    }
+
+    container.innerHTML = clientes.map(c => `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <strong style="color: #fff; font-size: 1.05rem;">#${c.id} - ${c.nome}</strong><br>
+                <span style="color: var(--lavender-glow); font-size: 0.9rem;">📡 ${c.email}</span>
+                <div style="margin-top: 5px; font-size: 0.8rem; color: var(--saturn-gold);">
+                    📏 Busto: ${c.busto || '-'} cm | Cintura: ${c.cintura || '-'} cm | Quadril: ${c.quadril || '-'} cm | Altura: ${c.altura || '-'} cm
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="prepararEdicaoCliente(${c.id})" style="background: var(--saturn-gold); color: #000; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">
+                    ✏️ Editar
+                </button>
+                <button onclick="excluirClienteAdmin(${c.id})" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                    🗑️ Excluir
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filtra clientes em tempo real pelo campo de busca
+function filtrarClientesAdmin() {
+    const campoFiltro = document.getElementById('filtro-cliente-admin');
+    if (!campoFiltro) return;
+    
+    const termo = campoFiltro.value.toLowerCase();
+    const filtrados = listaClientesCache.filter(c => 
+        (c.nome && c.nome.toLowerCase().includes(termo)) || 
+        (c.email && c.email.toLowerCase().includes(termo))
+    );
+    renderizarListaClientesAdmin(filtrados);
+}
+
+// Carrega os dados do cliente selecionado no formulário de edição e muda de aba
+function prepararEdicaoCliente(id) {
+    const cliente = listaClientesCache.find(c => c.id === id);
+    if (!cliente) return;
+
+    document.getElementById('admin-edit-id').value = cliente.id;
+    document.getElementById('admin-edit-nome').value = cliente.nome || '';
+    document.getElementById('admin-edit-email').value = cliente.email || '';
+    document.getElementById('admin-edit-busto').value = cliente.busto || '';
+    document.getElementById('admin-edit-cintura').value = cliente.cintura || '';
+    document.getElementById('admin-edit-quadril').value = cliente.quadril || '';
+    document.getElementById('admin-edit-altura').value = cliente.altura || '';
+
+    mudarSubAbaAdmin('edicao');
+}
+
+// Envia a requisição PUT para salvar as alterações do cliente no SQLite
+async function salvarEdicaoClienteAdmin(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('admin-edit-id').value;
+    const dados = {
+        nome: document.getElementById('admin-edit-nome').value,
+        email: document.getElementById('admin-edit-email').value,
+        busto: document.getElementById('admin-edit-busto').value,
+        cintura: document.getElementById('admin-edit-cintura').value,
+        quadril: document.getElementById('admin-edit-quadril').value,
+        altura: document.getElementById('admin-edit-altura').value
+    };
+
+    try {
+        const res = await fetch(`${API_URL}/clientes/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        const respostaJson = await res.json();
+
+        if (res.ok) {
+            alert(`✨ Dados do tripulante #${id} alterados com sucesso!`);
+            await buscarClientesAPI();
+            mudarSubAbaAdmin('consulta');
+        } else {
+            alert(`⚠️ Aviso: ${respostaJson.erro || 'Não foi possível salvar as alterações.'}`);
+        }
+    } catch (err) {
+        alert('❌ Erro de conexão com o servidor Node.js.');
+    }
+}
+
+// Remove um cliente do banco SQLite
+async function excluirClienteAdmin(id) {
+    if (!confirm(`Deseja realmente remover o cliente #${id} do banco de dados?`)) return;
+
+    try {
+        const res = await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert(`🗑️ Cliente #${id} removido.`);
+            await buscarClientesAPI();
+        } else {
+            alert('❌ Falha ao excluir cliente.');
+        }
+    } catch (err) {
+        alert('❌ Erro de conexão ao tentar excluir.');
+    }
+}
+// ==========================================
+// LÓGICA DAS NOVAS FUNCIONALIDADES DO MENU
+// ==========================================
+
+// 1. ATUALIZAÇÃO DA VISIBILIDADE E SISTEMA DE RECOMPENSAS / TIMELINE
+async function atualizarVisibilidadeMenuLateral() {
+    const itemPedidos = document.getElementById('menu-item-pedidos');
+    const itemClientes = document.getElementById('menu-item-clientes');
+    const itemAdmin = document.getElementById('menu-item-admin');
+    
+    const headerUser = document.getElementById('user-drawer-header');
+    const elAvatar = document.getElementById('user-drawer-avatar');
+    const elNome = document.getElementById('user-drawer-nome');
+    const elEmail = document.getElementById('user-drawer-email');
+    const btnLogout = document.getElementById('btn-logout-drawer');
+    const itensCliente = document.querySelectorAll('.item-cliente-only');
+    const timelineCard = document.getElementById('user-timeline-card');
+
+    const clienteLogado = obterClienteLogado();
+
+    if (clienteLogado) {
+        if (itemPedidos) itemPedidos.style.display = 'none';
+        if (itemClientes) itemClientes.style.display = 'none';
+        if (itemAdmin) itemAdmin.style.display = 'none';
+
+        itensCliente.forEach(el => el.style.display = 'block');
+        if (btnLogout) btnLogout.style.display = 'block';
+
+        if (headerUser) {
+            headerUser.style.display = 'block';
+            if (elNome) elNome.innerText = clienteLogado.nome;
+            if (elEmail) elEmail.innerText = `📡 ${clienteLogado.email}`;
+
+            if (clienteLogado.foto && elAvatar) {
+                elAvatar.innerHTML = `<img src="${clienteLogado.foto}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold);">`;
+            } else if (elAvatar) {
+                elAvatar.innerHTML = '👨‍🚀';
+            }
+        }
+
+        // Atualiza Pontos de Gamificação
+        atualizarVipGamificacao(clienteLogado);
+
+        // Busca Rastreio de Confecção do último pedido
+        if (timelineCard) {
+            timelineCard.style.display = 'block';
+            carregarTimelinePedidoMenu(clienteLogado.email);
+        }
+    } else {
+        if (itemPedidos) itemPedidos.style.display = 'block';
+        if (itemClientes) itemClientes.style.display = 'block';
+        if (itemAdmin) itemAdmin.style.display = 'block';
+
+        itensCliente.forEach(el => el.style.display = 'none');
+        if (headerUser) headerUser.style.display = 'none';
+        if (btnLogout) btnLogout.style.display = 'none';
+        if (timelineCard) timelineCard.style.display = 'none';
+    }
+}
+
+// IDEIA 1: Gamificação e Nível VIP
+function atualizarVipGamificacao(cliente) {
+    const elNivel = document.getElementById('user-vip-nivel');
+    const elPontos = document.getElementById('user-vip-pontos');
+    const elBarra = document.getElementById('user-vip-bar');
+    const elMeta = document.getElementById('user-vip-meta');
+
+    if (!elNivel || !elPontos || !elBarra) return;
+
+    // Cálculo simples baseado nos favoritos / cadastro
+    const favs = obterFavoritosCliente(cliente.email);
+    const pontos = 200 + (favs.length * 50);
+    const meta = 500;
+    const pct = Math.min(100, Math.round((pontos / meta) * 100));
+
+    elPontos.innerText = `${pontos} / ${meta} Pts`;
+    elBarra.style.width = `${pct}%`;
+
+    if (pontos >= 500) {
+        elNivel.innerText = "🪐 Nível: Embaixador de Saturno";
+        if (elMeta) elMeta.innerText = "✨ Benefício Ativo: Portes Grátis & Atendimento Prioritário!";
+    } else if (pontos >= 350) {
+        elNivel.innerText = "🚀 Nível: Comandante Orbital";
+        if (elMeta) elMeta.innerText = `Faltam ${meta - pontos} pts para subir de nível estelar!`;
+    } else {
+        elNivel.innerText = "👨‍🚀 Nível: Cadete Lunar";
+        if (elMeta) elMeta.innerText = `Favorite mais mantos para ganhar pontos!`;
+    }
+}
+
+// IDEIA 2: Linha do Tempo do Pedido em Tempo Real
+async function carregarTimelinePedidoMenu(email) {
+    const container = document.getElementById('timeline-passos-container');
+    if (!container) return;
+
+    try {
+        const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(email)}`);
+        const pedidos = await res.json();
+
+        if (!pedidos || pedidos.length === 0) {
+            container.innerHTML = `<span style="color: var(--lavender-glow);">Nenhum manto em confecção ativa.</span>`;
+            return;
+        }
+
+        const ultimo = pedidos[0];
+        const status = (ultimo.status || 'Pendente').toLowerCase();
+
+        let etapa1 = '✓', etapa2 = '⏳', etapa3 = '○';
+        if (status === 'aprovado') {
+            etapa1 = '✓'; etapa2 = '✓ (Em Corte & Costura)'; etapa3 = '🚀 Em Órbita';
+        } else if (status === 'recusado') {
+            etapa1 = '❌'; etapa2 = 'Cancelado'; etapa3 = '-';
+        } else {
+            etapa1 = '✓'; etapa2 = '⏳ Em Análise pelo Alfaiate'; etapa3 = '○ Prova Pendente';
+        }
+
+        container.innerHTML = `
+            <div style="color: #fff; margin-bottom: 2px;"><strong>Manto:</strong> #${ultimo.id} (${ultimo.estilo})</div>
+            <div style="color: var(--saturn-gold);">${etapa1} Pedido Recebido</div>
+            <div style="color: ${status === 'aprovado' ? '#28a745' : '#ffc107'};">${etapa2}</div>
+            <div style="color: rgba(255,255,255,0.4);">${etapa3}</div>
+        `;
+    } catch (err) {
+        container.innerHTML = `<span style="color: var(--lavender-glow);">Consulte o perfil para mais detalhes.</span>`;
+    }
+}
+
+// IDEIA 3: Gestão do Moodboard & Caderno de Eventos
+function abrirModalMoodboard() {
+    const modal = document.getElementById('modalMoodboard');
+    if (modal) modal.style.display = 'flex';
+    carregarEventosMoodboard();
+}
+
+function fecharModalMoodboard() {
+    const modal = document.getElementById('modalMoodboard');
+    if (modal) modal.style.display = 'none';
+}
+
+function obterEventosMoodboard(email) {
+    if (!email) return [];
+    return JSON.parse(localStorage.getItem(`moodboard_${email}`) || '[]');
+}
+
+function salvarEventoMoodboard(event) {
+    event.preventDefault();
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    const evento = document.getElementById('mb-evento').value;
+    const data = document.getElementById('mb-data').value;
+    const notas = document.getElementById('mb-notas').value;
+
+    const lista = obterEventosMoodboard(cliente.email);
+    lista.unshift({ id: Date.now(), evento, data, notas });
+
+    localStorage.setItem(`moodboard_${cliente.email}`, JSON.stringify(lista));
+    document.getElementById('form-moodboard').reset();
+    alert('✨ Evento e notas salvas no seu Caderno Estelar!');
+    carregarEventosMoodboard();
+}
+
+function carregarEventosMoodboard() {
+    const container = document.getElementById('lista-eventos-moodboard');
+    if (!container) return;
+
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    const lista = obterEventosMoodboard(cliente.email);
+
+    if (lista.length === 0) {
+        container.innerHTML = '<p style="color: var(--lavender-glow); font-size: 0.85rem; text-align: center;">Nenhum evento registado ainda.</p>';
+        return;
+    }
+
+    container.innerHTML = lista.map(item => `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #fff; font-size: 0.95rem;">${item.evento}</strong>
+                <small style="color: var(--saturn-gold);">${new Date(item.data).toLocaleDateString('pt-PT')}</small>
+            </div>
+            <p style="color: var(--lavender-glow); font-size: 0.85rem; margin-top: 6px;">${item.notas}</p>
+            <button onclick="removerEventoMoodboard(${item.id})" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 0; margin-top: 5px;">
+                🗑️ Remover Evento
+            </button>
+        </div>
+    `).join('');
+}
+
+function removerEventoMoodboard(id) {
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    let lista = obterEventosMoodboard(cliente.email);
+    lista = lista.filter(item => item.id !== id);
+    localStorage.setItem(`moodboard_${cliente.email}`, JSON.stringify(lista));
+    carregarEventosMoodboard();
+}
+
+// IDEIA 4: Sintonizador de Áudio Cósmico (Sintetizador Web Audio API)
+let audioCtx = null;
+let osc1 = null, osc2 = null, gainNode = null;
+let tocandoAudio = false;
+
+function alternarAudioCosmico() {
+    const btn = document.getElementById('btn-toggle-audio');
+    const status = document.getElementById('status-audio');
+
+    if (!tocandoAudio) {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        osc1 = audioCtx.createOscillator();
+        osc2 = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
+
+        // Frequência de acorde espacial relaxante (Lá 220Hz + 440Hz suave)
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(440, audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Volume suave de fundo
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+        tocandoAudio = true;
+
+        if (btn) btn.innerText = '⏸️ Pausar';
+        if (status) status.innerText = 'Sintonizando Frequência 440Hz...';
+    } else {
+        if (osc1) osc1.stop();
+        if (osc2) osc2.stop();
+        tocandoAudio = false;
+
+        if (btn) btn.innerText = '▶️ Play';
+        if (status) status.innerText = 'Sintonia Pausada';
+    }
+}
+
+// IDEIA 5: Canal Direto WhatsApp VIP com dados e medidas
+function abrirWhatsappVip() {
+    const cliente = obterClienteLogado();
+    if (!cliente) return;
+
+    let mensagem = `Olá, equipa Celestine Ateliê! Sou o tripulante VIP ${cliente.nome} (${cliente.email}).`;
+
+    if (cliente.busto || cliente.cintura || cliente.quadril) {
+        mensagem += ` Minhas medidas registadas: Busto: ${cliente.busto || '-'}cm, Cintura: ${cliente.cintura || '-'}cm, Quadril: ${cliente.quadril || '-'}cm.`;
+    }
+
+    mensagem += ` Gostaria de uma consultoria exclusiva com o alfaiate pessoal sobre o meu próximo manto.`;
+
+    const url = `https://api.whatsapp.com/send?phone=5541999999999&text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+}
