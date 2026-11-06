@@ -7,26 +7,109 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
+    <!-- CONTAINER OCULTO DO PLAYER DE MÚSICA YOUTUBE -->
+    <div id="youtube-player" style="display: none;"></div>
+
     <!-- MÁSCARA DE FUNDO -->
     <div class="space-nebula"></div>
 
-    <!-- PAINEL LATERAL (GAVETA) -->
+    <!-- PAINEL LATERAL (GAVETA / MENU HAMBÚRGUER) -->
     <aside id="sidePanel" class="side-panel">
         <button class="close-btn" onclick="toggleMenu()" aria-label="Fechar menu">&times;</button>
         <div class="panel-content">
-            <h3>🧭 Painel de Controle</h3>
-            <ul>
-                <li id="menu-item-pedidos"><a href="#pedidos" onclick="event.preventDefault(); abrirCaixaDePedidos();">📦 Caixa de Pedidos</a></li>
-                <li><a href="#mais-vendidos" onclick="event.preventDefault(); mudarTela('mais-vendidos');">👑 Mais Vendidos (Clientes)</a></li>
-                <li id="menu-item-clientes"><a href="#clientes" onclick="event.preventDefault(); abrirCaixaDeClientes();">👤 Clientes Registrados</a></li>
-                <li id="menu-item-admin"><a href="#admin" class="nav-admin-link" onclick="event.preventDefault(); mudarTela('admin'); carregarPainelAdmin();">🛸 Centro de Comando (Admin)</a></li>
-            </ul>
-        </div>
-        
-        
+            
+            <!-- 1. PERFIL E CARD DE GAMIFICAÇÃO VIP -->
+            <div id="user-drawer-header" class="item-cliente-only" style="display: none; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; margin-top: 15px; margin-bottom: 18px; text-align: center;">
+                <div id="user-drawer-avatar" style="font-size: 2.2rem; margin-bottom: 5px;">👨‍🚀</div>
+                <strong id="user-drawer-nome" style="color: #fff; font-size: 1.05rem; display: block;">Tripulante</strong>
+                <small id="user-drawer-email" style="color: var(--lavender-glow); font-size: 0.8rem; display: block; margin-bottom: 10px;">email@galaxia.com</small>
+                
+                <!-- CARD DE RECOMPENSAS / NÍVEL VIP -->
+                <div style="background: linear-gradient(135deg, rgba(238, 228, 187, 0.1), rgba(53, 42, 85, 0.4)); border: 1px solid var(--saturn-gold); border-radius: 12px; padding: 10px; margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--saturn-gold); font-weight: bold; margin-bottom: 5px;">
+                        <span id="user-vip-nivel">🚀 Nível: Comandante</span>
+                        <span id="user-vip-pontos">350 / 500 Pts</span>
+                    </div>
+                    <div style="width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; overflow: hidden;">
+                        <div id="user-vip-bar" style="width: 70%; background: var(--saturn-gold); height: 100%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <small id="user-vip-meta" style="color: var(--lavender-glow); font-size: 0.72rem; display: block; margin-top: 5px;">Faltam 150 pts para o próximo mimo estelar!</small>
+                </div>
+            </div>
 
+            <!-- 2. SINTONIZADOR DE ÁUDIO CÓSMICO (YOUTUBE SLOW) -->
+            <div class="audio-sintonizador-widget" style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 14px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" id="btn-toggle-audio" onclick="alternarAudioCosmico()" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 20px; background: rgba(238, 228, 187, 0.15); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); cursor: pointer;">
+                        ▶️ Play
+                    </button>
+                    <div>
+                        <strong style="color: #fff; font-size: 0.8rem; display: block;">🎵 Frequência Cósmica</strong>
+                        <small id="status-audio" style="color: var(--lavender-glow); font-size: 0.7rem;">Sintonia Pausada</small>
+                    </div>
+                </div>
+                <span style="font-size: 1.1rem;">🌌</span>
+            </div>
+
+            <!-- 3. LINHA DO TEMPO DE CONFECÇÃO EM TEMPO REAL -->
+            <div id="user-timeline-card" class="item-cliente-only" style="display: none; background: rgba(25, 27, 34, 0.8); border: 1px solid var(--glass-border); border-radius: 14px; padding: 12px; margin-bottom: 18px;">
+                <strong style="color: var(--saturn-gold); font-size: 0.85rem; display: block; margin-bottom: 8px;">⏱️ Confecção em Tempo Real</strong>
+                <div id="timeline-passos-container" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem;">
+                    <!-- Preenchido dinamicamente pelo JS -->
+                </div>
+            </div>
+
+            <h3>🧭 Painel de Navegação</h3>
+            <ul id="menu-lista-itens">
+                <!-- ITENS EXCLUSIVOS DE CLIENTES LOGADOS -->
+                <li class="item-cliente-only" style="display: none;">
+                    <a href="#perfil" onclick="event.preventDefault(); toggleMenu(); mudarTela('cliente');">
+                        👤 Meu Perfil & Medidas Estelares
+                    </a>
+                </li>
+                
+                <!-- MOODBOARD & EVENTOS ESTELARES -->
+                <li class="item-cliente-only" style="display: none;">
+                    <a href="#moodboard" onclick="event.preventDefault(); toggleMenu(); abrirModalMoodboard();">
+                        🎨 Moodboard & Caderno de Eventos
+                    </a>
+                </li>
+                
+                <li class="item-cliente-only" style="display: none;">
+                    <a href="#favoritos" onclick="event.preventDefault(); toggleMenu(); mudarTela('cliente');">
+                        ❤️ Meus Mantos Favoritos
+                    </a>
+                </li>
+                <li class="item-cliente-only" style="display: none;">
+                    <a href="#novo-pedido" onclick="event.preventDefault(); toggleMenu(); mudarTela('agendamento');">
+                        🌙 Agendar Novo Manto
+                    </a>
+                </li>
+
+                <!-- CANAL DIRETO COM ALFAIATE VIP -->
+                <li class="item-cliente-only" style="display: none;">
+                    <a href="#" onclick="event.preventDefault(); abrirWhatsappVip();" style="border-color: #25D366; color: #25D366; background: rgba(37, 211, 102, 0.08); font-weight: bold;">
+                        💬 Falar com Alfaiate VIP (WhatsApp)
+                    </a>
+                </li>
+
+                <!-- ITENS PÚBLICOS E ADMIN -->
+                <li><a href="#mais-vendidos" onclick="event.preventDefault(); toggleMenu(); mudarTela('mais-vendidos');">👑 Mantos Mais Vendidos</a></li>
+                <li id="menu-item-pedidos"><a href="#pedidos" onclick="event.preventDefault(); abrirCaixaDePedidos();">📦 Caixa de Pedidos (Global)</a></li>
+                <li id="menu-item-clientes"><a href="#clientes" onclick="event.preventDefault(); abrirCaixaDeClientes();">👤 Clientes Registrados</a></li>
+                <li id="menu-item-admin"><a href="#admin" class="nav-admin-link" onclick="event.preventDefault(); toggleMenu(); mudarTela('admin'); carregarPainelAdmin();">🛸 Centro de Comando (Admin)</a></li>
+            </ul>
+
+            <!-- BOTÃO DE LOGOUT -->
+            <div id="btn-logout-drawer" style="display: none; margin-top: 25px; text-align: center;">
+                <button onclick="toggleMenu(); desconectarTripulante();" style="width: 100%; border-color: #ff5252; color: #ff5252; background: rgba(255, 82, 82, 0.1); padding: 10px; border-radius: 12px; font-weight: bold; cursor: pointer;">
+                    🚪 Sair da Conta
+                </button>
+            </div>
+        </div>
     </aside>
 
     <!-- CABEÇALHO / NAVEGAÇÃO -->
@@ -149,6 +232,43 @@
             </div>
             <div id="lista-clientes-container" class="pedidos-lista">
                 <p>Buscando clientes registrados...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DO MOODBOARD & EVENTOS ESTELARES -->
+    <div id="modalMoodboard" class="modal-pedidos" style="display: none;">
+        <div class="modal-conteudo" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3>🎨 Moodboard & Caderno de Eventos Estelares</h3>
+                <button class="btn-fechar" onclick="fecharModalMoodboard()">&times;</button>
+            </div>
+            <div style="padding: 10px 0;">
+                <p style="font-size: 0.88rem; color: var(--lavender-glow); margin-bottom: 15px;">
+                    Registre os seus bailes galácticos e salve as suas ideias de mantos personalizados.
+                </p>
+                <form id="form-moodboard" onsubmit="salvarEventoMoodboard(event)">
+                    <div class="input-group">
+                        <label for="mb-evento">✨ Nome do Evento / Ocasião:</label>
+                        <input type="text" id="mb-evento" required placeholder="Ex: Gala de Saturno 2026">
+                    </div>
+                    <div class="input-group">
+                        <label for="mb-data">🗓️ Data Prevista:</label>
+                        <input type="date" id="mb-data" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="mb-notas">📝 Ideia do Manto & Notas:</label>
+                        <textarea id="mb-notas" rows="3" placeholder="Ex: Manto com caimento fluido em seda de nebulosa e corset com bordados dourados..." style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(38,41,52,0.85); border: 1px solid var(--glass-border); color: #fff; font-family: sans-serif;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit-login" style="margin-top: 10px;">💾 Salvar no Caderno Estelar</button>
+                </form>
+
+                <div style="margin-top: 25px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                    <h4 style="color: var(--saturn-gold); margin-bottom: 10px;">📜 Meus Eventos Registrados</h4>
+                    <div id="lista-eventos-moodboard">
+                        <p style="color: var(--lavender-glow); font-size: 0.85rem; text-align: center;">Nenhum evento registrado ainda.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

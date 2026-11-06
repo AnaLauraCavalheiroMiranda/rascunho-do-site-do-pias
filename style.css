@@ -1,7 +1,5 @@
 /*========================================================================== 
 1. RESET GERAL, CONFIGURAÇÃO DA TIPOGRAFIA E FUNDO COM NEBULOSA MANCHADINHA
-- Controla: Margens globais, fontes importadas, variáveis de cores e a
-  fusão entre seus feixes, Estrelas de Belém e manchas suaves de nebulosa.
 ========================================================================== */
 @import url('https://googleapis.com');
 
@@ -32,40 +30,21 @@ body {
  overflow-x: hidden;
  position: relative;
  
- /* 
-    A SUA ESTRUTURA ORIGINAL INTEGRAL + ADIÇÃO DA NEBULOSA MANCHADINHA:
-    Mantivemos todas as suas elipses e gradientes lineares idênticos.
-    No final, adicionamos manchas suaves em posições diferentes (at 20% 30% e at 80% 70%) 
-    para criar o efeito manchado orgânico de poeira cósmica sem poluir visualmente.
- */
  background-image: 
-     /* Suas Pontas Finas da Estrela de Belém Dourada */
      radial-gradient(ellipse 2px 50px at 0% 0%, var(--saturn-gold), transparent),
      radial-gradient(ellipse 50px 2px at 0% 0%, var(--saturn-gold), transparent),
-
-     /* Suas Pontas Finas da Estrela de Belém Branca */
      radial-gradient(ellipse 1px 40px at 70px 110px, rgba(255, 255, 255, 0.8), transparent),
      radial-gradient(ellipse 40px 1px at 70px 110px, rgba(255, 255, 255, 0.8), transparent),
-
-     /* Seus Gradientes Lineares Originais */
      linear-gradient(90deg, transparent 49.5%, var(--saturn-gold-dim) 50%, transparent 50.5%),
      linear-gradient(0deg, transparent 49.5%, var(--saturn-gold-dim) 50%, transparent 50.5%),
      radial-gradient(circle, var(--saturn-gold) 0px, rgba(238, 228, 187, 0.8) 1.5px, transparent 4px),
-
      linear-gradient(90deg, transparent 49.7%, rgba(255, 255, 255, 0.15) 50%, transparent 50.3%),
      linear-gradient(0deg, transparent 49.7%, rgba(255, 255, 255, 0.15) 50%, transparent 50.3%),
      radial-gradient(circle, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.6) 1px, transparent 3px),
-     
-     /* [NOVO] Mancha de Nebulosa Superior Esquerda (Suave e esfumada) */
      radial-gradient(circle at 20% 30%, rgba(53, 42, 85, 0.35) 0%, transparent 50%),
-     
-     /* [NOVO] Mancha de Nebulosa Inferior Direita (Suave e esfumada) */
      radial-gradient(circle at 80% 70%, rgba(154, 155, 193, 0.08) 0%, transparent 45%),
-     
-     /* Seu Fundo de Profundidade Espacial com Névoa Original */
      radial-gradient(circle at 50% 50%, rgba(38, 41, 52, 0.5), var(--bg-space));
 
- /* Atualizado o mapeamento de tamanhos e posições para incluir as duas manchas de nebulosa */
  background-size: 
      280px 280px, 280px 280px, 
      190px 190px, 190px 190px, 
@@ -97,9 +76,6 @@ h1, h2, h3, h4 {
  filter: drop-shadow(0 0 20px rgba(154, 155, 193, 0.15));
 }
 
-/* ==========================================================================
-EFEITOS DINÂMICOS DE LUXO SOBRE O FUNDO ORIGINAL
-========================================================================== */
 .feature-card:hover, .product-item:hover, .login-box:hover, .atelie-container:hover {
  background: radial-gradient(circle at top right, rgba(238, 228, 187, 0.08) 0%, rgba(154, 155, 193, 0.03) 70%);
  border-color: var(--saturn-gold);
@@ -113,9 +89,6 @@ form input:focus, form select:focus {
  box-shadow: 0 0 25px rgba(238, 228, 187, 0.25), inset 0 0 10px rgba(0,0,0,0.6) !important;
 }
 
-/* ==========================================================================
-2. DETALHES DE AMBIENTAÇÃO CÓSMICA (NEBULOSAS E SCROLLBAR)
-========================================================================== */
 .space-nebula {
  position: absolute;
  width: 700px;
@@ -145,9 +118,6 @@ form input:focus, form select:focus {
  background: var(--saturn-gold);
 }
 
-/* ==========================================================================
-3. FÍSICA E ANIMAÇÕES (SISTEMA DE GRAVIDADE ÓRBITAL)
-========================================================================== */
 @keyframes moonEclipseGlow {
  0%, 100% { 
      box-shadow: 0 0 25px rgba(154, 155, 193, 0.2), inset -15px -15px 40px rgba(0,0,0,0.6);
@@ -171,9 +141,7 @@ form input:focus, form select:focus {
 main {
  transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
-/* ==========================================================================
-4. ESTRUTURA DO CABEÇALHO (HEADER ESPACIAL)
-========================================================================== */
+
 header {
  display: flex;
  justify-content: space-between;
@@ -247,9 +215,6 @@ nav ul li a:hover::after {
  gap: 24px;
 }
 
-/* ==========================================================================
-5. BOTÕES E BOTÃO HAMBÚRGUER (SISTEMA ANTI-BUG)
-========================================================================== */
 button, .btn-space-login {
  background: transparent;
  color: var(--starlight);
@@ -337,22 +302,33 @@ button[type="button"]:hover::before, .btn-submit-login:hover::before {
 }
 
 /* ==========================================================================
-6. PAINEL GAVETA LATERAL PREMIUM (LUNAR DESIGN)
+6. PAINEL GAVETA LATERAL PREMIUM (AJUSTADO COM ROLAGEM E ORGANIZAÇÃO)
 ========================================================================== */
 .side-panel {
  position: fixed;
  top: 0;
- right: -360px;
- width: 360px;
- height: 100%;
- background: rgba(27, 29, 37, 0.96);
+ right: -400px;
+ width: 380px;
+ max-width: 90vw;
+ height: 100vh;
+ overflow-y: auto; /* PERMITE ROLAR PARA BAIXO */
+ background: rgba(22, 24, 33, 0.98);
  backdrop-filter: blur(25px);
  -webkit-backdrop-filter: blur(25px);
  border-left: 1px solid var(--glass-border);
  z-index: 2500;
  transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
- padding: 45px 35px;
- box-shadow: -20px 0 50px rgba(0, 0, 0, 0.7);
+ padding: 35px 22px 60px 22px;
+ box-shadow: -20px 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.side-panel::-webkit-scrollbar {
+ width: 5px;
+}
+
+.side-panel::-webkit-scrollbar-thumb {
+ background: var(--saturn-gold-dim);
+ border-radius: 4px;
 }
 
 .side-panel.open {
@@ -361,14 +337,15 @@ button[type="button"]:hover::before, .btn-submit-login:hover::before {
 
 .side-panel .close-btn {
  all: unset;
- font-size: 2.5rem;
+ font-size: 2.2rem;
  color: var(--lavender-glow);
  cursor: pointer;
  position: absolute;
- top: 25px;
- right: 25px;
+ top: 20px;
+ right: 20px;
  line-height: 1;
  transition: transform 0.3s ease;
+ z-index: 10;
 }
 
 .side-panel .close-btn:hover {
@@ -377,29 +354,29 @@ button[type="button"]:hover::before, .btn-submit-login:hover::before {
 }
 
 .panel-content h3 {
- font-size: 1.6rem;
- margin-top: 25px;
- margin-bottom: 35px;
+ font-size: 1.3rem;
+ margin-top: 15px;
+ margin-bottom: 20px;
  color: #ffffff;
  border-bottom: 1px solid var(--glass-border);
- padding-bottom: 15px;
+ padding-bottom: 10px;
 }
 
 .panel-content ul {
  list-style: none;
  display: flex;
  flex-direction: column;
- gap: 18px;
+ gap: 12px;
 }
 
 .panel-content ul li a {
  color: var(--starlight);
  text-decoration: none;
- font-size: 1.05rem;
+ font-size: 0.95rem;
  display: block;
- padding: 16px 20px;
- border-radius: 14px;
- background: rgba(255, 255, 255, 0.01);
+ padding: 12px 16px;
+ border-radius: 12px;
+ background: rgba(255, 255, 255, 0.02);
  border: 1px solid var(--glass-border);
  transition: all 0.3s ease;
 }
@@ -407,12 +384,10 @@ button[type="button"]:hover::before, .btn-submit-login:hover::before {
 .panel-content ul li a:hover {
  background: var(--glass-bg);
  border-color: var(--saturn-gold);
- padding-left: 26px;
- box-shadow: 0 0 20px var(--saturn-gold-dim);
+ padding-left: 22px;
+ box-shadow: 0 0 15px var(--saturn-gold-dim);
 }
-/* ==========================================================================
-7. SEÇÃO HERO, COMPONENTE SATURNO CORRIGIDO E MANIFESTO
-========================================================================== */
+
 main {
  margin-top: 120px;
 }
@@ -548,9 +523,6 @@ section {
  font-weight: 300;
 }
 
-/* ==========================================================================
-8. VITRINE DE LOOKS E ENGENHARIA DE PAGINAÇÃO
-========================================================================== */
 .gallery {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -687,9 +659,7 @@ section {
  letter-spacing: 1px;
  text-transform: uppercase;
 }
-/* ==========================================================================
-9. PÁGINA INSTITUCIONAL DO ATELIÊ
-========================================================================== */
+
 .atelie-page-section {
  max-width: 1100px;
  margin: 40px auto;
@@ -762,9 +732,6 @@ section {
  color: #ffffff;
 }
 
-/* ==========================================================================
-10. FORMULÁRIOS CORES E ENTRADAS GALÁCTICAS (AGENDAMENTO E LOGIN SPA)
-========================================================================== */
 #Agendamento {
  max-width: 750px;
  margin: 80px auto;
@@ -963,9 +930,6 @@ form select:focus {
  color: #ffffff;
 }
 
-/* ==========================================================================
-11. ARQUITETURA DO RODAPÉ (SOLUÇÃO ANTI-BUG REMODELADA)
-========================================================================== */
 .main-footer {
  width: 100%;
  margin-top: 140px;
@@ -1027,9 +991,6 @@ form select:focus {
  opacity: 0.5;
 }
 
-/* ==========================================================================
-12. MEDIA QUERIES (SISTEMA DE RESPONSIVIDADE ADAPTATIVA)
-========================================================================== */
 @media (max-width: 768px) {
  .atelie-container {
      padding: 40px 25px;
@@ -1082,9 +1043,7 @@ form select:focus {
      font-size: 5.4rem;
  }
 }
-/* ==========================================================================
-SEÇÃO DE EXPLORAÇÃO (QUIZ + GUIA DE MATERIAIS)
-========================================================================== */
+
 .exploracao-section {
  padding: 60px 8%;
  color: #ffffff;
@@ -1140,7 +1099,6 @@ SEÇÃO DE EXPLORAÇÃO (QUIZ + GUIA DE MATERIAIS)
  transform: translateY(-2px);
 }
 
-/* Grid do Guia de Materiais */
 .materiais-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1174,7 +1132,7 @@ SEÇÃO DE EXPLORAÇÃO (QUIZ + GUIA DE MATERIAIS)
  border-radius: 8px;
  text-align: left;
 }
-/* --- GUIA DE MATERIAIS EXPANDIDO --- */
+
 .materiais-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1294,9 +1252,7 @@ SEÇÃO DE EXPLORAÇÃO (QUIZ + GUIA DE MATERIAIS)
  border-color: var(--saturn-gold);
  color: #ffffff;
 }
-/* ==========================================================================
-TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
-========================================================================== */
+
 .produto-detalhe-section {
  padding: 50px 8%;
  color: #ffffff;
@@ -1407,22 +1363,14 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
 .detalhe-acoes-group {
  display: flex;
  flex-direction: column;
-}
-/* Import correto para carregar as fontes Space Grotesk e Cormorant Garamond */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,300&family=Space+Grotesk:wght@300;400;500;600&display=swap');
-
-/* Fechamento correto da classe final com estilização básica dos botões de ação */
-.detalhe-acoes-group {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+ gap: 15px;
+ margin-top: 20px;
 }
 
 .detalhe-acoes-group button {
-  width: 100%;
+ width: 100%;
 }
-/* MODAL CAIXA DE PEDIDOS */
+
 .modal-pedidos {
     position: fixed;
     top: 0;
@@ -1484,69 +1432,6 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
 }
 
 .badge-status {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    background: #ffd70022;
-    color: #ffd700;
-    border: 1px solid #ffd700;
-}
-.nav-admin-link {
-    color: #ffc107 !important;
-    border: 1px solid rgba(255, 193, 7, 0.4);
-    padding: 6px 14px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.nav-admin-link:hover {
-    background: rgba(255, 193, 7, 0.2);
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
-}
-.badge-status {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: bold;
-    display: inline-block;
-}
-
-.badge-pendente {
-    background: #ffd70022;
-    color: #ffd700;
-    border: 1px solid #ffd700;
-}
-
-.badge-aprovado {
-    background: #28a74522;
-    color: #2ebd59;
-    border: 1px solid #2ebd59;
-}
-
-.badge-recusado {
-    background: #dc354522;
-    color: #ff5252;
-    border: 1px solid #ff5252;
-}
-
-.nav-admin-link {
-    color: #ffc107 !important;
-    border: 1px solid rgba(255, 193, 7, 0.4);
-    padding: 6px 14px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.nav-admin-link:hover {
-    background: rgba(255, 193, 7, 0.2);
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
-}
-/* ==========================================
-   BADGES DE STATUS DOS PEDIDOS
-   ========================================== */
-
-   .badge-status {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
@@ -1556,7 +1441,6 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     letter-spacing: 0.5px;
 }
 
-/* Status: Pendente (Amarelo / Dourado) */
 .badge-status.pendente,
 .badge-status.badge-pendente {
     background-color: rgba(255, 193, 7, 0.2);
@@ -1564,7 +1448,6 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     border: 1px solid #ffc107;
 }
 
-/* Status: Aprovado (Verde) */
 .badge-status.aprovado,
 .badge-status.badge-aprovado {
     background-color: rgba(40, 167, 69, 0.2);
@@ -1572,26 +1455,27 @@ TELA DE DETALHES DO PRODUTO (PEÇA AUTORAL)
     border: 1px solid #28a745;
 }
 
-/* Status: Recusado (Vermelho) */
 .badge-status.recusado,
 .badge-status.badge-recusado {
     background-color: rgba(220, 53, 69, 0.2);
     color: #dc3545;
     border: 1px solid #dc3545;
 }
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(5px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000; /* Garante que fique por cima do menu e do conteúdo */
+
+.nav-admin-link {
+    color: #ffc107 !important;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
+
+.nav-admin-link:hover {
+    background: rgba(255, 193, 7, 0.2);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+}
+
 .btn-sub-admin {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
