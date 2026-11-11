@@ -1499,3 +1499,820 @@ form select:focus {
     border-color: var(--saturn-gold);
     box-shadow: 0 0 12px rgba(230, 190, 138, 0.4);
 }
+/* ==========================================================================
+   CELESTINE ATELIÊ - STYLESHEET COMPLETO, REFINADO & TOTALMENTE COMPATÍVEL
+   Tema Escuro (Saturno) & Tema Claro (Lua - Prata & Cinza-Azul Escuro)
+   ========================================================================== */
+
+   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+   /* ==========================================================================
+      1. VARIÁVEIS GERAIS (TEMA ESCURO - PADRÃO)
+      ========================================================================== */
+   :root {
+     --bg-space: #1a1c24; 
+     --lavender-glow: #9a9bc1;
+     --starlight: #ffffff;
+     --nebula-purple: #352a55;
+     --saturn-gold: #EEE4BB; 
+     --saturn-gold-dim: rgba(238, 228, 187, 0.2);
+     --glass-bg: rgba(154, 155, 193, 0.05);
+     --glass-border: rgba(154, 155, 193, 0.18);
+     --card-shadow: rgba(0, 0, 0, 0.5);
+     --input-bg: rgba(38, 41, 52, 0.85);
+     --footer-bg: #191b22;
+     --text-main: #ffffff;
+     --text-sub: #9a9bc1;
+     --close-icon-color: #9a9bc1;
+     --hamburger-bar: #9a9bc1;
+     --header-bg: rgba(38, 41, 52, 0.92);
+     --card-bg-solid: rgba(38, 41, 52, 0.85);
+   }
+   
+   /* ==========================================================================
+      2. VARIÁVEIS DO MODO CLARO (VIBE LUA - PRATA E CINZA-AZUL ESCURO)
+      ========================================================================== */
+   body.light-mode {
+     --bg-space: #f1f5f9;
+     --starlight: #0f172a;
+     --lavender-glow: #475569;
+     --saturn-gold: #2c3e50; /* Cinza-azul escuro elegante e sóbrio */
+     --saturn-gold-dim: rgba(44, 62, 80, 0.18);
+     --glass-bg: rgba(255, 255, 255, 0.92);
+     --glass-border: rgba(203, 213, 225, 0.8);
+     --card-shadow: rgba(148, 163, 184, 0.2);
+     --input-bg: #ffffff;
+     --footer-bg: #e2e8f0;
+     --text-main: #0f172a;
+     --text-sub: #475569;
+     --close-icon-color: #0f172a;
+     --hamburger-bar: #0f172a;
+     --header-bg: rgba(255, 255, 255, 0.96);
+     --card-bg-solid: #ffffff;
+   
+     background-color: var(--bg-space) !important;
+     color: var(--text-main) !important;
+   
+     /* Fundo estelar claro refinado */
+     background-image: 
+         radial-gradient(ellipse 2px 40px at 0% 0%, rgba(100, 116, 139, 0.2), transparent),
+         radial-gradient(ellipse 40px 2px at 0% 0%, rgba(100, 116, 139, 0.2), transparent),
+         radial-gradient(ellipse 1px 30px at 70px 110px, rgba(148, 163, 184, 0.35), transparent),
+         radial-gradient(ellipse 30px 1px at 70px 110px, rgba(148, 163, 184, 0.35), transparent),
+         linear-gradient(90deg, transparent 49.5%, rgba(203, 213, 225, 0.3) 50%, transparent 50.5%),
+         linear-gradient(0deg, transparent 49.5%, rgba(203, 213, 225, 0.3) 50%, transparent 50.5%),
+         radial-gradient(circle, rgba(148, 163, 184, 0.5) 0px, transparent 3px),
+         radial-gradient(circle at 20% 30%, rgba(226, 232, 240, 0.9) 0%, transparent 60%),
+         radial-gradient(circle at 80% 70%, rgba(203, 213, 225, 0.6) 0%, transparent 50%),
+         radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%) !important;
+     background-attachment: fixed !important;
+   }
+   
+   /* ==========================================================================
+      3. RESETS E TIPOGRAFIA ADAPTATIVA
+      ========================================================================== */
+   * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+     scroll-behavior: smooth;
+   }
+   
+   body {
+     background-color: var(--bg-space);
+     color: var(--text-main);
+     font-family: 'Space Grotesk', sans-serif;
+     font-size: 1.15rem;
+     line-height: 1.7;
+     overflow-x: hidden;
+     position: relative;
+     transition: background-color 0.4s ease, color 0.4s ease;
+   }
+   
+   h1, h2, h3, h4, h5, h6 {
+     font-family: 'Cormorant Garamond', serif;
+     font-weight: 600;
+     letter-spacing: 1px;
+     color: var(--text-main);
+     transition: color 0.4s ease;
+   }
+   
+   p, span, label, li, a, td, th {
+     transition: color 0.4s ease;
+   }
+   
+   /* Gradiente dos títulos principais */
+   .hero-content h2, .manifesto-box h3, .catalogo-header h2, .atelie-header h2, .exploracao-header h2 {
+     background: linear-gradient(135deg, var(--starlight) 30%, var(--lavender-glow) 70%, var(--saturn-gold) 100%);
+     background-clip: text;
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     filter: drop-shadow(0 0 20px rgba(154, 155, 193, 0.15));
+   }
+   
+   body.light-mode .hero-content h2, 
+   body.light-mode .manifesto-box h3,
+   body.light-mode .catalogo-header h2,
+   body.light-mode .atelie-header h2,
+   body.light-mode .exploracao-header h2 {
+     background: linear-gradient(135deg, #0f172a 30%, #334155 70%, #2c3e50 100%) !important;
+     background-clip: text !important;
+     -webkit-background-clip: text !important;
+     -webkit-text-fill-color: transparent !important;
+   }
+   
+   /* ==========================================================================
+      4. HEADER E BARRA SUPERIOR (CORRIGIDO PROBLEMA DO JS OVERRIDE NO SCROLL)
+      ========================================================================== */
+   header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 22px 6%;
+     position: fixed;
+     width: 100%;
+     top: 0;
+     z-index: 2000;
+     background: var(--header-bg);
+     backdrop-filter: blur(18px);
+     -webkit-backdrop-filter: blur(18px);
+     border-bottom: 1px solid var(--glass-border);
+     transition: padding 0.3s ease, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+   }
+   
+   /* !important é essencial para que o JS (window.onscroll) não force o tom escuro no modo claro */
+   body.light-mode header {
+     background: rgba(255, 255, 255, 0.96) !important;
+     border-bottom-color: rgba(203, 213, 225, 0.8) !important;
+     box-shadow: 0 4px 18px rgba(148, 163, 184, 0.15) !important;
+   }
+   
+   .logo h1 {
+     font-size: 2rem;
+     color: var(--text-main);
+     font-style: italic;
+     text-shadow: 0 0 15px var(--saturn-gold-dim);
+   }
+   
+   .logo p {
+     font-size: 0.75rem;
+     color: var(--text-sub); 
+     font-family: 'Space Grotesk', sans-serif;
+     text-transform: uppercase;
+     letter-spacing: 3px;
+     margin-top: 2px;
+   }
+   
+   nav.desktop-nav ul {
+     display: flex;
+     list-style: none;
+     gap: 45px;
+   }
+   
+   nav ul li a {
+     color: var(--text-main);
+     text-decoration: none;
+     font-family: 'Space Grotesk', sans-serif;
+     font-size: 1rem;
+     font-weight: 500;
+     position: relative;
+     padding-bottom: 6px;
+     transition: color 0.3s ease;
+   }
+   
+   nav ul li a:hover {
+     color: var(--saturn-gold);
+   }
+   
+   /* Menu Hambúrguer Ícone (Três Barrinhas) */
+   .header-actions button.menu-hamburger {
+     all: unset;
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     width: 28px;
+     height: 16px;
+     background: transparent !important;
+     border: none !important;
+     padding: 0 !important;
+     margin: 0 !important;
+     cursor: pointer;
+     box-shadow: none !important;
+     transform: none !important;
+   }
+   
+   .header-actions button.menu-hamburger span {
+     display: block;
+     width: 100%;
+     height: 2px;
+     background-color: var(--hamburger-bar);
+     border-radius: 1px;
+     transition: background-color 0.3s ease, box-shadow 0.3s ease;
+   }
+   
+   .header-actions button.menu-hamburger:hover span {
+     background-color: var(--saturn-gold);
+     box-shadow: 0 0 8px var(--saturn-gold);
+   }
+   
+   /* ==========================================================================
+      5. BOTÕES DO SITE E RESETS DE BOTÕES ESPECIAIS
+      ========================================================================== */
+   button, .btn-space-login {
+     background: transparent;
+     color: var(--text-main);
+     border: 1px solid var(--saturn-gold);
+     padding: 14px 34px;
+     font-family: 'Space Grotesk', sans-serif;
+     font-size: 0.95rem;
+     font-weight: 600;
+     cursor: pointer;
+     border-radius: 30px; 
+     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+     box-shadow: 0 0 15px var(--saturn-gold-dim);
+   }
+   
+   button:hover {
+     color: #ffffff;
+     background-color: var(--saturn-gold);
+     box-shadow: 0 0 25px var(--saturn-gold);
+     transform: translateY(-2px);
+   }
+   
+   body.light-mode button:hover {
+     color: #ffffff !important;
+     background-color: var(--saturn-gold) !important;
+     box-shadow: 0 4px 18px rgba(44, 62, 80, 0.3) !important;
+   }
+   
+   .btn-back-home {
+     background: rgba(255, 255, 255, 0.05) !important;
+     border-color: var(--glass-border) !important;
+     font-size: 0.85rem !important;
+     padding: 10px 24px !important;
+     margin-top: 15px;
+   }
+   
+   body.light-mode .btn-back-home {
+     background: #e2e8f0 !important;
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .btn-back-home:hover {
+     background: var(--saturn-gold) !important;
+     color: #ffffff !important;
+   }
+   
+   /* ==========================================================================
+      6. CORREÇÃO DEFINITIVA DO BOTÃO DE FECHAR (X)
+      Impede que a regra button:hover aplique quadrado azul no X!
+      ========================================================================== */
+   button.close-btn,
+   button.btn-fechar,
+   button.modal-fechar,
+   .close-btn,
+   .btn-fechar,
+   .modal-fechar {
+     all: unset !important;
+     display: inline-flex !important;
+     align-items: center !important;
+     justify-content: center !important;
+     font-size: 2.2rem !important;
+     color: var(--close-icon-color) !important;
+     cursor: pointer !important;
+     position: absolute !important;
+     top: 20px !important;
+     right: 20px !important;
+     line-height: 1 !important;
+     background: transparent !important;
+     background-color: transparent !important;
+     border: none !important;
+     box-shadow: none !important;
+     padding: 0 !important;
+     border-radius: 0 !important;
+     outline: none !important;
+     transform: none !important;
+     transition: transform 0.3s ease, color 0.3s ease !important;
+     z-index: 10 !important;
+   }
+   
+   button.close-btn:hover,
+   button.btn-fechar:hover,
+   button.modal-fechar:hover,
+   .close-btn:hover,
+   .btn-fechar:hover,
+   .modal-fechar:hover,
+   body.light-mode button.close-btn:hover,
+   body.light-mode button.btn-fechar:hover,
+   body.light-mode button.modal-fechar:hover,
+   body.light-mode .close-btn:hover,
+   body.light-mode .btn-fechar:hover,
+   body.light-mode .modal-fechar:hover {
+     background: transparent !important;
+     background-color: transparent !important;
+     border: none !important;
+     box-shadow: none !important;
+     outline: none !important;
+     color: var(--saturn-gold) !important;
+     transform: rotate(90deg) scale(1.1) !important;
+   }
+   
+   body.light-mode .close-btn,
+   body.light-mode .modal-fechar,
+   body.light-mode .btn-fechar {
+     color: #0f172a !important;
+   }
+   
+   /* ==========================================================================
+      7. HERO, SATURNO VS LUA COM MANCHAS
+      ========================================================================== */
+   .hero-section {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     min-height: 90vh;
+     padding: 140px 8% 60px 8%;
+     gap: 40px;
+   }
+   
+   .hero-content {
+     max-width: 600px;
+   }
+   
+   .hero-content h2 {
+     font-size: 3.8rem;
+     line-height: 1.1;
+     margin-bottom: 20px;
+   }
+   
+   .hero-content p {
+     font-size: 1.2rem;
+     color: var(--text-sub);
+     margin-bottom: 30px;
+   }
+   
+   .hero-image-container {
+     position: relative;
+     width: 100%;
+     max-width: 460px; 
+     height: 460px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     animation: planetFloat 7s ease-in-out infinite;
+   }
+   
+   .saturn-ring {
+     position: absolute;
+     width: 140%; 
+     height: 50px;
+     border: 2px solid var(--saturn-gold);
+     border-radius: 50%;
+     z-index: 5; 
+     pointer-events: none;
+     box-shadow: 0 0 25px var(--saturn-gold-dim);
+     animation: ringSpin 7s ease-in-out infinite;
+     transition: opacity 0.5s ease, visibility 0.5s ease;
+   }
+   
+   body.light-mode .saturn-ring {
+     opacity: 0;
+     visibility: hidden;
+   }
+   
+   .hero-image {
+     width: 85%;
+     height: 85%;
+     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(154, 155, 193, 0.1) 40%, rgba(0, 0, 0, 0.75) 85%);
+     border: 1px solid var(--glass-border);
+     border-radius: 50%;
+     display: flex;
+     flex-direction: column; 
+     align-items: center;
+     justify-content: center;
+     padding: 40px; 
+     text-align: center;
+     animation: moonEclipseGlow 9s ease-in-out infinite;
+     z-index: 2; 
+     transition: background 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
+     position: relative;
+     overflow: hidden;
+   }
+   
+   /* LUA COM CRATERAS E MANCHAS NO MODO CLARO */
+   body.light-mode .hero-image {
+     background-image: 
+         radial-gradient(circle at 26% 32%, rgba(100, 116, 139, 0.38) 0%, rgba(148, 163, 184, 0.15) 14%, transparent 15%),
+         radial-gradient(circle at 66% 22%, rgba(100, 116, 139, 0.40) 0%, rgba(148, 163, 184, 0.12) 18%, transparent 19%),
+         radial-gradient(circle at 44% 74%, rgba(100, 116, 139, 0.44) 0%, rgba(148, 163, 184, 0.18) 22%, transparent 23%),
+         radial-gradient(circle at 78% 66%, rgba(100, 116, 139, 0.32) 0%, rgba(148, 163, 184, 0.1) 11%, transparent 12%),
+         radial-gradient(circle at 20% 68%, rgba(100, 116, 139, 0.30) 0%, transparent 13%),
+         radial-gradient(circle at 55% 38%, rgba(148, 163, 184, 0.35) 0%, rgba(203, 213, 225, 0.1) 45%, transparent 60%),
+         radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 35%, #cbd5e1 75%, #94a3b8 100%) !important;
+     
+     border: 2px solid rgba(255, 255, 255, 0.95) !important;
+     box-shadow: 
+         0 0 55px rgba(255, 255, 255, 0.95), 
+         0 0 25px rgba(148, 163, 184, 0.45), 
+         inset -25px -25px 45px rgba(51, 65, 85, 0.32) !important;
+     animation: lunarPearlPulse 8s ease-in-out infinite;
+   }
+   
+   body.light-mode .hero-image p {
+     color: #0f172a !important;
+     text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 2px rgba(255, 255, 255, 1);
+     font-weight: 700;
+     position: relative;
+     z-index: 3;
+   }
+   
+   /* ==========================================================================
+      8. GAVETA LATERAL (SIDE PANEL) & ELEMENTOS INTERNOS
+      ========================================================================== */
+   .side-panel {
+     position: fixed;
+     top: 0;
+     right: -420px;
+     width: 380px;
+     max-width: 90vw;
+     height: 100vh;
+     overflow-y: auto;
+     background: rgba(22, 24, 33, 0.98);
+     backdrop-filter: blur(25px);
+     -webkit-backdrop-filter: blur(25px);
+     border-left: 1px solid var(--glass-border);
+     z-index: 2500;
+     transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1), background 0.4s ease, border-color 0.4s ease;
+     padding: 35px 22px 60px 22px;
+     box-shadow: -20px 0 50px rgba(0, 0, 0, 0.8);
+   }
+   
+   .side-panel.open {
+     right: 0;
+   }
+   
+   body.light-mode .side-panel {
+     background: rgba(255, 255, 255, 0.98) !important;
+     border-left-color: rgba(203, 213, 225, 0.8) !important;
+     box-shadow: -15px 0 40px rgba(148, 163, 184, 0.25) !important;
+   }
+   
+   .panel-content h3 {
+     font-size: 1.3rem;
+     color: var(--saturn-gold);
+     border-bottom: 1px solid var(--glass-border);
+     padding-bottom: 10px;
+     margin-bottom: 20px;
+   }
+   
+   body.light-mode .panel-content h3 {
+     color: #0f172a !important;
+     border-bottom-color: rgba(203, 213, 225, 0.7) !important;
+   }
+   
+   .panel-content ul {
+     list-style: none;
+     display: flex;
+     flex-direction: column;
+     gap: 12px;
+   }
+   
+   .panel-content ul li a {
+     display: block;
+     padding: 12px 18px;
+     background: rgba(255, 255, 255, 0.03);
+     border: 1px solid var(--glass-border);
+     border-radius: 12px;
+     color: var(--text-main);
+     text-decoration: none;
+     font-size: 0.95rem;
+     font-weight: 500;
+     transition: all 0.3s ease;
+   }
+   
+   .panel-content ul li a:hover {
+     background: rgba(255, 255, 255, 0.08);
+     border-color: var(--saturn-gold);
+     color: var(--saturn-gold);
+   }
+   
+   body.light-mode .panel-content ul li a {
+     color: #334155 !important;
+     background: rgba(241, 245, 249, 0.85) !important;
+     border-color: rgba(203, 213, 225, 0.7) !important;
+   }
+   
+   body.light-mode .panel-content ul li a:hover {
+     background: #ffffff !important;
+     color: var(--saturn-gold) !important;
+     border-color: var(--saturn-gold) !important;
+     box-shadow: 0 4px 15px rgba(148, 163, 184, 0.2) !important;
+   }
+   
+   /* Botão Alternar Tema no Menu */
+   .theme-toggle-container {
+     margin-top: 30px;
+     padding-top: 20px;
+     border-top: 1px solid var(--glass-border);
+   }
+   
+   body.light-mode .theme-toggle-container {
+     border-top-color: rgba(203, 213, 225, 0.7) !important;
+   }
+   
+   .theme-toggle-btn {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     width: 100%;
+     padding: 12px 22px;
+     background: rgba(255, 255, 255, 0.05);
+     border: 1px solid var(--glass-border);
+     border-radius: 30px;
+     color: var(--text-main);
+     font-family: 'Space Grotesk', sans-serif;
+     font-size: 0.9rem;
+     font-weight: 500;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     box-shadow: none !important;
+   }
+   
+   .theme-toggle-btn:hover {
+     background: rgba(255, 255, 255, 0.12);
+     border-color: var(--saturn-gold);
+     transform: translateY(-2px);
+   }
+   
+   body.light-mode .theme-toggle-btn {
+     background: #f1f5f9 !important;
+     border-color: #cbd5e1 !important;
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .theme-toggle-btn:hover {
+     background: #ffffff !important;
+     border-color: var(--saturn-gold) !important;
+     box-shadow: 0 4px 18px rgba(148, 163, 184, 0.25) !important;
+   }
+   
+   /* ==========================================================================
+      9. CARDS E CONTEÚDOS DO SITE
+      ========================================================================== */
+   .feature-card, .product-item, .login-box, .atelie-container, .material-card, .agendamento-section, .quiz-card-container, .result-card {
+     background: var(--glass-bg);
+     border: 1px solid var(--glass-border);
+     border-radius: 20px;
+     padding: 35px;
+     box-shadow: 0 15px 35px var(--card-shadow);
+     transition: all 0.4s ease;
+   }
+   
+   body.light-mode .feature-card, 
+   body.light-mode .product-item, 
+   body.light-mode .login-box, 
+   body.light-mode .atelie-container, 
+   body.light-mode .material-card, 
+   body.light-mode .agendamento-section,
+   body.light-mode .quiz-card-container {
+     background: #ffffff !important;
+     border-color: rgba(203, 213, 225, 0.7) !important;
+     box-shadow: 0 10px 30px rgba(148, 163, 184, 0.18) !important;
+   }
+   
+   body.light-mode .feature-card h4,
+   body.light-mode .product-item h4,
+   body.light-mode .material-card h4,
+   body.light-mode .atelie-header h2,
+   body.light-mode .login-header h2,
+   body.light-mode .exploracao-header h3,
+   body.light-mode .quiz-header h3,
+   body.light-mode .materiais-header h3,
+   body.light-mode .manifesto-box h3 {
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .feature-card p,
+   body.light-mode .product-item p,
+   body.light-mode .material-desc,
+   body.light-mode .atelie-subtitle,
+   body.light-mode .form-subtitle,
+   body.light-mode .login-header p,
+   body.light-mode .manifesto-box p {
+     color: #475569 !important;
+   }
+   
+   /* Grid de recursos */
+   .feature-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+     gap: 30px;
+     margin-top: 40px;
+   }
+   
+   /* Vitrine de Coleções */
+   .gallery {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+     gap: 30px;
+     margin-top: 40px;
+   }
+   
+   .product-thumb {
+     width: 100%;
+     height: 360px;
+     overflow: hidden;
+     border-radius: 14px;
+     margin-bottom: 20px;
+   }
+   
+   .product-thumb img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     transition: transform 0.6s ease;
+   }
+   
+   .product-item:hover .product-thumb img {
+     transform: scale(1.08);
+   }
+   
+   /* ==========================================================================
+      10. FORMULÁRIOS, INPUTS E SELECTS ADAPTÁVEIS
+      ========================================================================== */
+   form {
+     display: flex;
+     flex-direction: column;
+     gap: 18px;
+   }
+   
+   form label, .input-group label {
+     font-size: 0.95rem;
+     color: var(--text-sub);
+   }
+   
+   body.light-mode form label, 
+   body.light-mode .input-group label {
+     color: #334155 !important;
+     font-weight: 600;
+   }
+   
+   form input, form select, form textarea, .pergunta-group select {
+     background: var(--input-bg);
+     border: 1px solid var(--glass-border);
+     color: var(--text-main);
+     border-radius: 10px;
+     padding: 16px;
+     font-size: 1rem;
+     font-family: 'Space Grotesk', sans-serif;
+     transition: all 0.3s ease;
+     width: 100%;
+   }
+   
+   body.light-mode form input, 
+   body.light-mode form select, 
+   body.light-mode form textarea,
+   body.light-mode .pergunta-group select {
+     background: #ffffff !important;
+     border-color: #cbd5e1 !important;
+     color: #0f172a !important;
+   }
+   
+   body.light-mode form select option,
+   body.light-mode .pergunta-group select option {
+     background: #ffffff !important;
+     color: #0f172a !important;
+   }
+   
+   body.light-mode form input:focus,
+   body.light-mode form select:focus,
+   body.light-mode form textarea:focus {
+     border-color: var(--saturn-gold) !important;
+     box-shadow: 0 0 15px rgba(44, 62, 80, 0.25) !important;
+     outline: none;
+   }
+   
+   /* ==========================================================================
+      11. MODAIS E CAIXAS FLUTUANTES
+      ========================================================================== */
+   .modal-pedidos {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100vh;
+     background: rgba(0, 0, 0, 0.75);
+     backdrop-filter: blur(8px);
+     z-index: 10000;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+   }
+   
+   .modal-conteudo {
+     background: var(--card-bg-solid);
+     border: 1px solid var(--glass-border);
+     border-radius: 20px;
+     width: 90%;
+     max-width: 600px;
+     padding: 35px;
+     position: relative;
+     box-shadow: 0 20px 50px var(--card-shadow);
+     transition: background 0.4s ease, border-color 0.4s ease;
+   }
+   
+   body.light-mode .modal-conteudo {
+     background: #ffffff !important;
+     border-color: rgba(203, 213, 225, 0.8) !important;
+     color: #0f172a !important;
+     box-shadow: 0 20px 50px rgba(148, 163, 184, 0.25) !important;
+   }
+   
+   body.light-mode .modal-header h3 {
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .card-pedido-item {
+     background: #f8fafc !important;
+     border-color: #e2e8f0 !important;
+   }
+   
+   /* ==========================================================================
+      12. PAINEL ADMIN E COMPONENTES ESPECÍFICOS
+      ========================================================================== */
+   body.light-mode .admin-dashboard-section,
+   body.light-mode .sub-aba-conteudo {
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .admin-header h2 {
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .btn-sub-admin {
+     background: #e2e8f0 !important;
+     color: #0f172a !important;
+     border-color: #cbd5e1 !important;
+   }
+   
+   body.light-mode .btn-sub-admin.active {
+     background: var(--saturn-gold) !important;
+     color: #ffffff !important;
+   }
+   
+   /* ==========================================================================
+      13. FOOTER E ROLAGEM
+      ========================================================================== */
+   .main-footer {
+     width: 100%;
+     margin-top: 140px;
+     background: var(--footer-bg);
+     border-top: 1px solid var(--glass-border);
+     padding: 70px 8% 40px 8%;
+     transition: background 0.4s ease, border-color 0.4s ease;
+   }
+   
+   body.light-mode .main-footer {
+     background: #e2e8f0 !important;
+     border-top-color: #cbd5e1 !important;
+   }
+   
+   body.light-mode .footer-brand h4,
+   body.light-mode .footer-links a,
+   body.light-mode .footer-socials a {
+     color: #0f172a !important;
+   }
+   
+   body.light-mode .footer-brand p,
+   body.light-mode .footer-bottom {
+     color: #475569 !important;
+   }
+   
+   /* Scrollbar adaptável */
+   ::-webkit-scrollbar {
+     width: 8px;
+   }
+   
+   ::-webkit-scrollbar-track {
+     background: var(--bg-space);
+   }
+   
+   ::-webkit-scrollbar-thumb {
+     background: linear-gradient(var(--bg-space), var(--lavender-glow), var(--saturn-gold));
+     border-radius: 4px;
+   }
+   
+   body.light-mode ::-webkit-scrollbar-thumb {
+     background: linear-gradient(#f1f5f9, #94a3b8, var(--saturn-gold));
+   }
+   
+   /* Animações astronômicas */
+   @keyframes planetFloat {
+     0%, 100% { transform: translateY(0px); }
+     50% { transform: translateY(-18px); }
+   }
+   
+   @keyframes ringSpin {
+     0%, 100% { transform: rotate(-13deg) scaleY(1); }
+     50% { transform: rotate(-15deg) scaleY(1.05); }
+   }

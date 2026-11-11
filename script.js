@@ -1948,7 +1948,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
+function toggleTheme() {
+    const body = document.body;
+    const icon = document.getElementById('themeIcon');
+    const text = document.getElementById('themeText');
+  
+    body.classList.toggle('light-mode');
+    const isLight = body.classList.contains('light-mode');
+  
+    if (isLight) {
+      if (icon) icon.textContent = '🪐'; // Ícone para voltar a Saturno
+      if (text) text.textContent = 'Modo Saturno';
+      localStorage.setItem('siteTheme', 'lunar');
+    } else {
+      if (icon) icon.textContent = '🌙'; // Ícone para ir à Lua
+      if (text) text.textContent = 'Modo Lunar';
+      localStorage.setItem('siteTheme', 'saturn');
+    }
+  }
+  
+  // Carrega o tema salvo ao abrir a página
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('siteTheme') === 'lunar') {
+      document.body.classList.add('light-mode');
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+      if (icon) icon.textContent = '🪐';
+      if (text) text.textContent = 'Modo Saturno';
+    }
+  });
 // ==========================================
 // 12. EFEITOS VISUAIS
 // ==========================================
