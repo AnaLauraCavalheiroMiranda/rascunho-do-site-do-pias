@@ -26,6 +26,7 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
+        senha TEXT,
         foto TEXT,
         busto TEXT,
         cintura TEXT,
@@ -33,12 +34,11 @@ db.serialize(() => {
         altura TEXT
     )`);
 
-    // Adiciona colunas para compatibilidade com bancos criados anteriormente
-    db.run(`ALTER TABLE clientes ADD COLUMN foto TEXT`, () => {});
-    db.run(`ALTER TABLE clientes ADD COLUMN busto TEXT`, () => {});
-    db.run(`ALTER TABLE clientes ADD COLUMN cintura TEXT`, () => {});
-    db.run(`ALTER TABLE clientes ADD COLUMN quadril TEXT`, () => {});
-    db.run(`ALTER TABLE clientes ADD COLUMN altura TEXT`, () => {});
+    // Adiciona colunas para garantia de compatibilidade caso o banco já exista
+    const colunas = ['senha', 'foto', 'busto', 'cintura', 'quadril', 'altura'];
+    colunas.forEach(col => {
+        db.run(`ALTER TABLE clientes ADD COLUMN ${col} TEXT`, () => {});
+    });
 
     // Tabela de Pedidos
     db.run(`CREATE TABLE IF NOT EXISTS pedidos (
@@ -57,16 +57,16 @@ db.serialize(() => {
 
 // Cadastrar novo cliente
 app.post('/api/clientes', (req, res) => {
-    const { nome, email } = req.body;
+    const { nome, email, senha } = req.body;
 
     if (!nome || !email) {
         return res.status(400).json({ erro: 'Por favor, informe nome e e-mail.' });
     }
 
-    const sql = 'INSERT INTO clientes (nome, email) VALUES (?, ?)';
-    db.run(sql, [nome, email], function (err) {
+    const sql = 'INSERT INTO clientes (nome, email, senha) VALUES (?, ?, ?)';
+    db.run(sql, [nome, email, senha || ''], function (err) {
         if (err) {
-            if (err.message.includes('UNIQUE')) {
+            if (err.message && err.message.includes('UNIQUE')) {
                 return res.status(400).json({ erro: 'Este e-mail já está cadastrado!' });
             }
             return res.status(500).json({ erro: 'Erro ao cadastrar cliente.', detalhes: err.message });
@@ -83,7 +83,7 @@ app.post('/api/clientes', (req, res) => {
 
 // Login de cliente existente
 app.post('/api/clientes/login', (req, res) => {
-    const { email } = req.body;
+    const { email, senha } = req.body;
 
     if (!email) {
         return res.status(400).json({ erro: 'Por favor, informe seu e-mail.' });
@@ -93,6 +93,12 @@ app.post('/api/clientes/login', (req, res) => {
     db.get(sql, [email], (err, cliente) => {
         if (err) return res.status(500).json({ erro: 'Erro no banco de dados.' });
         if (!cliente) return res.status(404).json({ erro: 'Conta não encontrada! Verifique o e-mail ou cadastre-se.' });
+        
+        // Se houver senha cadastrada e senha enviada, valida
+        if (cliente.senha && senha && cliente.senha !== senha) {
+            return res.status(401).json({ erro: 'Senha incorreta!' });
+        }
+
         res.json({ mensagem: 'Sintonizado com sucesso!', cliente });
     });
 });
@@ -123,7 +129,7 @@ app.put('/api/clientes/:id/medidas', (req, res) => {
 // Consultar todos os clientes
 app.get('/api/clientes', (req, res) => {
     db.all('SELECT * FROM clientes ORDER BY id DESC', [], (err, rows) => {
-        if (err) return res.status(500).json({ erro: 'Erro ao consultar clientes.', detalhes: err.message });
+        if (err) return res.status(500).json({ erro: 'Erro ao consultar clientes no banco.', detalhes: err.message });
         res.json(rows);
     });
 });
@@ -144,14 +150,14 @@ app.put('/api/clientes/:id', (req, res) => {
     db.run(sql, [nome, email, busto, cintura, quadril, altura, id], function (err) {
         if (err) {
             if (err.message && err.message.includes('UNIQUE')) {
-                return res.status(400).json({ erro: 'Este e-mail já pertence a outro cadastrado.' });
+                return res.status(400).json({ erro: 'Este e-mail já pertence a outro tripulante registrado.' });
             }
             return res.status(500).json({ erro: 'Erro ao atualizar dados do cliente.', detalhes: err.message });
         }
         if (this.changes === 0) {
             return res.status(404).json({ erro: 'Cliente não encontrado.' });
         }
-        res.json({ mensagem: 'Dados do cliente atualizados com sucesso!', id });
+        res.json({ mensagem: 'Dados atualizados com sucesso!', id });
     });
 });
 
@@ -227,55 +233,6 @@ app.get('/api/admin/estatisticas', (req, res) => {
             SUM(CASE WHEN status = 'Recusado' THEN 1 ELSE 0 END) as recusados
         FROM pedidos
     `;
-    // GET - Buscar todos os clientes
-app.get('/api/clientes', (req, res) => {
-    db.all('SELECT * FROM clientes ORDER BY id DESC', [], (err, rows) => {
-        if (err) return res.status(500).json({ erro: 'Erro ao consultar clientes no banco.', detalhes: err.message });
-        res.json(rows);
-    });
-});
-
-// PUT - Atualizar dados completos do cliente no banco SQLite (Admin)
-app.put('/api/clientes/:id', (req, res) => {
-    const { id } = req.params;
-    const { nome, email, busto, cintura, quadril, altura } = req.body;
-
-    if (!nome || !email) {
-        return res.status(400).json({ erro: 'Nome e e-mail são obrigatórios.' });
-    }
-
-    const sql = `UPDATE clientes 
-                 SET nome = ?, email = ?, busto = ?, cintura = ?, quadril = ?, altura = ? 
-                 WHERE id = ?`;
-
-    db.run(sql, [nome, email, busto, cintura, quadril, altura, id], function (err) {
-        if (err) {
-            if (err.message && err.message.includes('UNIQUE')) {
-                return res.status(400).json({ erro: 'Este e-mail já pertence a outro tripulante registrado.' });
-            }
-            return res.status(500).json({ erro: 'Erro ao atualizar dados do cliente.', detalhes: err.message });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ erro: 'Cliente não encontrado.' });
-        }
-        res.json({ mensagem: 'Dados atualizados com sucesso!', id });
-    });
-});
-
-// DELETE - Excluir cliente do banco SQLite (Admin)
-app.delete('/api/clientes/:id', (req, res) => {
-    const { id } = req.params;
-
-    db.run('DELETE FROM clientes WHERE id = ?', [id], function (err) {
-        if (err) {
-            return res.status(500).json({ erro: 'Erro ao excluir cliente do banco de dados.' });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ erro: 'Cliente não encontrado.' });
-        }
-        res.json({ mensagem: 'Cliente removido com sucesso!' });
-    });
-});
 
     db.get(query, [], (err, row) => {
         if (err) return res.status(500).json({ erro: err.message });

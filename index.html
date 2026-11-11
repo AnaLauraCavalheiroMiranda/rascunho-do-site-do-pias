@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <!-- 2. SINTONIZADOR DE ÁUDIO CÓSMICO (YOUTUBE SLOW) -->
+            <!-- 2. SINTONIZADOR DE ÁUDIO CÓSMICO -->
             <div class="audio-sintonizador-widget" style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 14px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <button type="button" id="btn-toggle-audio" onclick="alternarAudioCosmico()" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 20px; background: rgba(238, 228, 187, 0.15); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); cursor: pointer;">
@@ -272,7 +272,11 @@
             </div>
         </div>
     </div>
-
+<!-- Player de áudio com controles -->
+<audio id="musicaJazz" controls loop>
+    <source src="sua-musica.mp3" type="audio/mpeg">
+    Seu navegador não suporta o tocador de áudio.
+  </audio>
     <!-- RODAPÉ -->
     <footer class="main-footer">
         <div class="footer-container">

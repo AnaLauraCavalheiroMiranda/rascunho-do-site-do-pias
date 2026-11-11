@@ -589,7 +589,8 @@ function configurarGatilhosNavegacao() {
 
 function mudarTela(nomeDaTela) {
     const containerPrincipal = document.querySelector('main');
-    
+    if (!containerPrincipal) return;
+
     if (telasCelestine[nomeDaTela] !== undefined) {
         const sidePanel = document.getElementById('sidePanel');
         if (sidePanel && sidePanel.classList.contains('open')) {
@@ -680,17 +681,17 @@ function alternarModoLogin(modo) {
     const textoAlternar = document.getElementById('texto-alternar-login');
 
     if (modo === 'login') {
-        formCadastro.style.display = 'none';
-        formLogin.style.display = 'flex';
-        titulo.innerText = "Acessar Conta de Tripulante";
-        subtitulo.innerText = "Digite seu e-mail e palavra-passe cadastrados para sintonizar sua sessão.";
-        textoAlternar.innerHTML = `Não tem uma assinatura ainda? <a href="#" onclick="event.preventDefault(); alternarModoLogin('cadastro');">Criar novo cadastro</a>`;
+        if (formCadastro) formCadastro.style.display = 'none';
+        if (formLogin) formLogin.style.display = 'flex';
+        if (titulo) titulo.innerText = "Acessar Conta de Tripulante";
+        if (subtitulo) subtitulo.innerText = "Digite seu e-mail e palavra-passe cadastrados para sintonizar sua sessão.";
+        if (textoAlternar) textoAlternar.innerHTML = `Não tem uma assinatura ainda? <a href="#" onclick="event.preventDefault(); alternarModoLogin('cadastro');">Criar novo cadastro</a>`;
     } else {
-        formCadastro.style.display = 'flex';
-        formLogin.style.display = 'none';
-        titulo.innerText = "Identificação de Tripulante";
-        subtitulo.innerText = "Sincronize seus dados orbitais para acessar seus mantos cósmicos privados.";
-        textoAlternar.innerHTML = `Já possui registro no ateliê? <a href="#" onclick="event.preventDefault(); alternarModoLogin('login');">Entrar com conta existente</a>`;
+        if (formCadastro) formCadastro.style.display = 'flex';
+        if (formLogin) formLogin.style.display = 'none';
+        if (titulo) titulo.innerText = "Identificação de Tripulante";
+        if (subtitulo) subtitulo.innerText = "Sincronize seus dados orbitais para acessar seus mantos cósmicos privados.";
+        if (textoAlternar) textoAlternar.innerHTML = `Já possui registro no ateliê? <a href="#" onclick="event.preventDefault(); alternarModoLogin('login');">Entrar com conta existente</a>`;
     }
 }
 
@@ -716,7 +717,7 @@ async function autenticarTripulante(event) {
             alert(`⚡ Tripulante ${nome} cadastrado com sucesso!`);
             mudarTela('cliente');
         } else {
-            alert(`⚠️ Aviso: ${dados.erro}`);
+            alert(`⚠️ Aviso: ${dados.erro || 'Erro ao realizar cadastro.'}`);
         }
     } catch (erro) {
         alert('❌ Falha ao conectar ao servidor Node.js.');
@@ -743,14 +744,13 @@ async function fazerLoginTripulante(event) {
             alert(`🚀 Bem-vindo(a) de volta, Comandante ${dados.cliente.nome}!`);
             mudarTela('cliente');
         } else {
-            alert(`❌ ${dados.erro}`);
+            alert(`❌ ${dados.erro || 'Falha no login.'}`);
         }
     } catch (erro) {
         alert('❌ Falha na conexão com o servidor.');
     }
 }
 
-// ATUALIZAÇÃO DA VISIBILIDADE E GESTÃO DAS 5 NOVAS FUNCIONALIDADES NO MENU HAMBÚRGUER
 async function atualizarVisibilidadeMenuLateral() {
     const itemPedidos = document.getElementById('menu-item-pedidos');
     const itemClientes = document.getElementById('menu-item-clientes');
@@ -786,10 +786,8 @@ async function atualizarVisibilidadeMenuLateral() {
             }
         }
 
-        // 1. Atualiza Pontos de Gamificação VIP
         atualizarVipGamificacao(clienteLogado);
 
-        // 2. Busca Rastreio de Confecção do pedido
         if (timelineCard) {
             timelineCard.style.display = 'block';
             carregarTimelinePedidoMenu(clienteLogado.email);
@@ -1059,7 +1057,7 @@ async function carregarMantosDoJson() {
             }
         });
     } catch (erro) {
-        console.error('Erro ao carregar o arquivo JSON de mantos:', erro);
+        console.warn('produtos.json não carregado ou sem dados.');
     }
 }
 
@@ -1150,7 +1148,7 @@ function alternarPaginaColecao(numeroPagina) {
         p1.classList.remove('ativa');
         setTimeout(() => {
             p2.classList.add('ativa');
-            indicador.textContent = "Órbita 2 de 2";
+            if (indicador) indicador.textContent = "Órbita 2 de 2";
             if (btnVoltar) btnVoltar.removeAttribute('disabled');
             if (btnAvancar) btnAvancar.setAttribute('disabled', 'true');
         }, 250);
@@ -1158,7 +1156,7 @@ function alternarPaginaColecao(numeroPagina) {
         p2.classList.remove('ativa');
         setTimeout(() => {
             p1.classList.add('ativa');
-            indicador.textContent = "Órbita 1 de 2";
+            if (indicador) indicador.textContent = "Órbita 1 de 2";
             if (btnVoltar) btnVoltar.setAttribute('disabled', 'true');
             if (btnAvancar) btnAvancar.removeAttribute('disabled');
         }, 250);
@@ -1676,7 +1674,7 @@ function gerarCalendarioOrbital() {
 }
 
 // ==========================================
-// 11. NOVAS FUNCIONALIDADES DO MENU HAMBÚRGUER (GAMIFICAÇÃO, TIMELINE, MOODBOARD, SOM & WHATSAPP)
+// 11. NOVAS FUNCIONALIDADES DO MENU HAMBÚRGUER
 // ==========================================
 
 function atualizarVipGamificacao(cliente) {
@@ -1874,9 +1872,85 @@ function abrirWhatsappVip() {
     const url = `https://api.whatsapp.com/send?phone=5541999999999&text=${encodeURIComponent(mensagem)}`;
     window.open(url, '_blank');
 }
+const musica = document.getElementById('musicaJazz');
+
+/**
+ * Gerenciador de Áudio do Site - script.js
+ * Reproduz o áudio de fundo (Untitled.mp3) e gerencia os controles de reprodução.
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Busca ou cria o elemento de áudio
+    let audio = document.getElementById('bgMusic');
+    
+    if (!audio) {
+        audio = document.createElement('audio');
+        audio.id = 'bgMusic';
+        audio.src = 'Untitled.mp3'; // Garanta que o arquivo Untitled.mp3 esteja na mesma pasta
+        audio.loop = true;
+        audio.preload = 'auto';
+        document.body.appendChild(audio);
+    }
+
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const musicBtnText = document.getElementById('musicBtnText');
+    const eqIcon = document.getElementById('eqIcon');
+
+    // Função para alternar entre Tocar e Pausar
+    window.toggleAudio = function () {
+        if (audio.paused) {
+            audio.play().then(() => {
+                atualizarUI(true);
+            }).catch(err => {
+                console.warn("Autoplay bloqueado ou falha ao reproduzir:", err);
+            });
+        } else {
+            audio.pause();
+            atualizarUI(false);
+        }
+    };
+
+    // Atualiza o estado visual do botão (se existir na página)
+    function atualizarUI(isPlaying) {
+        if (musicBtnText) {
+            musicBtnText.textContent = isPlaying ? "Pausar Música" : "Tocar Música";
+        }
+        if (eqIcon) {
+            if (isPlaying) {
+                eqIcon.classList.add('playing');
+            } else {
+                eqIcon.classList.remove('playing');
+            }
+        }
+    }
+
+    // Toca automaticamente no primeiro clique/interação do usuário na página
+    function iniciarNoPrimeiroClique() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                atualizarUI(true);
+            }).catch(() => {});
+        }
+        document.removeEventListener('click', iniciarNoPrimeiroClique);
+        document.removeEventListener('keydown', iniciarNoPrimeiroClique);
+        document.removeEventListener('touchstart', iniciarNoPrimeiroClique);
+    }
+
+    document.addEventListener('click', iniciarNoPrimeiroClique, { once: true });
+    document.addEventListener('keydown', iniciarNoPrimeiroClique, { once: true });
+    document.addEventListener('touchstart', iniciarNoPrimeiroClique, { once: true });
+
+    // Se o botão existir no HTML, conecta o evento de clique
+    if (musicBtn) {
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita acionar o listener global duas vezes
+            toggleAudio();
+        });
+    }
+});
 
 // ==========================================
-// 12. EFEITOS VISUAIS E ESTILOS DINÂMICOS
+// 12. EFEITOS VISUAIS
 // ==========================================
 
 window.addEventListener('scroll', () => {
