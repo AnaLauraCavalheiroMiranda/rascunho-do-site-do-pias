@@ -2316,3 +2316,568 @@ form select:focus {
      0%, 100% { transform: rotate(-13deg) scaleY(1); }
      50% { transform: rotate(-15deg) scaleY(1.05); }
    }
+   /* ==========================================================================
+   16. MODAL DE INSPEÇÃO DE TEXTURAS (ÁREA DE EXPLORAÇÃO)
+   ========================================================================== */
+.modal-textura-conteudo {
+  max-width: 780px;
+  padding: 40px;
+}
+
+.textura-modal-header {
+  margin-bottom: 25px;
+  padding-right: 30px;
+}
+
+.textura-modal-header h3 {
+  font-size: 2.2rem;
+  color: var(--saturn-gold);
+  margin: 10px 0 5px 0;
+}
+
+.textura-subtitulo {
+  color: var(--text-sub);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.textura-swatch-container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+  margin-bottom: 28px;
+  align-items: stretch;
+}
+
+@media (max-width: 650px) {
+  .textura-swatch-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.textura-swatch {
+  min-height: 170px;
+  border-radius: 16px;
+  border: 1px solid var(--saturn-gold);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s ease;
+}
+
+.textura-swatch:hover {
+  transform: scale(1.02);
+}
+
+.swatch-lupa-tag {
+  background: rgba(15, 17, 24, 0.78);
+  backdrop-filter: blur(6px);
+  color: var(--starlight);
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+}
+
+body.light-mode .swatch-lupa-tag {
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f172a;
+}
+
+.textura-sensacao-box {
+  background: rgba(10, 11, 16, 0.55);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+body.light-mode .textura-sensacao-box {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.textura-sensacao-box > div {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.textura-detalhes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 650px) {
+  .textura-detalhes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.textura-info-bloco {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+body.light-mode .textura-info-bloco {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.textura-info-bloco h4 {
+  font-size: 1.25rem;
+  color: var(--saturn-gold);
+  margin-bottom: 10px;
+}
+
+.textura-info-bloco p {
+  font-size: 0.95rem;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+.textura-pecas-section h4 {
+  font-size: 1.35rem;
+  margin-bottom: 15px;
+  color: var(--text-main);
+}
+
+.textura-pecas-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.peca-citada-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.peca-citada-card:hover {
+  border-color: var(--saturn-gold);
+  transform: translateY(-3px);
+}
+
+body.light-mode .peca-citada-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.peca-citada-card strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--text-main);
+  display: block;
+}
+
+.peca-citada-card span {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  display: block;
+}
+
+.btn-ver-peca-citada {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  width: 100%;
+  text-align: center;
+}
+/* ==========================================================================
+   17. SELETOR DE TECIDOS & PEÇA BASE NA ABA DE PEDIDOS (CICLOS LUNARES)
+   ========================================================================== */
+   .bloco-customizacao-pedido {
+    background: rgba(10, 11, 16, 0.45);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  
+  body.light-mode .bloco-customizacao-pedido {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  
+  .bloco-custom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .badge-opcional {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-sub);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .contador-tecidos-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--saturn-gold-dim);
+    color: var(--saturn-gold);
+    border: 1px solid var(--saturn-gold);
+  }
+  
+  .tecidos-selecao-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+  }
+  
+  .tecido-opcao-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+  }
+  
+  .tecido-opcao-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .tecido-opcao-card:hover {
+    border-color: var(--saturn-gold);
+    transform: translateY(-2px);
+  }
+  
+  .tecido-opcao-card.selecionado {
+    background: radial-gradient(circle at top right, rgba(238, 228, 187, 0.16), rgba(53, 42, 85, 0.35));
+    border-color: var(--saturn-gold);
+    box-shadow: 0 0 18px var(--saturn-gold-dim);
+  }
+  
+  body.light-mode .tecido-opcao-card {
+    background: #ffffff;
+    border-color: #cbd5e1;
+  }
+  
+  body.light-mode .tecido-opcao-card.selecionado {
+    background: rgba(44, 62, 80, 0.08);
+    border-color: var(--saturn-gold);
+    box-shadow: 0 4px 14px rgba(44, 62, 80, 0.18);
+  }
+  
+  .tecido-opcao-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .tecido-opcao-icone {
+    font-size: 1.5rem;
+  }
+  
+  .tecido-opcao-check {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-sub);
+    transition: all 0.25s ease;
+  }
+  
+  .tecido-opcao-card.selecionado .tecido-opcao-check {
+    background: var(--saturn-gold);
+    color: #000000;
+  }
+  
+  body.light-mode .tecido-opcao-card.selecionado .tecido-opcao-check {
+    color: #ffffff;
+  }
+  
+  .tecido-opcao-nome {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    color: var(--text-main);
+    line-height: 1.25;
+  }
+  
+  .tecido-opcao-meta {
+    font-size: 0.78rem;
+    color: var(--text-sub);
+  }
+  /* ==========================================================================
+   18. BANCADA DO ALFAIATE — FICHAS TÉCNICAS NO PAINEL ADMIN
+   ========================================================================== */
+.bancada-alfaiate-wrapper {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 28px;
+}
+
+body.light-mode .bancada-alfaiate-wrapper {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.bancada-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.bancada-header h3 {
+  font-size: 1.7rem;
+  color: var(--saturn-gold);
+  margin-bottom: 4px;
+}
+
+.bancada-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.filtros-status-alfaiate {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-filtro-status {
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  color: var(--text-sub);
+  box-shadow: none;
+}
+
+.btn-filtro-status.active {
+  background: var(--saturn-gold);
+  color: #000000;
+  border-color: var(--saturn-gold);
+  font-weight: 700;
+}
+
+body.light-mode .btn-filtro-status.active {
+  color: #ffffff;
+}
+
+.fichas-alfaiate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 480px) {
+  .fichas-alfaiate-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ficha-alfaiate-card {
+  background: rgba(25, 27, 36, 0.85);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.ficha-alfaiate-card:hover {
+  border-color: var(--saturn-gold);
+  transform: translateY(-3px);
+}
+
+body.light-mode .ficha-alfaiate-card {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.ficha-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px dashed var(--glass-border);
+  padding-bottom: 12px;
+}
+
+.ficha-numero-pedido {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--saturn-gold);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.ficha-topo h4 {
+  font-size: 1.35rem;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.ficha-resumo-modelo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+body.light-mode .ficha-resumo-modelo {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.ficha-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ficha-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-sub);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ficha-valor-destaque {
+  font-size: 1rem;
+  color: var(--saturn-gold);
+}
+
+.ficha-valor {
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.ficha-tecidos-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-tecido-ficha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--saturn-gold-dim);
+  border: 1px solid var(--saturn-gold);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.84rem;
+}
+
+.tag-tecido-ficha small {
+  color: var(--text-sub);
+  font-size: 0.75rem;
+}
+
+.tag-tecido-vazio {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-style: italic;
+}
+
+.box-escrita-cliente {
+  background: rgba(53, 42, 85, 0.25);
+  border-left: 3px solid var(--saturn-gold);
+  border-radius: 10px;
+  padding: 12px 15px;
+}
+
+body.light-mode .box-escrita-cliente {
+  background: #ffffff;
+  border-color: var(--saturn-gold);
+}
+
+.texto-escrita-cliente {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.texto-escrita-vazio {
+  font-size: 0.84rem;
+  color: var(--text-sub);
+  font-style: italic;
+  margin: 0;
+}
+
+.box-medidas-cliente {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 12px 15px;
+}
+
+body.light-mode .box-medidas-cliente {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.ficha-medidas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--text-main);
+}
+
+.ficha-acoes-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}

@@ -5,9 +5,21 @@
 const API_URL = 'http://localhost:3000/api';
 let produtosGlobais = [];
 let listaClientesCache = [];
+let listaPedidosAdminCache = [];
+let filtroStatusAlfaiateAtual = 'todos';
+
+// Lista de peças clássicas/mais vendidas para sempre constarem no seletor de referência
+const pecasDestaqueCatalogo = [
+    "Vestido Saturniano Imperial",
+    "Manto Eclipse Noturno",
+    "Manto Via Láctea Translúcida",
+    "Vestido Eclipse Total",
+    "Terno Alinhamento Astral",
+    "Corset Aurora Lunar"
+];
 
 // ==========================================
-// 1. BASE DE DADOS DE MATÉRIAS-PRIMAS
+// 1. BASE DE DADOS DE MATÉRIAS-PRIMAS & TEXTURAS
 // ==========================================
 const materiaisCelestine = [
     {
@@ -15,66 +27,175 @@ const materiaisCelestine = [
         nome: "Veludo Negro de Buraco Negro",
         icone: "🌑",
         tag: "Alta Densidade",
+        subtitulo: "Densidade absoluta que absorve 99% da luz ambiente como o horizonte de eventos.",
         descricao: "Tecido de estrutura densa capaz de absorver 99% da luz ambiente. Projetado para trajes de alta imponência e presença marcante.",
         caimento: "Estruturado / Pesado",
         origem: "Órbita de Cygnus X-1",
         brilho: "0% (Absorção Total)",
-        raridade: "Lendário"
+        gramatura: "360 g/m²",
+        cuidados: "Escovação suave no sentido do pelo; limpeza especializada a seco.",
+        raridade: "Lendário",
+        estiloAgendamento: "minimalista",
+        estiloTrama: "repeating-radial-gradient(circle at 50% 50%, #261e3d 0px, #12131a 4px, #07080c 8px)",
+        composicao: "78% Viscose de bambu de pelo duplo ultra-denso e 22% Seda estrutural na trama de urdume.",
+        processo: "Tecido em teares de dupla felpa e submetido a navalhamento micrométrico seguido de vaporização direcional. As microfibras são inclinadas em ângulos opostos para aprisionar a luz e criar profundidade visual sem reflexos artificiais.",
+        pecasLoja: [
+            {
+                nome: "Vestido Eclipse Total",
+                detalhe: "Veludo negro profundo com recortes e detalhes em branco puro",
+                destino: "colecoes"
+            },
+            {
+                nome: "Manto Eclipse Noturno",
+                detalhe: "Corte minimalista de caimento pesado e acabamento fosco",
+                destino: "mais-vendidos"
+            }
+        ]
     },
     {
         id: "brilho",
         nome: "Jacquard de Ouro Saturniano",
         icone: "🪐",
         tag: "Fios Metálicos",
+        subtitulo: "Relevos arquitetônicos banhados em fios metálicos que refletem a luz como os anéis de Saturno.",
         descricao: "Fios de titânio e microcristais trançados com fibras nobres. Reflete gradientes dourados vibrantes conforme a luz do ambiente oscila.",
         caimento: "Rígido / Imponente",
         origem: "Anéis Internos de Saturno",
         brilho: "95% (Reflexo Angular)",
-        raridade: "Raro"
+        gramatura: "410 g/m²",
+        cuidados: "Não dobrar sobre os relevos; armazenar em capa respirável e lavar a seco.",
+        raridade: "Raro",
+        estiloAgendamento: "brilhante",
+        estiloTrama: "repeating-linear-gradient(-30deg, rgba(238,228,187,0.32) 0px, rgba(238,228,187,0.32) 3px, rgba(42,45,61,0.92) 3px, rgba(42,45,61,0.92) 10px)",
+        composicao: "62% Algodão egípcio penteado, 23% Seda crua e 15% Filamentos de titânio dourado e microcristais.",
+        processo: "Produzido em tear Jacquard programado exclusivamente para o Celestine Ateliê. Em vez de estampa superficial, cada órbita dourada é tecida em alto-relevo pelo entrelaçamento de fios extras de trama, levando cerca de 6 horas por metro.",
+        pecasLoja: [
+            {
+                nome: "Vestido Saturniano Imperial",
+                detalhe: "Camadas sobrepostas em anéis com aplicação manual de brilho dourado",
+                destino: "mais-vendidos"
+            },
+            {
+                nome: "Corset Aurora Lunar",
+                detalhe: "Estrutura esculpida com acabamento perolado e sustentação imperial",
+                destino: "colecoes"
+            }
+        ]
     },
     {
         id: "fluidez",
         nome: "Seda Flutuante de Nebulosa",
         icone: "✨",
         tag: "Gravidade Zero",
+        subtitulo: "Leveza etérea que reage à menor corrente de ar, simulando gases cósmicos em gravidade zero.",
         descricao: "Seda ultraleve e translúcida que responde ao menor fluxo de ar, simulação visual contínua de gases cósmicos em flutuação.",
         caimento: "Esvoaçante / Ultra Leve",
         origem: "Nebulosa de Órion",
         brilho: "60% (Suave / Etéreo)",
-        raridade: "Épico"
+        gramatura: "85 g/m² (19 Momme)",
+        cuidados: "Vaporização indireta a baixa temperatura; evitar contato com superfícies ásperas.",
+        raridade: "Épico",
+        estiloAgendamento: "futurista",
+        estiloTrama: "repeating-linear-gradient(45deg, rgba(154,155,193,0.22) 0px, rgba(154,155,193,0.22) 2px, transparent 2px, transparent 6px), radial-gradient(circle at 30% 30%, #4b3d7a, #1d1f2b 70%, rgba(238,228,187,0.25))",
+        composicao: "90% Seda Mulberry pura de fios contínuos e 10% Microfilamentos furta-cor de celulose mineral.",
+        processo: "Tecida em baixa tensão para preservar a elasticidade natural do casulo. O tingimento é artesanal por imersão gradual, criando nuances iridescentes entre lavanda e azul profundo sem uso de corantes pesados.",
+        pecasLoja: [
+            {
+                nome: "Terno Alinhamento Astral",
+                detalhe: "Cortes assimétricos com reflexos furta-cor de nebulosas",
+                destino: "colecoes"
+            },
+            {
+                nome: "Vestido Eclipse Total",
+                detalhe: "Forro interno fluido para movimento contínuo em órbita",
+                destino: "colecoes"
+            }
+        ]
     },
     {
         id: "plasma",
         nome: "Manta Magnética Aurora",
         icone: "🌌",
         tag: "Termocrômico",
+        subtitulo: "Trama inteligente termocrômica que oscila entre lavanda e ciano conforme o calor do corpo.",
         descricao: "Tecido inteligente que altera sua tonalidade entre tons de lavanda e ciano de acordo com a temperatura corporal do tripulante.",
         caimento: "Moldável / Ajustável",
         origem: "Magnetosfera Polar",
         brilho: "80% (Iridescente)",
-        raridade: "Exclusivo"
+        gramatura: "220 g/m²",
+        cuidados: "Lavar manualmente em água fria; secar à sombra longe de fontes de calor.",
+        raridade: "Exclusivo",
+        estiloAgendamento: "futurista",
+        estiloTrama: "linear-gradient(125deg, rgba(0,240,255,0.25), rgba(157,78,221,0.35), rgba(26,28,36,0.9)), repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0px, transparent 2px, transparent 6px)",
+        composicao: "70% Microfibra de poliamida bio-sintética, 20% Elastano anatômico e 10% Microcápsulas termocrômicas.",
+        processo: "Os fios passam por um banho de encapsulamento magnético antes da malharia circular de alta precisão. Quando aquecido pela pele do tripulante, o alinhamento molecular altera a refração da luz na superfície do manto.",
+        pecasLoja: [
+            {
+                nome: "Terno Alinhamento Astral",
+                detalhe: "Painéis laterais com transição cromática sob luz noturna",
+                destino: "colecoes"
+            }
+        ]
     },
     {
         id: "cristal",
         nome: "Tule de Poeira Estelar",
         icone: "💎",
         tag: "Transparência",
+        subtitulo: "Transparência cristalina incrustada com micro-partículas luminosas como constelações na pele.",
         descricao: "Tule finíssimo incrustado com micropartículas de quartzo estelar. Cria uma ilusão de constelações flutuando sobre a pele.",
         caimento: "Vaporoso / Delicado",
         origem: "Cinturão de Kuiper",
         brilho: "100% (Ponto de Luz)",
-        raridade: "Raro"
+        gramatura: "48 g/m²",
+        cuidados: "Lavagem delicada à mão sem torcer; guardar pendurado em cabide acolchoado.",
+        raridade: "Raro",
+        estiloAgendamento: "futurista",
+        estiloTrama: "radial-gradient(circle at 20% 30%, #ffffff 1px, transparent 2px), radial-gradient(circle at 75% 65%, #EEE4BB 1.5px, transparent 2.5px), radial-gradient(circle at 50% 20%, #ffffff 1px, transparent 2px), repeating-linear-gradient(60deg, rgba(255,255,255,0.08) 0px, transparent 1px, transparent 5px), #1b1e2b",
+        composicao: "92% Tule de seda francesa de trama hexagonal e 8% Microcristais de quartzo estelar termofixados.",
+        processo: "Cada metro de tule hexagonal recebe a aplicação manual de micropartículas minerais facetadas em intervalos assimétricos, garantindo brilho cintilante sem comprometer a transparência nem pesar sobre o corpo.",
+        pecasLoja: [
+            {
+                nome: "Manto Via Láctea Translúcida",
+                detalhe: "Sobreposição translúcida com aplicação manual de microcristais celestes",
+                destino: "mais-vendidos"
+            },
+            {
+                nome: "Corset Aurora Lunar",
+                detalhe: "Camada externa translúcida banhada a pó de pérola cósmica",
+                destino: "colecoes"
+            }
+        ]
     },
     {
         id: "couro",
         nome: "Couro Sintético de Asteroide",
         icone: "☄️",
         tag: "Escudo Térmico",
+        subtitulo: "Superfície esculpida em relevo mineral com acabamento acetinado fosco e isolamento térmico.",
         descricao: "Textura em relevo tridimensional com acabamento fosco. Oferece visual futurista urbano e proteção contra variações térmicas.",
         caimento: "Firme / Esculpido",
         origem: "Ateliê Orbital 09",
         brilho: "15% (Acabamento Satim)",
-        raridade: "Comum"
+        gramatura: "480 g/m²",
+        cuidados: "Higienizar com pano úmido macio; hidratar semestralmente com cera neutra.",
+        raridade: "Comum",
+        estiloAgendamento: "minimalista",
+        estiloTrama: "repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, #191b22 2px, #191b22 7px), radial-gradient(circle at 40% 40%, #343846, #14161d)",
+        composicao: "65% Poliuretano vegetal de alta resistência, 25% Base de algodão orgânico trançado e 10% Resina mineral fosca.",
+        processo: "Prensado a quente em cilindros gravados a laser que reproduzem micro-crateras de asteroides. O revestimento interno recebe malha respirável para conforto térmico em eventos de longa duração.",
+        pecasLoja: [
+            {
+                nome: "Terno Alinhamento Astral",
+                detalhe: "Gola estruturada e recortes arquitetônicos nos ombros",
+                destino: "colecoes"
+            },
+            {
+                nome: "Corset Aurora Lunar",
+                detalhe: "Cintura marcada com acabamento estrutural de alta precisão",
+                destino: "colecoes"
+            }
+        ]
     }
 ];
 
@@ -190,7 +311,7 @@ const telasCelestine = {
             <div class="materiais-guia-container">
                 <div class="materiais-header">
                     <h3>🧪 Enciclopédia de Tecidos & Matéria-Prima</h3>
-                    <p>Conheça a física e o caimento dos tecidos raros tecidos no ateliê.</p>
+                    <p>Clique em "Examinar Textura" para conhecer a composição, o processo artesanal e as peças criadas com cada trama.</p>
                 </div>
 
                 <div id="grid-materiais" class="materiais-grid"></div>
@@ -219,7 +340,7 @@ const telasCelestine = {
                         <div>🧵 <strong>Tecido:</strong> Jacquard de Ouro</div>
                         <div>⏱️ <strong>Prazo:</strong> 15 dias orbitais</div>
                     </div>
-                    <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
+                    <button onclick="iniciarAgendamentoComProduto('Vestido Saturniano Imperial')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
                     <button onclick="alternarFavorito('Vestido Saturniano Imperial', event)" style="background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 20px; padding: 8px 12px; margin-top: 10px; cursor: pointer; width: 100%; font-weight: bold;">
                         ❤️ Favoritar Manto
                     </button>
@@ -235,7 +356,7 @@ const telasCelestine = {
                         <div>🧵 <strong>Tecido:</strong> Veludo Negro Encorpado</div>
                         <div>⏱️ <strong>Prazo:</strong> 10 dias orbitais</div>
                     </div>
-                    <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
+                    <button onclick="iniciarAgendamentoComProduto('Manto Eclipse Noturno')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
                     <button onclick="alternarFavorito('Manto Eclipse Noturno', event)" style="background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 20px; padding: 8px 12px; margin-top: 10px; cursor: pointer; width: 100%; font-weight: bold;">
                         ❤️ Favoritar Manto
                     </button>
@@ -251,7 +372,7 @@ const telasCelestine = {
                         <div>🧵 <strong>Tecido:</strong> Tule de Cristais</div>
                         <div>⏱️ <strong>Prazo:</strong> 20 dias orbitais</div>
                     </div>
-                    <button onclick="mudarTela('agendamento')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
+                    <button onclick="iniciarAgendamentoComProduto('Manto Via Láctea Translúcida')" class="btn-submit-login" style="width: 100%; padding: 12px; font-size: 0.95rem;">🌙 Agendar Este Manto</button>
                     <button onclick="alternarFavorito('Manto Via Láctea Translúcida', event)" style="background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 20px; padding: 8px 12px; margin-top: 10px; cursor: pointer; width: 100%; font-weight: bold;">
                         ❤️ Favoritar Manto
                     </button>
@@ -266,25 +387,74 @@ const telasCelestine = {
     `,
 
     'agendamento': `
-        <section id="Agendamento" class="agendamento-section">
+        <section id="Agendamento" class="agendamento-section" style="max-width: 820px; margin: 0 auto;">
             <h3>🌙 Ciclos Lunares: Reservar Atendimento</h3>
-            <p class="form-subtitle">Sincronize sua frequência para agendar o desenho e a confecção do seu pedido sob medida.</p>
+            <p class="form-subtitle">Sincronize sua frequência, escolha uma peça de inspiração e combine os tecidos do seu manto sob medida.</p>
+            
+            <div id="aviso-tecido-selecionado" style="display: none; background: rgba(238, 228, 187, 0.12); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); padding: 14px 18px; border-radius: 12px; margin-bottom: 22px; font-size: 0.92rem; text-align: center;"></div>
+            
             <form id="form-agendamento" onsubmit="processarAgendamentoEspacial(event)">
-                <label for="nome">Nome do Tripulante:</label>
-                <input type="text" id="nome" required placeholder="Ex: Comandante Silva">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+                    <div>
+                        <label for="nome">👤 Nome do Tripulante:</label>
+                        <input type="text" id="nome" required placeholder="Ex: Comandante Silva">
+                    </div>
+                    <div>
+                        <label for="email">📡 Frequência Digital (E-mail):</label>
+                        <input type="email" id="email" required placeholder="seu-canal@galaxia.com">
+                    </div>
+                </div>
 
-                <label for="email">Frequência Digital (E-mail):</label>
-                <input type="email" id="email" required placeholder="seu-canal@galaxia.com">
+                <!-- PEÇA PARECIDA / MODELO DE REFERÊNCIA -->
+                <div class="bloco-customizacao-pedido">
+                    <div class="bloco-custom-header">
+                        <label for="peca-referencia" style="font-weight: 600; color: var(--saturn-gold); font-size: 1rem;">
+                            👗 Peça Parecida / Modelo de Inspiração
+                        </label>
+                        <span class="badge-opcional">Opcional</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 10px;">
+                        Selecione uma criação do ateliê como base de modelagem ou deixe em branco para um desenho 100% inédito.
+                    </p>
+                    <select id="peca-referencia">
+                        <option value="">✨ Criação 100% Inédita (Sem peça base)</option>
+                    </select>
+                </div>
 
-                <label for="Estilo">Estilo de Preferência do Pedido:</label>
-                <select id="Estilo">
-                    <option value="minimalista">🌘 Eclipse (Minimalista e Escuro)</option>
-                    <option value="brilhante">🪐 Saturniano (Anéis e Camadas Extravagantes)</option>
-                    <option value="futurista">✨ Via Láctea (Brilho Máximo e Cristais)</option>
-                </select>
+                <!-- ABA DE ESCOLHA DE TECIDOS (MÚLTIPLA ESCOLHA) -->
+                <div class="bloco-customizacao-pedido">
+                    <div class="bloco-custom-header">
+                        <label style="font-weight: 600; color: var(--saturn-gold); font-size: 1rem;">
+                            🧵 Escolha dos Tecidos (Selecione um ou mais)
+                        </label>
+                        <span id="contador-tecidos-selecionados" class="contador-tecidos-badge">0 selecionados</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 14px;">
+                        Combine diferentes matérias-primas (ex: estrutura em veludo + mangas em tule estelar).
+                    </p>
 
-                <button type="submit" class="btn-submit-login">Transmitir Sinal do Pedido</button>
+                    <div id="seletor-tecidos-pedido" class="tecidos-selecao-grid">
+                        <!-- Preenchido dinamicamente a partir de materiaisCelestine -->
+                    </div>
+                </div>
+
+                <div>
+                    <label for="Estilo">🌌 Atmosfera & Estilo do Pedido:</label>
+                    <select id="Estilo">
+                        <option value="minimalista">🌘 Eclipse (Minimalista e Escuro)</option>
+                        <option value="brilhante">🪐 Saturniano (Anéis e Camadas Extravagantes)</option>
+                        <option value="futurista">✨ Via Láctea (Brilho Máximo e Cristais)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="observacoes-pedido">📝 Como deseja combinar os tecidos ou adaptar a peça? (Opcional)</label>
+                    <textarea id="observacoes-pedido" rows="3" placeholder="Ex: Gostaria do corte parecido com o Vestido Eclipse Total, mas usando Seda Flutuante de Nebulosa na saia e Tule de Poeira Estelar nas mangas..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit-login">🚀 Transmitir Sinal do Pedido</button>
             </form>
+
             <div class="login-footer" style="margin-top: 30px; text-align: center;">
                 <button class="btn-back-home" onclick="mudarTela('orbita')">🪐 Retornar à Órbita Inicial</button>
             </div>
@@ -416,13 +586,16 @@ const telasCelestine = {
         <section class="admin-dashboard-section" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
             <div class="admin-header" style="text-align: center; margin-bottom: 25px;">
                 <h2>🛸 Centro de Comando Admin</h2>
-                <p style="color: var(--lavender-glow);">Painel central de controle do ateliê estelar.</p>
+                <p style="color: var(--lavender-glow);">Painel central de controle e bancada técnica do ateliê estelar.</p>
             </div>
 
             <!-- SUB-BOTÕES DE NAVEGAÇÃO INTERNA NO ADMIN -->
             <div class="admin-sub-menu" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; flex-wrap: wrap;">
                 <button class="btn-sub-admin active" onclick="mudarSubAbaAdmin('pedidos')">
                     📦 Pedidos & Estatísticas
+                </button>
+                <button class="btn-sub-admin" onclick="mudarSubAbaAdmin('alfaiate')">
+                    ✂️ Bancada do Alfaiate
                 </button>
                 <button class="btn-sub-admin" onclick="mudarSubAbaAdmin('consulta')">
                     📋 Consultar Clientes
@@ -467,7 +640,34 @@ const telasCelestine = {
                 </div>
             </div>
 
-            <!-- ABA 2: CONSULTA DE CLIENTES -->
+            <!-- ABA 2: BANCADA DO ALFAIATE (FICHAS TÉCNICAS COMPLETAS) -->
+            <div id="sub-aba-alfaiate" class="sub-aba-conteudo" style="display: none;">
+                <div class="bancada-alfaiate-wrapper">
+                    <div class="bancada-header">
+                        <div>
+                            <h3>✂️ Bancada do Alfaiate — Fichas Técnicas</h3>
+                            <p style="color: var(--text-sub); font-size: 0.92rem;">
+                                Visualize os tecidos combinados, a peça de referência, as medidas corporais e o que cada cliente escreveu.
+                            </p>
+                        </div>
+
+                        <div class="bancada-controles">
+                            <input type="text" id="busca-alfaiate" placeholder="🔍 Filtrar cliente, tecido ou peça..." oninput="renderizarFichasAlfaiate()" style="padding: 9px 16px; border-radius: 20px; font-size: 0.85rem; min-width: 240px;">
+                            <div class="filtros-status-alfaiate">
+                                <button type="button" class="btn-filtro-status active" data-status="todos" onclick="filtrarStatusAlfaiate('todos', this)">Todos</button>
+                                <button type="button" class="btn-filtro-status" data-status="pendente" onclick="filtrarStatusAlfaiate('pendente', this)">⏳ Pendentes</button>
+                                <button type="button" class="btn-filtro-status" data-status="aprovado" onclick="filtrarStatusAlfaiate('aprovado', this)">✅ Em Confecção</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="lista-fichas-alfaiate" class="fichas-alfaiate-grid">
+                        <p style="text-align: center; color: var(--lavender-glow); padding: 25px;">Carregando fichas de costura...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 3: CONSULTA DE CLIENTES -->
             <div id="sub-aba-consulta" class="sub-aba-conteudo" style="display: none;">
                 <div style="background: rgba(0,0,0,0.3); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -481,7 +681,7 @@ const telasCelestine = {
                 </div>
             </div>
 
-            <!-- ABA 3: ALTERAÇÃO / EDIÇÃO DE CLIENTES -->
+            <!-- ABA 4: ALTERAÇÃO / EDIÇÃO DE CLIENTES -->
             <div id="sub-aba-edicao" class="sub-aba-conteudo" style="display: none;">
                 <div style="background: rgba(38, 41, 52, 0.95); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px);">
                     <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">✏️ Formulário de Alteração de Dados</h3>
@@ -555,6 +755,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const linkAdmin = document.querySelector('a[href="#admin"]');
     if (linkAdmin) linkAdmin.setAttribute('onclick', "event.preventDefault(); mudarTela('admin');");
+
+    if (localStorage.getItem('siteTheme') === 'lunar') {
+        document.body.classList.add('light-mode');
+        const icon = document.getElementById('themeIcon');
+        const text = document.getElementById('themeText');
+        if (icon) icon.textContent = '🪐';
+        if (text) text.textContent = 'Modo Saturno';
+    }
 });
 
 function toggleMenu() {
@@ -587,7 +795,7 @@ function configurarGatilhosNavegacao() {
     if (btnJornada) btnJornada.setAttribute('onclick', "mudarTela('login')");
 }
 
-function mudarTela(nomeDaTela) {
+function mudarTela(nomeDaTela, callbackPosRender) {
     const containerPrincipal = document.querySelector('main');
     if (!containerPrincipal) return;
 
@@ -599,21 +807,25 @@ function mudarTela(nomeDaTela) {
 
         containerPrincipal.style.opacity = 0;
         
-        setTimeout(() => {
+        setTimeout(async () => {
             containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
             
             if (nomeDaTela === 'orbita') {
                 configurarGatilhosNavegacao();
             } else if (nomeDaTela === 'colecoes') {
-                carregarMantosDoJson();
+                await carregarMantosDoJson();
             } else if (nomeDaTela === 'exploracao') {
                 carregarGuiaMateriais();
             } else if (nomeDaTela === 'admin') {
-                carregarPainelAdmin();
+                await carregarPainelAdmin();
             } else if (nomeDaTela === 'cliente') {
-                carregarPerfilCliente();
+                await carregarPerfilCliente();
             } else if (nomeDaTela === 'agendamento') {
-                preencherFormularioAgendamentoSeLogado();
+                await inicializarTelaAgendamento();
+            }
+
+            if (typeof callbackPosRender === 'function') {
+                callbackPosRender();
             }
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -872,19 +1084,22 @@ function carregarFavoritosNoPerfil() {
         return;
     }
 
-    container.innerHTML = favoritos.map(manto => `
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
-            <div>
-                <div style="font-size: 2.2rem; margin-bottom: 5px;">✨</div>
-                <strong style="color: #fff; font-size: 1rem; display: block; margin-bottom: 5px;">${manto}</strong>
-                <span style="font-size: 0.75rem; color: var(--saturn-gold);">Manto Autoral Salvo</span>
+    container.innerHTML = favoritos.map(manto => {
+        const mantoEscapado = manto.replace(/'/g, "\\'");
+        return `
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+                <div>
+                    <div style="font-size: 2.2rem; margin-bottom: 5px;">✨</div>
+                    <strong style="color: #fff; font-size: 1rem; display: block; margin-bottom: 5px;">${manto}</strong>
+                    <span style="font-size: 0.75rem; color: var(--saturn-gold);">Manto Autoral Salvo</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+                    <button onclick="iniciarAgendamentoComProduto('${mantoEscapado}')" style="background: var(--saturn-gold); color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">🌙 Agendar Prova</button>
+                    <button onclick="alternarFavorito('${mantoEscapado}')" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
+                </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-                <button onclick="mudarTela('agendamento')" style="background: var(--saturn-gold); color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">🌙 Agendar Prova</button>
-                <button onclick="alternarFavorito('${manto}')" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // ==========================================
@@ -993,7 +1208,7 @@ async function carregarPerfilCliente() {
                 containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px; color: var(--lavender-glow);">Você ainda não possui pedidos registrados nesta conta.</p>';
             } else {
                 containerPedidos.innerHTML = pedidos.map(p => `
-                    <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                         <div>
                             <strong>#${p.id} ${p.estilo}</strong><br>
                             <small style="color: var(--lavender-glow);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
@@ -1028,6 +1243,7 @@ async function carregarMantosDoJson() {
         produtosGlobais.forEach((produto, index) => {
             const favoritado = ehFavorito(produto.titulo);
             const iconeFav = favoritado ? '❤️ Favoritado' : '🤍 Favoritar';
+            const tituloEscapado = produto.titulo.replace(/'/g, "\\'");
 
             const cardHTML = `
                 <article class="product-item" onclick="verDetalhesProduto(${index})" style="cursor: pointer; position: relative;">
@@ -1042,7 +1258,7 @@ async function carregarMantosDoJson() {
                             <button type="button" class="btn-buy" style="flex: 1;" onclick="event.stopPropagation(); verDetalhesProduto(${index})">
                                 ✨ Ver Detalhes
                             </button>
-                            <button type="button" onclick="alternarFavorito('${produto.titulo}', event)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+                            <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
                                 ${iconeFav}
                             </button>
                         </div>
@@ -1069,6 +1285,7 @@ function verDetalhesProduto(index) {
     const precoEstimado = produto.preco || "R$ 1.850,00 - R$ 2.400,00 (Sob Medida)";
     const tempoConfeccao = produto.tempo || "15 a 20 Dias Orbitais";
     const favoritado = ehFavorito(produto.titulo);
+    const tituloEscapado = produto.titulo.replace(/'/g, "\\'");
 
     const htmlDetalhes = `
         <section class="produto-detalhe-section">
@@ -1111,15 +1328,15 @@ function verDetalhesProduto(index) {
                     </div>
 
                     <div class="detalhe-acoes-group">
-                        <button type="button" class="btn-submit-quiz" onclick="iniciarAgendamentoComProduto('${produto.titulo}')">
-                            🌙 Agendar Prova & Medidas Desta Peça
+                        <button type="button" class="btn-submit-quiz" onclick="iniciarAgendamentoComProduto('${tituloEscapado}')">
+                            🌙 Agendar Prova & Escolher Tecidos Desta Peça
                         </button>
 
-                        <button type="button" onclick="alternarFavorito('${produto.titulo}', event)" style="margin-top: 10px; background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 12px; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+                        <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="margin-top: 10px; background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 12px; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
                             ${favoritado ? '❤️ Remover dos Favoritos' : '🤍 Adicionar aos Meus Favoritos'}
                         </button>
 
-                        <button type="button" class="btn-interagir-material" style="margin-top: 10px; padding: 12px;" onclick="acionarAtendimentoPersonalizado('${produto.titulo}')">
+                        <button type="button" class="btn-interagir-material" style="margin-top: 10px; padding: 12px;" onclick="acionarAtendimentoPersonalizado('${tituloEscapado}')">
                             💬 Acionar Atendimento no WhatsApp
                         </button>
                     </div>
@@ -1168,13 +1385,6 @@ function alternarPaginaColecao(numeroPagina) {
     }
 }
 
-function iniciarAgendamentoComProduto(nomeProduto) {
-    mudarTela('agendamento');
-    setTimeout(() => {
-        alert(`✨ Manto "${nomeProduto}" selecionado! Complete o formulário para agendar sua sessão de confecção.`);
-    }, 300);
-}
-
 function acionarAtendimentoPersonalizado(nomeProduto) {
     const mensagem = encodeURIComponent(`Olá, equipe Celestine Ateliê! Gostaria de mais detalhes e atendimento sobre o manto: ${nomeProduto}`);
     const urlWhatsapp = `https://api.whatsapp.com/send?phone=5541999999999&text=${mensagem}`;
@@ -1182,7 +1392,7 @@ function acionarAtendimentoPersonalizado(nomeProduto) {
 }
 
 // ==========================================
-// 8. EXPLORAÇÃO, QUIZ & MATERIAIS
+// 8. EXPLORAÇÃO, QUIZ & INSPEÇÃO DE TEXTURAS
 // ==========================================
 
 function carregarGuiaMateriais() {
@@ -1218,14 +1428,164 @@ function carregarGuiaMateriais() {
                         <span class="spec-label">Luminosidade</span>
                         <span class="spec-value">${mat.brilho || '100%'}</span>
                     </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Criações na Loja</span>
+                        <span class="spec-value">${mat.pecasLoja.length} peça(s)</span>
+                    </div>
                 </div>
 
-                <button type="button" class="btn-interagir-material" onclick="alert('⚡ Sintonizando amostra tátil de ${mat.nome}...')">
-                    🔍 Examinar Textura
+                <button type="button" class="btn-interagir-material" onclick="abrirModalTextura('${mat.id}')">
+                    🔍 Examinar Textura & Peças
                 </button>
             </article>
         `;
     });
+}
+
+function garantirModalTexturaNoDOM() {
+    if (document.getElementById('modal-textura')) return;
+
+    const modalHTML = `
+        <div id="modal-textura" class="modal-pedidos" style="display: none;" onclick="if(event.target.id === 'modal-textura') fecharModalTextura()">
+            <div class="modal-conteudo modal-textura-conteudo">
+                <button type="button" class="close-btn" onclick="fecharModalTextura()" aria-label="Fechar">&times;</button>
+
+                <div class="textura-modal-header">
+                    <span id="modal-tecido-badge" class="material-badge"></span>
+                    <h3 id="modal-tecido-nome"></h3>
+                    <p id="modal-tecido-subtitulo" class="textura-subtitulo"></p>
+                </div>
+
+                <div class="textura-swatch-container">
+                    <div id="modal-tecido-swatch" class="textura-swatch">
+                        <div class="swatch-lupa-tag">🔍 Inspeção Macro da Trama</div>
+                    </div>
+                    <div class="textura-sensacao-box">
+                        <div>
+                            <span class="spec-label">Toque & Caimento:</span>
+                            <strong id="modal-tecido-toque" class="spec-value"></strong>
+                        </div>
+                        <div>
+                            <span class="spec-label">Gramatura:</span>
+                            <strong id="modal-tecido-gramatura" class="spec-value"></strong>
+                        </div>
+                        <div>
+                            <span class="spec-label">Conservação:</span>
+                            <strong id="modal-tecido-cuidados" class="spec-value"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="textura-detalhes-grid">
+                    <div class="textura-info-bloco">
+                        <h4>🧬 Do que é feito (Composição)</h4>
+                        <p id="modal-tecido-composicao"></p>
+                    </div>
+                    <div class="textura-info-bloco">
+                        <h4>🧵 Como é feito (Processo Artesanal)</h4>
+                        <p id="modal-tecido-processo"></p>
+                    </div>
+                </div>
+
+                <div class="textura-pecas-section">
+                    <h4>✨ Peças do Ateliê Confeccionadas com esta Trama</h4>
+                    <div id="modal-tecido-pecas" class="textura-pecas-lista"></div>
+                </div>
+
+                <div class="textura-modal-footer">
+                    <button type="button" id="btn-encomendar-tecido" class="btn-submit-quiz">
+                        🌙 Solicitar Peça Sob Medida neste Tecido
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function abrirModalTextura(idTecido) {
+    const mat = materiaisCelestine.find(m => m.id === idTecido);
+    if (!mat) return;
+
+    garantirModalTexturaNoDOM();
+
+    const badgeEl = document.getElementById('modal-tecido-badge');
+    badgeEl.textContent = mat.raridade;
+    badgeEl.className = `material-badge ${mat.raridade.toLowerCase()}`;
+
+    document.getElementById('modal-tecido-nome').textContent = `${mat.icone} ${mat.nome}`;
+    document.getElementById('modal-tecido-subtitulo').textContent = mat.subtitulo;
+
+    const swatchEl = document.getElementById('modal-tecido-swatch');
+    swatchEl.style.background = mat.estiloTrama;
+
+    document.getElementById('modal-tecido-toque').textContent = mat.caimento;
+    document.getElementById('modal-tecido-gramatura').textContent = mat.gramatura;
+    document.getElementById('modal-tecido-cuidados').textContent = mat.cuidados;
+
+    document.getElementById('modal-tecido-composicao').textContent = mat.composicao;
+    document.getElementById('modal-tecido-processo').textContent = mat.processo;
+
+    const listaPecasEl = document.getElementById('modal-tecido-pecas');
+    listaPecasEl.innerHTML = mat.pecasLoja.map(peca => {
+        const nomeEscapado = peca.nome.replace(/'/g, "\\'");
+        return `
+            <div class="peca-citada-card">
+                <div>
+                    <strong>${peca.nome}</strong>
+                    <span>${peca.detalhe}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+                    <button type="button" class="btn-ver-peca-citada" style="background: var(--saturn-gold); color: #000; font-weight: bold;" onclick="encomendarPecaComTecido('${nomeEscapado}', '${mat.id}')">
+                        🌙 Encomendar Esta Peça + Tecido
+                    </button>
+                    <button type="button" class="btn-ver-peca-citada" onclick="irParaPecaDaLoja('${nomeEscapado}', '${peca.destino}')">
+                        ✨ Ver Peça na Loja
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const btnEncomendar = document.getElementById('btn-encomendar-tecido');
+    btnEncomendar.onclick = () => encomendarComTecido(mat.id);
+
+    document.getElementById('modal-textura').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModalTextura() {
+    const modal = document.getElementById('modal-textura');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharModalTextura();
+});
+
+async function irParaPecaDaLoja(nomePeca, destinoPadrao) {
+    fecharModalTextura();
+
+    if (produtosGlobais.length === 0) {
+        try {
+            const resp = await fetch('produtos.json');
+            produtosGlobais = await resp.json();
+        } catch (e) {
+            produtosGlobais = [];
+        }
+    }
+
+    const indexEncontrado = produtosGlobais.findIndex(
+        p => p.titulo && p.titulo.toLowerCase() === nomePeca.toLowerCase()
+    );
+
+    if (indexEncontrado !== -1) {
+        verDetalhesProduto(indexEncontrado);
+    } else {
+        mudarTela(destinoPadrao || 'colecoes');
+    }
 }
 
 function calcularResultadoQuiz(event) {
@@ -1269,9 +1629,10 @@ function calcularResultadoQuiz(event) {
                     <p>${materialRecomendado.descricao}</p>
                 </div>
 
-                <div class="resultado-acoes">
-                    <button type="button" class="btn-submit-login" onclick="mudarTela('agendamento')">🌙 Agendar Manto com este Tecido</button>
-                    <button type="button" class="btn-back-home" style="margin-top: 10px;" onclick="refazerQuiz()">🔄 Refazer Scanner</button>
+                <div class="resultado-acoes" style="display: flex; flex-direction: column; gap: 10px;">
+                    <button type="button" class="btn-submit-login" onclick="encomendarComTecido('${materialRecomendado.id}')">🌙 Agendar Manto com este Tecido</button>
+                    <button type="button" class="btn-interagir-material" onclick="abrirModalTextura('${materialRecomendado.id}')">🔍 Examinar Textura & Peças deste Tecido</button>
+                    <button type="button" class="btn-back-home" onclick="refazerQuiz()">🔄 Refazer Scanner</button>
                 </div>
             </div>
         `;
@@ -1290,8 +1651,14 @@ function refazerQuiz() {
 }
 
 // ==========================================
-// 9. AGENDAMENTO & CONSULTAS BANCO DE DADOS
+// 9. AGENDAMENTO, SELEÇÃO DE TECIDOS & PEÇA BASE
 // ==========================================
+
+async function inicializarTelaAgendamento() {
+    preencherFormularioAgendamentoSeLogado();
+    await popularSelectPecasReferencia();
+    renderizarSeletorTecidosPedido();
+}
 
 function preencherFormularioAgendamentoSeLogado() {
     const cliente = obterClienteLogado();
@@ -1304,18 +1671,175 @@ function preencherFormularioAgendamentoSeLogado() {
     if (inputEmail) inputEmail.value = cliente.email;
 }
 
+async function popularSelectPecasReferencia() {
+    const selectPeca = document.getElementById('peca-referencia');
+    if (!selectPeca) return;
+
+    if (produtosGlobais.length === 0) {
+        try {
+            const resp = await fetch('produtos.json');
+            produtosGlobais = await resp.json();
+        } catch (e) {
+            produtosGlobais = [];
+        }
+    }
+
+    const nomesUnicos = new Set(pecasDestaqueCatalogo);
+    produtosGlobais.forEach(p => {
+        if (p.titulo) nomesUnicos.add(p.titulo);
+    });
+
+    selectPeca.innerHTML = `<option value="">✨ Criação 100% Inédita (Sem peça base)</option>`;
+    nomesUnicos.forEach(nomePeca => {
+        const opt = document.createElement('option');
+        opt.value = nomePeca;
+        opt.textContent = `👗 Inspirado em: ${nomePeca}`;
+        selectPeca.appendChild(opt);
+    });
+}
+
+function renderizarSeletorTecidosPedido(idsPreSelecionados = []) {
+    const grid = document.getElementById('seletor-tecidos-pedido');
+    if (!grid) return;
+
+    grid.innerHTML = materiaisCelestine.map(mat => {
+        const marcado = idsPreSelecionados.includes(mat.id);
+        return `
+            <label class="tecido-opcao-card ${marcado ? 'selecionado' : ''}" id="card-tecido-opcao-${mat.id}">
+                <input type="checkbox" class="checkbox-tecido-pedido" value="${mat.id}" data-nome="${mat.nome}" ${marcado ? 'checked' : ''} onchange="alternarSelecaoTecidoPedido('${mat.id}')">
+                <div class="tecido-opcao-topo">
+                    <span class="tecido-opcao-icone">${mat.icone}</span>
+                    <span class="tecido-opcao-check">${marcado ? '✓ Escolhido' : '+ Adicionar'}</span>
+                </div>
+                <strong class="tecido-opcao-nome">${mat.nome}</strong>
+                <span class="tecido-opcao-meta">${mat.tag} • ${mat.gramatura}</span>
+            </label>
+        `;
+    }).join('');
+
+    atualizarContadorTecidosPedido();
+}
+
+function alternarSelecaoTecidoPedido(idTecido) {
+    const card = document.getElementById(`card-tecido-opcao-${idTecido}`);
+    if (!card) return;
+
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    const badgeCheck = card.querySelector('.tecido-opcao-check');
+
+    if (checkbox && checkbox.checked) {
+        card.classList.add('selecionado');
+        if (badgeCheck) badgeCheck.textContent = '✓ Escolhido';
+    } else {
+        card.classList.remove('selecionado');
+        if (badgeCheck) badgeCheck.textContent = '+ Adicionar';
+    }
+
+    atualizarContadorTecidosPedido();
+}
+
+function atualizarContadorTecidosPedido() {
+    const contador = document.getElementById('contador-tecidos-selecionados');
+    if (!contador) return;
+
+    const total = document.querySelectorAll('.checkbox-tecido-pedido:checked').length;
+    contador.textContent = total === 1 ? '1 tecido selecionado' : `${total} tecidos selecionados`;
+}
+
+function abrirAgendamentoPersonalizado({ peca = '', tecidosIds = [], estilo = '' } = {}) {
+    mudarTela('agendamento', () => {
+        const aviso = document.getElementById('aviso-tecido-selecionado');
+        const mensagensAviso = [];
+
+        if (peca) {
+            const selectPeca = document.getElementById('peca-referencia');
+            if (selectPeca) {
+                const existeOpcao = Array.from(selectPeca.options).some(opt => opt.value === peca);
+                if (!existeOpcao) {
+                    const novaOpt = document.createElement('option');
+                    novaOpt.value = peca;
+                    novaOpt.textContent = `👗 Inspirado em: ${peca}`;
+                    selectPeca.appendChild(novaOpt);
+                }
+                selectPeca.value = peca;
+            }
+            mensagensAviso.push(`👗 Peça de inspiração: <strong>${peca}</strong>`);
+        }
+
+        if (tecidosIds && tecidosIds.length > 0) {
+            renderizarSeletorTecidosPedido(tecidosIds);
+            const nomesTecidos = tecidosIds
+                .map(id => materiaisCelestine.find(m => m.id === id))
+                .filter(Boolean)
+                .map(m => `${m.icone} ${m.nome}`);
+
+            if (nomesTecidos.length > 0) {
+                mensagensAviso.push(`🧵 Tecido pré-selecionado: <strong>${nomesTecidos.join(', ')}</strong> (você pode marcar mais tecidos abaixo)`);
+            }
+        }
+
+        if (estilo) {
+            const selectEstilo = document.getElementById('Estilo');
+            if (selectEstilo) selectEstilo.value = estilo;
+        }
+
+        if (aviso && mensagensAviso.length > 0) {
+            aviso.style.display = 'block';
+            aviso.innerHTML = mensagensAviso.join('<br>');
+        }
+    });
+}
+
+function iniciarAgendamentoComProduto(nomeProduto) {
+    abrirAgendamentoPersonalizado({ peca: nomeProduto });
+}
+
+function encomendarComTecido(idTecido) {
+    const mat = materiaisCelestine.find(m => m.id === idTecido);
+    fecharModalTextura();
+
+    abrirAgendamentoPersonalizado({
+        tecidosIds: [idTecido],
+        estilo: mat ? mat.estiloAgendamento : ''
+    });
+}
+
+function encomendarPecaComTecido(nomePeca, idTecido) {
+    const mat = materiaisCelestine.find(m => m.id === idTecido);
+    fecharModalTextura();
+
+    abrirAgendamentoPersonalizado({
+        peca: nomePeca,
+        tecidosIds: [idTecido],
+        estilo: mat ? mat.estiloAgendamento : ''
+    });
+}
+
 async function processarAgendamentoEspacial(event) {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
-    const estilo = document.getElementById('Estilo').value;
+    const estiloBase = document.getElementById('Estilo').value;
+    const pecaReferencia = document.getElementById('peca-referencia')?.value || '';
+    const observacoes = document.getElementById('observacoes-pedido')?.value.trim() || '';
+
+    const tecidosSelecionados = Array.from(document.querySelectorAll('.checkbox-tecido-pedido:checked'))
+        .map(cb => cb.getAttribute('data-nome'))
+        .filter(Boolean);
+
+    const partesResumo = [estiloBase];
+    if (pecaReferencia) partesResumo.push(`Peça Ref: ${pecaReferencia}`);
+    if (tecidosSelecionados.length > 0) partesResumo.push(`Tecidos: ${tecidosSelecionados.join(' + ')}`);
+    if (observacoes) partesResumo.push(`Obs: ${observacoes}`);
+
+    const estiloCompleto = partesResumo.join(' | ');
 
     try {
         const resposta = await fetch(`${API_URL}/pedidos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, email, estilo })
+            body: JSON.stringify({ nome, email, estilo: estiloCompleto })
         });
 
         if (resposta.ok) {
@@ -1361,7 +1885,7 @@ async function carregarPedidosDoBanco() {
                 <div class="pedido-dados">
                     <strong>${p.nome_cliente || p.nome}</strong>
                     <span>📡 ${p.email}</span>
-                    <small>✨ Estilo: ${p.estilo}</small>
+                    <small>✨ ${p.estilo}</small>
                 </div>
                 <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
             </div>
@@ -1412,7 +1936,7 @@ async function carregarClientesDoBanco() {
 }
 
 // ==========================================
-// 10. PAINEL ADMIN, GESTÃO DE CLIENTES & METROLOGIA
+// 10. PAINEL ADMIN, BANCADA DO ALFAIATE & METROLOGIA
 // ==========================================
 
 function mudarSubAbaAdmin(nomeAba) {
@@ -1432,12 +1956,14 @@ function mudarSubAbaAdmin(nomeAba) {
     if (btnAtivo) btnAtivo.classList.add('active');
 
     if (nomeAba === 'consulta') buscarClientesAPI();
+    if (nomeAba === 'alfaiate') renderizarFichasAlfaiate();
 }
 
 async function carregarPainelAdmin() {
     await carregarMetricasEGrafico();
-    await carregarTabelaAdmin();
     await buscarClientesAPI();
+    await carregarTabelaAdmin();
+    renderizarFichasAlfaiate();
     gerarCalendarioOrbital();
 }
 
@@ -1482,17 +2008,18 @@ async function carregarTabelaAdmin() {
     try {
         const res = await fetch(`${API_URL}/pedidos`);
         const pedidos = await res.json();
+        listaPedidosAdminCache = Array.isArray(pedidos) ? pedidos : [];
 
-        if (!pedidos || pedidos.length === 0) {
+        if (listaPedidosAdminCache.length === 0) {
             container.innerHTML = '<p style="text-align:center; color: var(--lavender-glow);">Nenhum pedido encontrado no banco de dados.</p>';
             return;
         }
 
-        container.innerHTML = pedidos.map(p => `
+        container.innerHTML = listaPedidosAdminCache.map(p => `
             <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid var(--glass-border);">
-                <div>
+                <div style="max-width: 720px;">
                     <strong style="color: #fff;">#${p.id} ${p.nome_cliente || p.nome}</strong> <span style="color: var(--lavender-glow);">(${p.email})</span><br>
-                    <small style="color: var(--saturn-gold);">✨ Estilo: ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
+                    <small style="color: var(--saturn-gold);">✨ ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
                 </div>
                 <div style="display: flex; gap: 6px;">
                     <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
@@ -1506,6 +2033,175 @@ async function carregarTabelaAdmin() {
     }
 }
 
+// Separa os dados gravados no campo `estilo` para exibição estruturada na Bancada do Alfaiate
+function parsearDetalhesPedido(estiloStr = '') {
+    const partes = estiloStr.split(' | ').map(s => s.trim()).filter(Boolean);
+    let estiloBase = partes[0] || 'Não especificado';
+    let pecaRef = '';
+    let tecidos = [];
+    let observacoes = '';
+
+    partes.forEach((parte, idx) => {
+        if (parte.startsWith('Peça Ref:')) {
+            pecaRef = parte.replace('Peça Ref:', '').trim();
+        } else if (parte.startsWith('Tecidos:')) {
+            const listaStr = parte.replace('Tecidos:', '').trim();
+            tecidos = listaStr.split(' + ').map(t => t.trim()).filter(Boolean);
+        } else if (parte.startsWith('Obs:')) {
+            observacoes = parte.replace('Obs:', '').trim();
+        } else if (idx > 0 && !observacoes) {
+            observacoes = parte;
+        }
+    });
+
+    const nomesEstiloMap = {
+        minimalista: '🌘 Eclipse (Minimalista & Escuro)',
+        brilhante: '🪐 Saturniano (Anéis & Camadas)',
+        futurista: '✨ Via Láctea (Brilho & Cristais)'
+    };
+
+    return {
+        estiloBaseFormatado: nomesEstiloMap[estiloBase.toLowerCase()] || estiloBase,
+        pecaRef,
+        tecidos,
+        observacoes
+    };
+}
+
+function filtrarStatusAlfaiate(status, botaoEl) {
+    filtroStatusAlfaiateAtual = status;
+    document.querySelectorAll('.btn-filtro-status').forEach(btn => btn.classList.remove('active'));
+    if (botaoEl) botaoEl.classList.add('active');
+    renderizarFichasAlfaiate();
+}
+
+function renderizarFichasAlfaiate() {
+    const container = document.getElementById('lista-fichas-alfaiate');
+    if (!container) return;
+
+    const termoBusca = (document.getElementById('busca-alfaiate')?.value || '').toLowerCase().trim();
+
+    const pedidosFiltrados = listaPedidosAdminCache.filter(p => {
+        const statusPedido = (p.status || 'pendente').toLowerCase();
+        if (filtroStatusAlfaiateAtual !== 'todos' && statusPedido !== filtroStatusAlfaiateAtual) {
+            return false;
+        }
+
+        if (!termoBusca) return true;
+
+        const nomeCliente = (p.nome_cliente || p.nome || '').toLowerCase();
+        const emailCliente = (p.email || '').toLowerCase();
+        const detalhesStr = (p.estilo || '').toLowerCase();
+
+        return nomeCliente.includes(termoBusca) ||
+               emailCliente.includes(termoBusca) ||
+               detalhesStr.includes(termoBusca);
+    });
+
+    if (pedidosFiltrados.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 35px; background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 16px;">
+                <p style="color: var(--lavender-glow); margin: 0;">Nenhuma ficha técnica encontrada para este filtro.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = pedidosFiltrados.map(p => {
+        const nomeCliente = p.nome_cliente || p.nome || 'Tripulante';
+        const statusAtual = p.status || 'Pendente';
+        const statusClasse = statusAtual.toLowerCase();
+        const dataFormatada = p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Data não registrada';
+        const info = parsearDetalhesPedido(p.estilo || '');
+
+        // Busca medidas do cliente no cache pelo e-mail
+        const clienteCadastrado = listaClientesCache.find(
+            c => c.email && p.email && c.email.toLowerCase() === p.email.toLowerCase()
+        );
+
+        const temMedidas = clienteCadastrado && (
+            clienteCadastrado.busto || clienteCadastrado.cintura || clienteCadastrado.quadril || clienteCadastrado.altura
+        );
+
+        const htmlMedidas = temMedidas
+            ? `
+                <div class="ficha-medidas-grid">
+                    <span><strong>Busto:</strong> ${clienteCadastrado.busto || '-'} cm</span>
+                    <span><strong>Cintura:</strong> ${clienteCadastrado.cintura || '-'} cm</span>
+                    <span><strong>Quadril:</strong> ${clienteCadastrado.quadril || '-'} cm</span>
+                    <span><strong>Altura:</strong> ${clienteCadastrado.altura || '-'} cm</span>
+                </div>
+              `
+            : `<span style="font-size: 0.85rem; color: var(--text-sub); font-style: italic;">Medidas corporais ainda não registradas pelo cliente.</span>`;
+
+        const htmlTecidos = info.tecidos.length > 0
+            ? info.tecidos.map(nomeTecido => {
+                const matObj = materiaisCelestine.find(m => m.nome.toLowerCase() === nomeTecido.toLowerCase());
+                const icone = matObj ? matObj.icone : '🧵';
+                const extra = matObj ? ` • ${matObj.gramatura}` : '';
+                return `<span class="tag-tecido-ficha">${icone} <strong>${nomeTecido}</strong><small>${extra}</small></span>`;
+            }).join('')
+            : `<span class="tag-tecido-vazio">Nenhum tecido específico marcado (definir com o cliente)</span>`;
+
+        const htmlObservacoes = info.observacoes
+            ? `<p class="texto-escrita-cliente">“${info.observacoes}”</p>`
+            : `<p class="texto-escrita-vazio">O cliente não deixou observações escritas adicionais neste pedido.</p>`;
+
+        return `
+            <article class="ficha-alfaiate-card">
+                <div class="ficha-topo">
+                    <div>
+                        <span class="ficha-numero-pedido">ORDEM DE CORTE #${p.id}</span>
+                        <h4>${nomeCliente}</h4>
+                        <small style="color: var(--text-sub);">📡 ${p.email} • 🗓️ ${dataFormatada}</small>
+                    </div>
+                    <span class="badge-status ${statusClasse}">${statusAtual}</span>
+                </div>
+
+                <div class="ficha-resumo-modelo">
+                    <div class="ficha-campo">
+                        <span class="ficha-label">👗 Peça de Referência / Base:</span>
+                        <strong class="ficha-valor-destaque">${info.pecaRef || '✨ Criação 100% Inédita (Sem peça base)'}</strong>
+                    </div>
+                    <div class="ficha-campo">
+                        <span class="ficha-label">🌌 Atmosfera / Estilo Base:</span>
+                        <strong class="ficha-valor">${info.estiloBaseFormatado}</strong>
+                    </div>
+                </div>
+
+                <div class="ficha-secao">
+                    <span class="ficha-label">🧵 Tecidos Selecionados (${info.tecidos.length}):</span>
+                    <div class="ficha-tecidos-lista">
+                        ${htmlTecidos}
+                    </div>
+                </div>
+
+                <div class="ficha-secao box-escrita-cliente">
+                    <span class="ficha-label">📝 Escrita & Instruções do Cliente:</span>
+                    ${htmlObservacoes}
+                </div>
+
+                <div class="ficha-secao box-medidas-cliente">
+                    <span class="ficha-label">📏 Medidas Estelares Cadastradas:</span>
+                    ${htmlMedidas}
+                </div>
+
+                <div class="ficha-acoes-rodape">
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                        ✅ Aprovar & Iniciar Corte
+                    </button>
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.08); color: #ffc107; border: 1px solid #ffc107; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                        ⏳ Em Análise
+                    </button>
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: rgba(220,53,69,0.18); color: #ff6b6b; border: 1px solid #dc3545; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                        ❌ Recusar
+                    </button>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
 async function atualizarStatusPedido(id, novoStatus) {
     try {
         const res = await fetch(`${API_URL}/pedidos/${id}/status`, {
@@ -1516,7 +2212,9 @@ async function atualizarStatusPedido(id, novoStatus) {
 
         if (res.ok) {
             alert(`✨ Pedido #${id} alterado para ${novoStatus}!`);
-            carregarPainelAdmin();
+            await carregarMetricasEGrafico();
+            await carregarTabelaAdmin();
+            renderizarFichasAlfaiate();
         } else {
             alert('Erro ao atualizar o status.');
         }
@@ -1527,14 +2225,17 @@ async function atualizarStatusPedido(id, novoStatus) {
 
 async function buscarClientesAPI() {
     const container = document.getElementById('tabela-clientes-admin');
-    if (!container) return;
 
     try {
         const res = await fetch(`${API_URL}/clientes`);
         listaClientesCache = await res.json();
-        renderizarListaClientesAdmin(listaClientesCache);
+        if (container) {
+            renderizarListaClientesAdmin(listaClientesCache);
+        }
     } catch (err) {
-        container.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao conectar com o banco de dados.</p>';
+        if (container) {
+            container.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao conectar com o banco de dados.</p>';
+        }
     }
 }
 
@@ -1618,6 +2319,7 @@ async function salvarEdicaoClienteAdmin(event) {
         if (res.ok) {
             alert(`✨ Dados do tripulante #${id} alterados com sucesso!`);
             await buscarClientesAPI();
+            renderizarFichasAlfaiate();
             mudarSubAbaAdmin('consulta');
         } else {
             alert('⚠️ Não foi possível salvar as alterações.');
@@ -1634,6 +2336,7 @@ async function excluirClienteAdmin(id) {
         const res = await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
         if (res.ok) {
             await buscarClientesAPI();
+            renderizarFichasAlfaiate();
         }
     } catch (err) {
         alert('❌ Erro ao excluir cliente.');
@@ -1674,7 +2377,7 @@ function gerarCalendarioOrbital() {
 }
 
 // ==========================================
-// 11. NOVAS FUNCIONALIDADES DO MENU HAMBÚRGUER
+// 11. FUNCIONALIDADES DO MENU HAMBÚRGUER & TEMA
 // ==========================================
 
 function atualizarVipGamificacao(cliente) {
@@ -1813,50 +2516,6 @@ function removerEventoMoodboard(id) {
     carregarEventosMoodboard();
 }
 
-let audioCtx = null;
-let osc1 = null, osc2 = null, gainNode = null;
-let tocandoAudio = false;
-
-function alternarAudioCosmico() {
-    const btn = document.getElementById('btn-toggle-audio');
-    const status = document.getElementById('status-audio');
-
-    if (!tocandoAudio) {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        osc1 = audioCtx.createOscillator();
-        osc2 = audioCtx.createOscillator();
-        gainNode = audioCtx.createGain();
-
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(440, audioCtx.currentTime);
-
-        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-
-        osc1.connect(gainNode);
-        osc2.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        osc1.start();
-        osc2.start();
-        tocandoAudio = true;
-
-        if (btn) btn.innerText = '⏸️ Pausar';
-        if (status) status.innerText = 'Sintonizando Frequência 440Hz...';
-    } else {
-        if (osc1) osc1.stop();
-        if (osc2) osc2.stop();
-        tocandoAudio = false;
-
-        if (btn) btn.innerText = '▶️ Play';
-        if (status) status.innerText = 'Sintonia Pausada';
-    }
-}
-
 function abrirWhatsappVip() {
     const cliente = obterClienteLogado();
     if (!cliente) return;
@@ -1872,82 +2531,7 @@ function abrirWhatsappVip() {
     const url = `https://api.whatsapp.com/send?phone=5541999999999&text=${encodeURIComponent(mensagem)}`;
     window.open(url, '_blank');
 }
-const musica = document.getElementById('musicaJazz');
 
-/**
- * Gerenciador de Áudio do Site - script.js
- * Reproduz o áudio de fundo (Untitled.mp3) e gerencia os controles de reprodução.
- */
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Busca ou cria o elemento de áudio
-    let audio = document.getElementById('bgMusic');
-    
-    if (!audio) {
-        audio = document.createElement('audio');
-        audio.id = 'bgMusic';
-        audio.src = 'Untitled.mp3'; // Garanta que o arquivo Untitled.mp3 esteja na mesma pasta
-        audio.loop = true;
-        audio.preload = 'auto';
-        document.body.appendChild(audio);
-    }
-
-    const musicBtn = document.getElementById('musicToggleBtn');
-    const musicBtnText = document.getElementById('musicBtnText');
-    const eqIcon = document.getElementById('eqIcon');
-
-    // Função para alternar entre Tocar e Pausar
-    window.toggleAudio = function () {
-        if (audio.paused) {
-            audio.play().then(() => {
-                atualizarUI(true);
-            }).catch(err => {
-                console.warn("Autoplay bloqueado ou falha ao reproduzir:", err);
-            });
-        } else {
-            audio.pause();
-            atualizarUI(false);
-        }
-    };
-
-    // Atualiza o estado visual do botão (se existir na página)
-    function atualizarUI(isPlaying) {
-        if (musicBtnText) {
-            musicBtnText.textContent = isPlaying ? "Pausar Música" : "Tocar Música";
-        }
-        if (eqIcon) {
-            if (isPlaying) {
-                eqIcon.classList.add('playing');
-            } else {
-                eqIcon.classList.remove('playing');
-            }
-        }
-    }
-
-    // Toca automaticamente no primeiro clique/interação do usuário na página
-    function iniciarNoPrimeiroClique() {
-        if (audio.paused) {
-            audio.play().then(() => {
-                atualizarUI(true);
-            }).catch(() => {});
-        }
-        document.removeEventListener('click', iniciarNoPrimeiroClique);
-        document.removeEventListener('keydown', iniciarNoPrimeiroClique);
-        document.removeEventListener('touchstart', iniciarNoPrimeiroClique);
-    }
-
-    document.addEventListener('click', iniciarNoPrimeiroClique, { once: true });
-    document.addEventListener('keydown', iniciarNoPrimeiroClique, { once: true });
-    document.addEventListener('touchstart', iniciarNoPrimeiroClique, { once: true });
-
-    // Se o botão existir no HTML, conecta o evento de clique
-    if (musicBtn) {
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita acionar o listener global duas vezes
-            toggleAudio();
-        });
-    }
-});
 function toggleTheme() {
     const body = document.body;
     const icon = document.getElementById('themeIcon');
@@ -1957,26 +2541,16 @@ function toggleTheme() {
     const isLight = body.classList.contains('light-mode');
   
     if (isLight) {
-      if (icon) icon.textContent = '🪐'; // Ícone para voltar a Saturno
+      if (icon) icon.textContent = '🪐';
       if (text) text.textContent = 'Modo Saturno';
       localStorage.setItem('siteTheme', 'lunar');
     } else {
-      if (icon) icon.textContent = '🌙'; // Ícone para ir à Lua
+      if (icon) icon.textContent = '🌙';
       if (text) text.textContent = 'Modo Lunar';
       localStorage.setItem('siteTheme', 'saturn');
     }
-  }
-  
-  // Carrega o tema salvo ao abrir a página
-  document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('siteTheme') === 'lunar') {
-      document.body.classList.add('light-mode');
-      const icon = document.getElementById('themeIcon');
-      const text = document.getElementById('themeText');
-      if (icon) icon.textContent = '🪐';
-      if (text) text.textContent = 'Modo Saturno';
-    }
-  });
+}
+
 // ==========================================
 // 12. EFEITOS VISUAIS
 // ==========================================

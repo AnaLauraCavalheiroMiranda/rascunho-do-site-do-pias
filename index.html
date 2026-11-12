@@ -7,12 +7,8 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-    <!-- CONTAINER OCULTO DO PLAYER DE MÚSICA YOUTUBE -->
-    <div id="youtube-player" style="display: none;"></div>
-
     <!-- MÁSCARA DE FUNDO -->
     <div class="space-nebula"></div>
 
@@ -40,38 +36,20 @@
                 </div>
             </div>
 
-            <!-- 2. SINTONIZADOR DE ÁUDIO CÓSMICO -->
-            <div class="audio-sintonizador-widget" style="background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 14px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" id="btn-toggle-audio" onclick="alternarAudioCosmico()" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 20px; background: rgba(238, 228, 187, 0.15); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); cursor: pointer;">
-                        ▶️ Play
-                    </button>
-                    <div>
-                        <strong style="color: #fff; font-size: 0.8rem; display: block;">🎵 Frequência Cósmica</strong>
-                        <small id="status-audio" style="color: var(--lavender-glow); font-size: 0.7rem;">Sintonia Pausada</small>
-                    </div>
-                </div>
-                <span style="font-size: 1.1rem;">🌌</span>
-            </div>
-
-            <!-- 3. LINHA DO TEMPO DE CONFECÇÃO EM TEMPO REAL -->
+            <!-- 2. LINHA DO TEMPO DE CONFECÇÃO EM TEMPO REAL -->
             <div id="user-timeline-card" class="item-cliente-only" style="display: none; background: rgba(25, 27, 34, 0.8); border: 1px solid var(--glass-border); border-radius: 14px; padding: 12px; margin-bottom: 18px;">
                 <strong style="color: var(--saturn-gold); font-size: 0.85rem; display: block; margin-bottom: 8px;">⏱️ Confecção em Tempo Real</strong>
-                <div id="timeline-passos-container" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem;">
-                    <!-- Preenchido dinamicamente pelo JS -->
-                </div>
+                <div id="timeline-passos-container" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem;"></div>
             </div>
 
             <h3>🧭 Painel de Navegação</h3>
             <ul id="menu-lista-itens">
-                <!-- ITENS EXCLUSIVOS DE CLIENTES LOGADOS -->
                 <li class="item-cliente-only" style="display: none;">
                     <a href="#perfil" onclick="event.preventDefault(); toggleMenu(); mudarTela('cliente');">
                         👤 Meu Perfil & Medidas Estelares
                     </a>
                 </li>
                 
-                <!-- MOODBOARD & EVENTOS ESTELARES -->
                 <li class="item-cliente-only" style="display: none;">
                     <a href="#moodboard" onclick="event.preventDefault(); toggleMenu(); abrirModalMoodboard();">
                         🎨 Moodboard & Caderno de Eventos
@@ -89,14 +67,12 @@
                     </a>
                 </li>
 
-                <!-- CANAL DIRETO COM ALFAIATE VIP -->
                 <li class="item-cliente-only" style="display: none;">
                     <a href="#" onclick="event.preventDefault(); abrirWhatsappVip();" style="border-color: #25D366; color: #25D366; background: rgba(37, 211, 102, 0.08); font-weight: bold;">
                         💬 Falar com Alfaiate VIP (WhatsApp)
                     </a>
                 </li>
 
-                <!-- ITENS PÚBLICOS E ADMIN -->
                 <li><a href="#mais-vendidos" onclick="event.preventDefault(); toggleMenu(); mudarTela('mais-vendidos');">👑 Mantos Mais Vendidos</a></li>
                 <li id="menu-item-pedidos"><a href="#pedidos" onclick="event.preventDefault(); abrirCaixaDePedidos();">📦 Caixa de Pedidos (Global)</a></li>
                 <li id="menu-item-clientes"><a href="#clientes" onclick="event.preventDefault(); abrirCaixaDeClientes();">👤 Clientes Registrados</a></li>
@@ -110,13 +86,13 @@
                 </button>
             </div>
         </div>
-        <!-- Cole no final de .panel-content (dentro da div .side-panel) -->
-<div class="theme-toggle-container">
-    <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()">
-      <span id="themeText">Modo Lunar</span>
-      <span id="themeIcon" class="theme-toggle-icon">🌙</span>
-    </button>
-  </div>
+
+        <div class="theme-toggle-container">
+            <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()">
+                <span id="themeText">Modo Lunar</span>
+                <span id="themeIcon" class="theme-toggle-icon">🌙</span>
+            </button>
+        </div>
     </aside>
 
     <!-- CABEÇALHO / NAVEGAÇÃO -->
@@ -279,11 +255,7 @@
             </div>
         </div>
     </div>
-<!-- Player de áudio com controles -->
-<audio id="musicaJazz" controls loop>
-    <source src="sua-musica.mp3" type="audio/mpeg">
-    Seu navegador não suporta o tocador de áudio.
-  </audio>
+
     <!-- RODAPÉ -->
     <footer class="main-footer">
         <div class="footer-container">
