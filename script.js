@@ -7,6 +7,7 @@ let produtosGlobais = [];
 let listaClientesCache = [];
 let listaPedidosAdminCache = [];
 let filtroStatusAlfaiateAtual = 'todos';
+let graficoPedidosInstance = null;
 
 // Lista de peças clássicas/mais vendidas para sempre constarem no seletor de referência
 const pecasDestaqueCatalogo = [
@@ -325,18 +326,18 @@ const telasCelestine = {
 
     'mais-vendidos': `
         <section style="max-width: 1050px; margin: 40px auto; padding: 20px;">
-            <h2 style="text-align: center; color: #fff; font-size: 2.2rem; margin-bottom: 10px;">👑 Mantos Mais Vendidos</h2>
+            <h2 style="text-align: center; color: var(--text-main); font-size: 2.2rem; margin-bottom: 10px;">👑 Mantos Mais Vendidos</h2>
             <p style="text-align: center; color: var(--lavender-glow); margin-bottom: 35px;">Os modelos autorais mais requisitados pelos tripulantes do ateliê.</p>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
                 
-                <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
-                    <span style="position: absolute; top: 15px; right: 15px; background: var(--saturn-gold); color: #000; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">🏆 #1 Mais Pedido</span>
+                <div class="card-destaque-mv" style="background: var(--card-surface); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
+                    <span style="position: absolute; top: 15px; right: 15px; background: var(--saturn-gold); color: #fff; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">🏆 #1 Mais Pedido</span>
                     <div style="font-size: 3.5rem; margin: 15px 0 5px 0;">🪐</div>
-                    <h3 style="color: #fff; font-size: 1.4rem;">Vestido Saturniano Imperial</h3>
+                    <h3 style="color: var(--text-main); font-size: 1.4rem;">Vestido Saturniano Imperial</h3>
                     <p style="color: var(--saturn-gold); font-size: 0.85rem; margin-bottom: 10px;">🌙 5.0 (24 avaliações)</p>
-                    <p style="color: var(--lavender-glow); font-size: 0.9rem; margin-bottom: 15px;">Anéis e camadas sobrepostas com aplicação manual de brilho dourado estelar.</p>
-                    <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: #e0e0e0;">
+                    <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 15px;">Anéis e camadas sobrepostas com aplicação manual de brilho dourado estelar.</p>
+                    <div style="background: var(--card-inner); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: var(--text-main); border: 1px solid var(--glass-border);">
                         <div>🧵 <strong>Tecido:</strong> Jacquard de Ouro</div>
                         <div>⏱️ <strong>Prazo:</strong> 15 dias orbitais</div>
                     </div>
@@ -346,13 +347,13 @@ const telasCelestine = {
                     </button>
                 </div>
 
-                <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
-                    <span style="position: absolute; top: 15px; right: 15px; background: rgba(154, 155, 193, 0.2); color: var(--lavender-glow); border: 1px solid var(--lavender-glow); font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">✨ Favorito</span>
+                <div class="card-destaque-mv" style="background: var(--card-surface); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
+                    <span style="position: absolute; top: 15px; right: 15px; background: var(--saturn-gold-dim); color: var(--lavender-glow); border: 1px solid var(--lavender-glow); font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">✨ Favorito</span>
                     <div style="font-size: 3.5rem; margin: 15px 0 5px 0;">🌘</div>
-                    <h3 style="color: #fff; font-size: 1.4rem;">Manto Eclipse Noturno</h3>
+                    <h3 style="color: var(--text-main); font-size: 1.4rem;">Manto Eclipse Noturno</h3>
                     <p style="color: var(--saturn-gold); font-size: 0.85rem; margin-bottom: 10px;">🌙 4.9 (18 avaliações)</p>
-                    <p style="color: var(--lavender-glow); font-size: 0.9rem; margin-bottom: 15px;">Corte minimalista com caimento pesado e detalhes escuros refinados.</p>
-                    <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: #e0e0e0;">
+                    <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 15px;">Corte minimalista com caimento pesado e detalhes escuros refinados.</p>
+                    <div style="background: var(--card-inner); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: var(--text-main); border: 1px solid var(--glass-border);">
                         <div>🧵 <strong>Tecido:</strong> Veludo Negro Encorpado</div>
                         <div>⏱️ <strong>Prazo:</strong> 10 dias orbitais</div>
                     </div>
@@ -362,13 +363,13 @@ const telasCelestine = {
                     </button>
                 </div>
 
-                <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
-                    <span style="position: absolute; top: 15px; right: 15px; background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid #00f0ff; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">💎 Exclusivo</span>
+                <div class="card-destaque-mv" style="background: var(--card-surface); border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px; text-align: center; position: relative;">
+                    <span style="position: absolute; top: 15px; right: 15px; background: rgba(0, 180, 216, 0.14); color: #0077b6; border: 1px solid #0096c7; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 12px;">💎 Exclusivo</span>
                     <div style="font-size: 3.5rem; margin: 15px 0 5px 0;">✨</div>
-                    <h3 style="color: #fff; font-size: 1.4rem;">Manto Via Láctea Translúcida</h3>
+                    <h3 style="color: var(--text-main); font-size: 1.4rem;">Manto Via Láctea Translúcida</h3>
                     <p style="color: var(--saturn-gold); font-size: 0.85rem; margin-bottom: 10px;">🌙 5.0 (15 avaliações)</p>
-                    <p style="color: var(--lavender-glow); font-size: 0.9rem; margin-bottom: 15px;">Tece transparência com aplicação manual de microcristais celestes.</p>
-                    <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: #e0e0e0;">
+                    <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 15px;">Tece transparência com aplicação manual de microcristais celestes.</p>
+                    <div style="background: var(--card-inner); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: left; font-size: 0.85rem; color: var(--text-main); border: 1px solid var(--glass-border);">
                         <div>🧵 <strong>Tecido:</strong> Tule de Cristais</div>
                         <div>⏱️ <strong>Prazo:</strong> 20 dias orbitais</div>
                     </div>
@@ -391,7 +392,7 @@ const telasCelestine = {
             <h3>🌙 Ciclos Lunares: Reservar Atendimento</h3>
             <p class="form-subtitle">Sincronize sua frequência, escolha uma peça de inspiração e combine os tecidos do seu manto sob medida.</p>
             
-            <div id="aviso-tecido-selecionado" style="display: none; background: rgba(238, 228, 187, 0.12); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); padding: 14px 18px; border-radius: 12px; margin-bottom: 22px; font-size: 0.92rem; text-align: center;"></div>
+            <div id="aviso-tecido-selecionado" style="display: none; background: var(--saturn-gold-dim); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); padding: 14px 18px; border-radius: 12px; margin-bottom: 22px; font-size: 0.92rem; text-align: center;"></div>
             
             <form id="form-agendamento" onsubmit="processarAgendamentoEspacial(event)">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
@@ -433,9 +434,7 @@ const telasCelestine = {
                         Combine diferentes matérias-primas (ex: estrutura em veludo + mangas em tule estelar).
                     </p>
 
-                    <div id="seletor-tecidos-pedido" class="tecidos-selecao-grid">
-                        <!-- Preenchido dinamicamente a partir de materiaisCelestine -->
-                    </div>
+                    <div id="seletor-tecidos-pedido" class="tecidos-selecao-grid"></div>
                 </div>
 
                 <div>
@@ -469,7 +468,6 @@ const telasCelestine = {
                     <p id="subtitulo-login-form">Sincronize seus dados orbitais para acessar seus mantos cósmicos privados.</p>
                 </div>
 
-                <!-- FORMULÁRIO DE CADASTRO NOVO COM PALAVRA-PASSE -->
                 <form id="form-cadastro" onsubmit="autenticarTripulante(event)">
                     <div class="input-group">
                         <label for="login-nome">👤 Nome do Tripulante</label>
@@ -486,7 +484,6 @@ const telasCelestine = {
                     <button type="submit" class="btn-submit-login">Cadastrar / Autenticar Assinatura</button>
                 </form>
 
-                <!-- FORMULÁRIO DE LOGIN EXISTENTE COM PALAVRA-PASSE -->
                 <form id="form-login-existente" onsubmit="fazerLoginTripulante(event)" style="display: none;">
                     <div class="input-group">
                         <label for="login-existente-email">📡 Frequência Digital Registrada (E-mail)</label>
@@ -512,56 +509,56 @@ const telasCelestine = {
 
     'cliente': `
         <section class="cliente-perfil-section" style="max-width: 900px; margin: 40px auto; padding: 20px;">
-            <div style="background: rgba(38, 41, 52, 0.85); border: 1px solid var(--glass-border); border-radius: 24px; padding: 35px; text-align: center; backdrop-filter: blur(15px);">
+            <div style="background: var(--card-surface); border: 1px solid var(--glass-border); border-radius: 24px; padding: 35px; text-align: center; backdrop-filter: blur(15px);">
                 
                 <!-- FOTO DE PERFIL -->
                 <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 15px auto; cursor: pointer;" onclick="document.getElementById('input-foto').click()" title="Clique para alterar sua foto">
                     <img id="img-perfil" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--saturn-gold); display: none;">
-                    <div id="avatar-padrao" style="font-size: 3.5rem; line-height: 110px; background: rgba(255,255,255,0.05); border-radius: 50%; border: 2px dashed var(--saturn-gold);">👨‍🚀</div>
-                    <div style="position: absolute; bottom: 0; right: 0; background: var(--saturn-gold); color: #000; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold;">📷</div>
+                    <div id="avatar-padrao" style="font-size: 3.5rem; line-height: 110px; background: var(--card-inner); border-radius: 50%; border: 2px dashed var(--saturn-gold);">👨‍🚀</div>
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--saturn-gold); color: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold;">📷</div>
                 </div>
                 <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="salvarFotoPerfil(event)">
                 <small style="color: var(--lavender-glow); display: block; margin-bottom: 15px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Clique na foto para alterar</small>
 
                 <!-- DADOS BÁSICOS -->
-                <h2 id="perfil-nome" style="font-size: 2rem; color: #fff; margin-top: 5px;">Nome do Tripulante</h2>
+                <h2 id="perfil-nome" style="font-size: 2rem; color: var(--text-main); margin-top: 5px;">Nome do Tripulante</h2>
                 <p id="perfil-email" style="color: var(--lavender-glow); margin-bottom: 15px;">email@galaxia.com</p>
                 <span class="badge-status aprovado" style="font-size: 0.85rem;">Sintonizado em Órbita</span>
 
                 <!-- FORMULÁRIO DE MEDIDAS -->
-                <div style="margin-top: 30px; text-align: left; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;">
+                <div style="margin-top: 30px; text-align: left; background: var(--card-inner); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;">
                     <h3 style="color: var(--saturn-gold); margin-bottom: 8px; font-size: 1.1rem;">📏 Minhas Medidas Estelares (Sob Medida)</h3>
-                    <p style="font-size: 0.85rem; color: var(--lavender-glow); margin-bottom: 15px;">Preencha suas medidas para agilizar a confecção sob medida de seus mantos.</p>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">Preencha suas medidas para agilizar a confecção sob medida de seus mantos.</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
                         <div>
-                            <label style="font-size: 0.8rem; color: #fff;">Busto (cm):</label>
-                            <input type="number" id="medida-busto" placeholder="ex: 90" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                            <label style="font-size: 0.8rem; color: var(--text-main);">Busto (cm):</label>
+                            <input type="number" id="medida-busto" placeholder="ex: 90" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.8rem; color: #fff;">Cintura (cm):</label>
-                            <input type="number" id="medida-cintura" placeholder="ex: 70" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                            <label style="font-size: 0.8rem; color: var(--text-main);">Cintura (cm):</label>
+                            <input type="number" id="medida-cintura" placeholder="ex: 70" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.8rem; color: #fff;">Quadril (cm):</label>
-                            <input type="number" id="medida-quadril" placeholder="ex: 98" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                            <label style="font-size: 0.8rem; color: var(--text-main);">Quadril (cm):</label>
+                            <input type="number" id="medida-quadril" placeholder="ex: 98" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
-                            <label style="font-size: 0.8rem; color: #fff;">Altura (cm):</label>
-                            <input type="number" id="medida-altura" placeholder="ex: 165" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: #fff;">
+                            <label style="font-size: 0.8rem; color: var(--text-main);">Altura (cm):</label>
+                            <input type="number" id="medida-altura" placeholder="ex: 165" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                     </div>
-                    <button onclick="salvarMedidasCliente()" style="margin-top: 15px; background: var(--saturn-gold); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer;">✨ Salvar Medidas</button>
+                    <button onclick="salvarMedidasCliente()" class="btn-submit-login" style="margin-top: 15px; padding: 9px 20px; font-size: 0.9rem;">✨ Salvar Medidas</button>
                 </div>
 
                 <!-- ABA DE MANTOS FAVORITOS DO CLIENTE -->
                 <div style="margin-top: 30px; text-align: left; border-top: 1px solid var(--glass-border); padding-top: 25px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: var(--saturn-gold); margin: 0;">❤️ Meus Mantos Favoritos</h3>
-                        <span style="font-size: 0.8rem; color: var(--lavender-glow);">Salvos na sua galáxia privada</span>
+                        <span style="font-size: 0.8rem; color: var(--text-sub);">Salvos na sua galáxia privada</span>
                     </div>
                     <div id="lista-favoritos-cliente" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
-                        <p style="color: var(--lavender-glow); grid-column: 1/-1; text-align: center;">Buscando seus mantos favoritos...</p>
+                        <p style="color: var(--text-sub); grid-column: 1/-1; text-align: center;">Buscando seus mantos favoritos...</p>
                     </div>
                 </div>
 
@@ -569,14 +566,14 @@ const telasCelestine = {
                 <div style="margin-top: 30px; text-align: left; border-top: 1px solid var(--glass-border); padding-top: 25px;">
                     <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">📦 Peças Encomendadas & Histórico</h3>
                     <div id="lista-pedidos-cliente">
-                        <p style="text-align: center; color: var(--lavender-glow);">Buscando pedidos...</p>
+                        <p style="text-align: center; color: var(--text-sub);">Buscando pedidos...</p>
                     </div>
                 </div>
 
                 <!-- BOTÕES DE AÇÃO -->
                 <div style="margin-top: 35px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                     <button class="btn-submit-login" onclick="mudarTela('agendamento')" style="max-width: 220px; padding: 12px;">🌙 Novo Pedido</button>
-                    <button class="btn-back-home" onclick="desconectarTripulante()" style="border-color: #ff5252 !important; color: #ff5252 !important; margin: 0; padding: 12px 24px;">🚪 Sair da Conta</button>
+                    <button class="btn-back-home" onclick="desconectarTripulante()" style="border-color: #dc2626 !important; color: #dc2626 !important; margin: 0; padding: 12px 24px;">🚪 Sair da Conta</button>
                 </div>
             </div>
         </section>
@@ -585,7 +582,7 @@ const telasCelestine = {
     'admin': `
         <section class="admin-dashboard-section" style="padding: 20px; max-width: 1200px; margin: 0 auto;">
             <div class="admin-header" style="text-align: center; margin-bottom: 25px;">
-                <h2>🛸 Centro de Comando Admin</h2>
+                <h2 style="color: var(--text-main);">🛸 Centro de Comando Admin</h2>
                 <p style="color: var(--lavender-glow);">Painel central de controle e bancada técnica do ateliê estelar.</p>
             </div>
 
@@ -608,34 +605,34 @@ const telasCelestine = {
             <!-- ABA 1: PEDIDOS, MÉTRICAS E CALENDÁRIO -->
             <div id="sub-aba-pedidos" class="sub-aba-conteudo" style="display: block;">
                 <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border); text-align: center;">
+                    <div style="background: var(--card-surface); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); text-align: center;">
                         <small style="color: var(--lavender-glow);">Total de Pedidos</small>
-                        <h3 id="metric-total" style="font-size: 2em; margin: 5px 0; color: #fff;">0</h3>
+                        <h3 id="metric-total" style="font-size: 2em; margin: 5px 0; color: var(--text-main);">0</h3>
                     </div>
-                    <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #ffc107; text-align: center;">
-                        <small style="color: #ffc107;">⌛ Pendentes</small>
-                        <h3 id="metric-pendentes" style="font-size: 2em; margin: 5px 0; color: #ffc107;">0</h3>
+                    <div style="background: rgba(217, 119, 6, 0.1); padding: 15px; border-radius: 12px; border: 1px solid #d97706; text-align: center;">
+                        <small style="color: #d97706; font-weight: 600;">⌛ Pendentes</small>
+                        <h3 id="metric-pendentes" style="font-size: 2em; margin: 5px 0; color: #d97706;">0</h3>
                     </div>
-                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #28a745; text-align: center;">
-                        <small style="color: #28a745;">✅ Aprovados</small>
-                        <h3 id="metric-aprovados" style="font-size: 2em; margin: 5px 0; color: #28a745;">0</h3>
+                    <div style="background: rgba(22, 163, 74, 0.1); padding: 15px; border-radius: 12px; border: 1px solid #16a34a; text-align: center;">
+                        <small style="color: #16a34a; font-weight: 600;">✅ Aprovados</small>
+                        <h3 id="metric-aprovados" style="font-size: 2em; margin: 5px 0; color: #16a34a;">0</h3>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        <h3 style="color: #fff; margin-bottom: 15px;">📊 Distribuição dos Pedidos</h3>
+                    <div style="background: var(--card-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--glass-border);">
+                        <h3 style="color: var(--text-main); margin-bottom: 15px;">📊 Distribuição dos Pedidos</h3>
                         <canvas id="graficoPedidos" style="max-height: 250px;"></canvas>
                     </div>
 
-                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                        <h3 id="titulo-calendario" style="color: #fff; margin-bottom: 15px;">🗓️ Calendário de Atendimento</h3>
+                    <div style="background: var(--card-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--glass-border);">
+                        <h3 id="titulo-calendario" style="color: var(--text-main); margin-bottom: 15px;">🗓️ Calendário de Atendimento</h3>
                         <div id="grid-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; text-align: center;"></div>
                     </div>
                 </div>
 
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <h3 style="color: #fff; margin-bottom: 15px;">📜 Aprovação & Gestão de Pedidos</h3>
+                <div style="background: var(--card-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--glass-border);">
+                    <h3 style="color: var(--text-main); margin-bottom: 15px;">📜 Aprovação & Gestão de Pedidos</h3>
                     <div id="tabela-pedidos-admin" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
@@ -662,28 +659,28 @@ const telasCelestine = {
                     </div>
 
                     <div id="lista-fichas-alfaiate" class="fichas-alfaiate-grid">
-                        <p style="text-align: center; color: var(--lavender-glow); padding: 25px;">Carregando fichas de costura...</p>
+                        <p style="text-align: center; color: var(--text-sub); padding: 25px;">Carregando fichas de costura...</p>
                     </div>
                 </div>
             </div>
 
             <!-- ABA 3: CONSULTA DE CLIENTES -->
             <div id="sub-aba-consulta" class="sub-aba-conteudo" style="display: none;">
-                <div style="background: rgba(0,0,0,0.3); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                <div style="background: var(--card-surface); padding: 25px; border-radius: 16px; border: 1px solid var(--glass-border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="color: #fff; margin: 0;">👥 Tripulantes Cadastrados</h3>
+                        <h3 style="color: var(--text-main); margin: 0;">👥 Tripulantes Cadastrados</h3>
                         <input type="text" id="filtro-cliente-admin" placeholder="🔍 Buscar nome ou e-mail..." oninput="filtrarClientesAdmin()" style="padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; width: 260px;">
                     </div>
 
                     <div id="tabela-clientes-admin" style="display: flex; flex-direction: column; gap: 12px;">
-                        <p style="text-align: center; color: var(--lavender-glow);">Carregando tripulantes...</p>
+                        <p style="text-align: center; color: var(--text-sub);">Carregando tripulantes...</p>
                     </div>
                 </div>
             </div>
 
             <!-- ABA 4: ALTERAÇÃO / EDIÇÃO DE CLIENTES -->
             <div id="sub-aba-edicao" class="sub-aba-conteudo" style="display: none;">
-                <div style="background: rgba(38, 41, 52, 0.95); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px);">
+                <div style="background: var(--card-surface); border: 1px solid var(--saturn-gold); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px);">
                     <h3 style="color: var(--saturn-gold); margin-bottom: 15px;">✏️ Formulário de Alteração de Dados</h3>
                     
                     <form id="form-edicao-admin" onsubmit="salvarEdicaoClienteAdmin(event)">
@@ -691,11 +688,11 @@ const telasCelestine = {
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
                             <div>
-                                <label style="color: #fff; font-size: 0.85rem;">Nome Completo:</label>
+                                <label style="color: var(--text-main); font-size: 0.85rem;">Nome Completo:</label>
                                 <input type="text" id="admin-edit-nome" required style="width: 100%; padding: 10px; border-radius: 8px;">
                             </div>
                             <div>
-                                <label style="color: #fff; font-size: 0.85rem;">E-mail (Frequência Digital):</label>
+                                <label style="color: var(--text-main); font-size: 0.85rem;">E-mail (Frequência Digital):</label>
                                 <input type="email" id="admin-edit-email" required style="width: 100%; padding: 10px; border-radius: 8px;">
                             </div>
                         </div>
@@ -703,19 +700,19 @@ const telasCelestine = {
                         <h4 style="color: var(--saturn-gold); margin-top: 15px; font-size: 0.95rem;">📏 Medidas Estelares (cm)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 8px;">
                             <div>
-                                <label style="color: #fff; font-size: 0.8rem;">Busto:</label>
+                                <label style="color: var(--text-main); font-size: 0.8rem;">Busto:</label>
                                 <input type="number" id="admin-edit-busto" placeholder="90" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
-                                <label style="color: #fff; font-size: 0.8rem;">Cintura:</label>
+                                <label style="color: var(--text-main); font-size: 0.8rem;">Cintura:</label>
                                 <input type="number" id="admin-edit-cintura" placeholder="70" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
-                                <label style="color: #fff; font-size: 0.8rem;">Quadril:</label>
+                                <label style="color: var(--text-main); font-size: 0.8rem;">Quadril:</label>
                                 <input type="number" id="admin-edit-quadril" placeholder="98" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
-                                <label style="color: #fff; font-size: 0.8rem;">Altura:</label>
+                                <label style="color: var(--text-main); font-size: 0.8rem;">Altura:</label>
                                 <input type="number" id="admin-edit-altura" placeholder="165" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                         </div>
@@ -760,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add('light-mode');
         const icon = document.getElementById('themeIcon');
         const text = document.getElementById('themeText');
-        if (icon) icon.textContent = '🪐';
+        if (icon) icon.textContent = '🌑';
         if (text) text.textContent = 'Modo Saturno';
     }
 });
@@ -1068,7 +1065,7 @@ function carregarFavoritosNoPerfil() {
 
     const cliente = obterClienteLogado();
     if (!cliente) {
-        container.innerHTML = '<p style="color: var(--lavender-glow); grid-column: 1/-1; text-align: center;">Faça login para ver seus favoritos.</p>';
+        container.innerHTML = '<p style="color: var(--text-sub); grid-column: 1/-1; text-align: center;">Faça login para ver seus favoritos.</p>';
         return;
     }
 
@@ -1076,8 +1073,8 @@ function carregarFavoritosNoPerfil() {
 
     if (favoritos.length === 0) {
         container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed var(--glass-border);">
-                <p style="color: var(--lavender-glow); margin: 0;">Você ainda não favoritou nenhum manto.</p>
+            <div style="grid-column: 1/-1; text-align: center; padding: 20px; background: var(--card-inner); border-radius: 12px; border: 1px dashed var(--glass-border);">
+                <p style="color: var(--text-sub); margin: 0;">Você ainda não favoritou nenhum manto.</p>
                 <button onclick="mudarTela('colecoes')" style="margin-top: 10px; background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 20px; padding: 6px 16px; cursor: pointer;">✨ Explorar Coleções</button>
             </div>
         `;
@@ -1087,15 +1084,15 @@ function carregarFavoritosNoPerfil() {
     container.innerHTML = favoritos.map(manto => {
         const mantoEscapado = manto.replace(/'/g, "\\'");
         return `
-            <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+            <div style="background: var(--card-inner); border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
                 <div>
                     <div style="font-size: 2.2rem; margin-bottom: 5px;">✨</div>
-                    <strong style="color: #fff; font-size: 1rem; display: block; margin-bottom: 5px;">${manto}</strong>
+                    <strong style="color: var(--text-main); font-size: 1rem; display: block; margin-bottom: 5px;">${manto}</strong>
                     <span style="font-size: 0.75rem; color: var(--saturn-gold);">Manto Autoral Salvo</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-                    <button onclick="iniciarAgendamentoComProduto('${mantoEscapado}')" style="background: var(--saturn-gold); color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">🌙 Agendar Prova</button>
-                    <button onclick="alternarFavorito('${mantoEscapado}')" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
+                    <button onclick="iniciarAgendamentoComProduto('${mantoEscapado}')" class="btn-submit-login" style="padding: 8px; border-radius: 8px; font-size: 0.85rem;">🌙 Agendar Prova</button>
+                    <button onclick="alternarFavorito('${mantoEscapado}')" style="background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid #dc2626; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
                 </div>
             </div>
         `;
@@ -1205,20 +1202,20 @@ async function carregarPerfilCliente() {
             const pedidos = await res.json();
 
             if (!pedidos || pedidos.length === 0) {
-                containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px; color: var(--lavender-glow);">Você ainda não possui pedidos registrados nesta conta.</p>';
+                containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px; color: var(--text-sub);">Você ainda não possui pedidos registrados nesta conta.</p>';
             } else {
                 containerPedidos.innerHTML = pedidos.map(p => `
-                    <div class="card-pedido-item" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <div class="card-pedido-item" style="background: var(--card-inner); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                         <div>
-                            <strong>#${p.id} ${p.estilo}</strong><br>
-                            <small style="color: var(--lavender-glow);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
+                            <strong style="color: var(--text-main);">#${p.id} ${p.estilo}</strong><br>
+                            <small style="color: var(--text-sub);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
                         </div>
                         <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
                     </div>
                 `).join('');
             }
         } catch (err) {
-            containerPedidos.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao carregar histórico de pedidos.</p>';
+            containerPedidos.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao carregar histórico de pedidos.</p>';
         }
     }
 }
@@ -1258,7 +1255,7 @@ async function carregarMantosDoJson() {
                             <button type="button" class="btn-buy" style="flex: 1;" onclick="event.stopPropagation(); verDetalhesProduto(${index})">
                                 ✨ Ver Detalhes
                             </button>
-                            <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+                            <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="background: var(--card-inner); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
                                 ${iconeFav}
                             </button>
                         </div>
@@ -1537,7 +1534,7 @@ function abrirModalTextura(idTecido) {
                     <span>${peca.detalhe}</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
-                    <button type="button" class="btn-ver-peca-citada" style="background: var(--saturn-gold); color: #000; font-weight: bold;" onclick="encomendarPecaComTecido('${nomeEscapado}', '${mat.id}')">
+                    <button type="button" class="btn-submit-login" style="padding: 8px 12px; font-size: 0.84rem;" onclick="encomendarPecaComTecido('${nomeEscapado}', '${mat.id}')">
                         🌙 Encomendar Esta Peça + Tecido
                     </button>
                     <button type="button" class="btn-ver-peca-citada" onclick="irParaPecaDaLoja('${nomeEscapado}', '${peca.destino}')">
@@ -1891,7 +1888,7 @@ async function carregarPedidosDoBanco() {
             </div>
         `).join('');
     } catch (erro) {
-        container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao conectar com o banco SQLite.</p>';
+        container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao conectar com o banco SQLite.</p>';
     }
 }
 
@@ -1931,7 +1928,7 @@ async function carregarClientesDoBanco() {
             </div>
         `).join('');
     } catch (erro) {
-        container.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Erro ao consultar a lista de clientes.</p>';
+        container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao consultar a lista de clientes.</p>';
     }
 }
 
@@ -1979,20 +1976,28 @@ async function carregarMetricasEGrafico() {
         const ctx = document.getElementById('graficoPedidos');
         if (!ctx || typeof Chart === 'undefined') return;
 
-        new Chart(ctx, {
+        if (graficoPedidosInstance) {
+            graficoPedidosInstance.destroy();
+            graficoPedidosInstance = null;
+        }
+
+        const isLight = document.body.classList.contains('light-mode');
+        const corLegenda = isLight ? '#181b26' : '#ffffff';
+
+        graficoPedidosInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Pendentes', 'Aprovados', 'Recusados'],
                 datasets: [{
                     data: [dados.pendentes || 0, dados.aprovados || 0, dados.recusados || 0],
-                    backgroundColor: ['#ffc107', '#28a745', '#dc3545'],
+                    backgroundColor: ['#d97706', '#16a34a', '#dc2626'],
                     borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { labels: { color: '#ffffff' } }
+                    legend: { labels: { color: corLegenda } }
                 }
             }
         });
@@ -2011,29 +2016,28 @@ async function carregarTabelaAdmin() {
         listaPedidosAdminCache = Array.isArray(pedidos) ? pedidos : [];
 
         if (listaPedidosAdminCache.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color: var(--lavender-glow);">Nenhum pedido encontrado no banco de dados.</p>';
+            container.innerHTML = '<p style="text-align:center; color: var(--text-sub);">Nenhum pedido encontrado no banco de dados.</p>';
             return;
         }
 
         container.innerHTML = listaPedidosAdminCache.map(p => `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-inner); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid var(--glass-border);">
                 <div style="max-width: 720px;">
-                    <strong style="color: #fff;">#${p.id} ${p.nome_cliente || p.nome}</strong> <span style="color: var(--lavender-glow);">(${p.email})</span><br>
+                    <strong style="color: var(--text-main);">#${p.id} ${p.nome_cliente || p.nome}</strong> <span style="color: var(--text-sub);">(${p.email})</span><br>
                     <small style="color: var(--saturn-gold);">✨ ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">❌ Recusar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.1); color: #ffc107; border: 1px solid #ffc107; padding: 6px 12px; border-radius: 6px; cursor: pointer;">⏳ Pendente</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">❌ Recusar</button>
+                    <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 6px 12px; border-radius: 6px; cursor: pointer;">⏳ Pendente</button>
                 </div>
             </div>
         `).join('');
     } catch (err) {
-        container.innerHTML = '<p style="color: #ff6b6b;">Erro ao carregar lista de pedidos.</p>';
+        container.innerHTML = '<p style="color: #dc2626;">Erro ao carregar lista de pedidos.</p>';
     }
 }
 
-// Separa os dados gravados no campo `estilo` para exibição estruturada na Bancada do Alfaiate
 function parsearDetalhesPedido(estiloStr = '') {
     const partes = estiloStr.split(' | ').map(s => s.trim()).filter(Boolean);
     let estiloBase = partes[0] || 'Não especificado';
@@ -2100,8 +2104,8 @@ function renderizarFichasAlfaiate() {
 
     if (pedidosFiltrados.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 35px; background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 16px;">
-                <p style="color: var(--lavender-glow); margin: 0;">Nenhuma ficha técnica encontrada para este filtro.</p>
+            <div style="text-align: center; padding: 35px; background: var(--card-inner); border: 1px dashed var(--glass-border); border-radius: 16px;">
+                <p style="color: var(--text-sub); margin: 0;">Nenhuma ficha técnica encontrada para este filtro.</p>
             </div>
         `;
         return;
@@ -2114,7 +2118,6 @@ function renderizarFichasAlfaiate() {
         const dataFormatada = p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Data não registrada';
         const info = parsearDetalhesPedido(p.estilo || '');
 
-        // Busca medidas do cliente no cache pelo e-mail
         const clienteCadastrado = listaClientesCache.find(
             c => c.email && p.email && c.email.toLowerCase() === p.email.toLowerCase()
         );
@@ -2187,13 +2190,13 @@ function renderizarFichasAlfaiate() {
                 </div>
 
                 <div class="ficha-acoes-rodape">
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
                         ✅ Aprovar & Iniciar Corte
                     </button>
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(255,255,255,0.08); color: #ffc107; border: 1px solid #ffc107; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
                         ⏳ Em Análise
                     </button>
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: rgba(220,53,69,0.18); color: #ff6b6b; border: 1px solid #dc3545; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
                         ❌ Recusar
                     </button>
                 </div>
@@ -2234,7 +2237,7 @@ async function buscarClientesAPI() {
         }
     } catch (err) {
         if (container) {
-            container.innerHTML = '<p style="color: #ff5252; text-align: center;">Erro ao conectar com o banco de dados.</p>';
+            container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao conectar com o banco de dados.</p>';
         }
     }
 }
@@ -2244,24 +2247,24 @@ function renderizarListaClientesAdmin(clientes) {
     if (!container) return;
 
     if (!clientes || clientes.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--lavender-glow);">Nenhum cliente cadastrado.</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--text-sub);">Nenhum cliente cadastrado.</p>';
         return;
     }
 
     container.innerHTML = clientes.map(c => `
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="background: var(--card-inner); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
-                <strong style="color: #fff; font-size: 1.05rem;">#${c.id} - ${c.nome}</strong><br>
-                <span style="color: var(--lavender-glow); font-size: 0.9rem;">📡 ${c.email}</span>
+                <strong style="color: var(--text-main); font-size: 1.05rem;">#${c.id} - ${c.nome}</strong><br>
+                <span style="color: var(--text-sub); font-size: 0.9rem;">📡 ${c.email}</span>
                 <div style="margin-top: 5px; font-size: 0.8rem; color: var(--saturn-gold);">
                     📏 Busto: ${c.busto || '-'} cm | Cintura: ${c.cintura || '-'} cm | Quadril: ${c.quadril || '-'} cm | Altura: ${c.altura || '-'} cm
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button onclick="prepararEdicaoCliente(${c.id})" style="background: var(--saturn-gold); color: #000; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">
+                <button onclick="prepararEdicaoCliente(${c.id})" class="btn-submit-login" style="padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;">
                     ✏️ Editar
                 </button>
-                <button onclick="excluirClienteAdmin(${c.id})" style="background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid #ff5252; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                <button onclick="excluirClienteAdmin(${c.id})" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
                     🗑️ Excluir
                 </button>
             </div>
@@ -2351,6 +2354,7 @@ function gerarCalendarioOrbital() {
     const agora = new Date();
     const ano = agora.getFullYear();
     const mes = agora.getMonth();
+    const isLight = document.body.classList.contains('light-mode');
 
     const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     if (titulo) titulo.innerText = `🗓️ ${nomesMeses[mes]} / ${ano}`;
@@ -2359,7 +2363,9 @@ function gerarCalendarioOrbital() {
     const primeiroDiaDaSemana = new Date(ano, mes, 1).getDay();
     const hoje = agora.getDate();
 
-    let html = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => `<strong style="font-size:0.8em; opacity:0.7;">${d}</strong>`).join('');
+    let html = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+        .map(d => `<strong style="font-size:0.8em; opacity:0.75; color: var(--text-sub);">${d}</strong>`)
+        .join('');
 
     for (let i = 0; i < primeiroDiaDaSemana; i++) {
         html += `<div></div>`;
@@ -2367,10 +2373,10 @@ function gerarCalendarioOrbital() {
 
     for (let dia = 1; dia <= diasNoMes; dia++) {
         const isHoje = dia === hoje;
-        const bg = isHoje ? 'var(--saturn-gold, #ffd700)' : 'rgba(255,255,255,0.05)';
-        const corTexto = isHoje ? '#000' : '#fff';
+        const bg = isHoje ? 'var(--saturn-gold)' : 'var(--card-inner)';
+        const corTexto = isHoje ? (isLight ? '#ffffff' : '#000000') : 'var(--text-main)';
 
-        html += `<div style="background: ${bg}; color: ${corTexto}; padding: 8px 0; border-radius: 4px; font-weight: bold; font-size: 0.9em;">${dia}</div>`;
+        html += `<div style="background: ${bg}; color: ${corTexto}; padding: 8px 0; border-radius: 6px; font-weight: bold; font-size: 0.9em; border: 1px solid var(--glass-border);">${dia}</div>`;
     }
 
     container.innerHTML = html;
@@ -2417,7 +2423,7 @@ async function carregarTimelinePedidoMenu(email) {
         const pedidos = await res.json();
 
         if (!pedidos || pedidos.length === 0) {
-            container.innerHTML = `<span style="color: var(--lavender-glow);">Nenhum manto em confecção ativa.</span>`;
+            container.innerHTML = `<span style="color: var(--text-sub);">Nenhum manto em confecção ativa.</span>`;
             return;
         }
 
@@ -2434,13 +2440,13 @@ async function carregarTimelinePedidoMenu(email) {
         }
 
         container.innerHTML = `
-            <div style="color: #fff; margin-bottom: 2px;"><strong>Manto:</strong> #${ultimo.id} (${ultimo.estilo})</div>
+            <div style="color: var(--text-main); margin-bottom: 2px;"><strong>Manto:</strong> #${ultimo.id} (${ultimo.estilo})</div>
             <div style="color: var(--saturn-gold);">${etapa1} Pedido Recebido</div>
-            <div style="color: ${status === 'aprovado' ? '#28a745' : '#ffc107'};">${etapa2}</div>
-            <div style="color: rgba(255,255,255,0.4);">${etapa3}</div>
+            <div style="color: ${status === 'aprovado' ? '#16a34a' : '#d97706'};">${etapa2}</div>
+            <div style="color: var(--text-sub);">${etapa3}</div>
         `;
     } catch (err) {
-        container.innerHTML = `<span style="color: var(--lavender-glow);">Consulte o perfil para mais detalhes.</span>`;
+        container.innerHTML = `<span style="color: var(--text-sub);">Consulte o perfil para mais detalhes.</span>`;
     }
 }
 
@@ -2488,18 +2494,18 @@ function carregarEventosMoodboard() {
     const lista = obterEventosMoodboard(cliente.email);
 
     if (lista.length === 0) {
-        container.innerHTML = '<p style="color: var(--lavender-glow); font-size: 0.85rem; text-align: center;">Nenhum evento registrado ainda.</p>';
+        container.innerHTML = '<p style="color: var(--text-sub); font-size: 0.85rem; text-align: center;">Nenhum evento registrado ainda.</p>';
         return;
     }
 
     container.innerHTML = lista.map(item => `
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+        <div style="background: var(--card-inner); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong style="color: #fff; font-size: 0.95rem;">${item.evento}</strong>
+                <strong style="color: var(--text-main); font-size: 0.95rem;">${item.evento}</strong>
                 <small style="color: var(--saturn-gold);">${new Date(item.data).toLocaleDateString('pt-BR')}</small>
             </div>
-            <p style="color: var(--lavender-glow); font-size: 0.85rem; margin-top: 6px;">${item.notas}</p>
-            <button onclick="removerEventoMoodboard(${item.id})" style="background: transparent; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; padding: 0; margin-top: 5px;">
+            <p style="color: var(--text-sub); font-size: 0.85rem; margin-top: 6px;">${item.notas}</p>
+            <button onclick="removerEventoMoodboard(${item.id})" style="background: transparent; border: none; color: #dc2626; font-size: 0.75rem; cursor: pointer; padding: 0; margin-top: 5px;">
                 🗑️ Remover Evento
             </button>
         </div>
@@ -2539,15 +2545,22 @@ function toggleTheme() {
   
     body.classList.toggle('light-mode');
     const isLight = body.classList.contains('light-mode');
-  
     if (isLight) {
-      if (icon) icon.textContent = '🪐';
-      if (text) text.textContent = 'Modo Saturno';
-      localStorage.setItem('siteTheme', 'lunar');
+        if (icon) icon.textContent = '🌑';
+        if (text) text.textContent = 'Modo Saturno';
+        localStorage.setItem('siteTheme', 'lunar');
     } else {
-      if (icon) icon.textContent = '🌙';
-      if (text) text.textContent = 'Modo Lunar';
-      localStorage.setItem('siteTheme', 'saturn');
+        if (icon) icon.textContent = '🌙';
+        if (text) text.textContent = 'Modo Lunar';
+        localStorage.setItem('siteTheme', 'saturn');
+    }
+    // Atualiza cores dinâmicas de gráficos e calendário caso o Admin esteja aberto
+    if (graficoPedidosInstance) {
+        graficoPedidosInstance.options.plugins.legend.labels.color = isLight ? '#181b26' : '#ffffff';
+        graficoPedidosInstance.update();
+    }
+    if (document.getElementById('grid-calendario')) {
+        gerarCalendarioOrbital();
     }
 }
 
@@ -2558,18 +2571,7 @@ function toggleTheme() {
 window.addEventListener('scroll', () => {
     const header = document.querySelector('header');
     if (!header) return;
-    
-    if (window.scrollY > 50) {
-        header.style.padding = '14px 6%';
-        header.style.background = 'rgba(25, 27, 34, 0.96)';
-        header.style.borderBottom = '1px solid var(--saturn-gold-dim)';
-        header.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-    } else {
-        header.style.padding = '22px 6%';
-        header.style.background = 'rgba(38, 41, 52, 0.92)';
-        header.style.borderBottom = '1px solid var(--glass-border)';
-        header.style.boxShadow = 'none';
-    }
+    header.classList.toggle('header-scrolled', window.scrollY > 50);
 });
 
 document.addEventListener('mousemove', (e) => {
@@ -2581,7 +2583,7 @@ document.addEventListener('mousemove', (e) => {
     star.style.pointerEvents = 'none';
     star.style.color = Math.random() > 0.5 ? 'var(--saturn-gold)' : 'var(--lavender-glow)';
     star.style.fontSize = Math.random() * (14 - 6) + 6 + 'px';
-    star.style.opacity = '0.8';
+    star.style.opacity = '0.85';
     star.style.transition = 'all 0.8s ease-out';
     star.style.zIndex = '9999';
     star.style.transform = 'translate(-50%, -50%)';
