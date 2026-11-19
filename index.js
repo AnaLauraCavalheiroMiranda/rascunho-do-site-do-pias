@@ -137,30 +137,34 @@ app.get('/api/clientes', (req, res) => {
 // Atualizar dados completos do cliente (Admin)
 app.put('/api/clientes/:id', (req, res) => {
     const { id } = req.params;
-    const { nome, email, busto, cintura, quadril, altura } = req.body;
+    const { nome, email, senha, busto, cintura, quadril, altura } = req.body;
 
-    if (!nome || !email) {
-        return res.status(400).json({ erro: 'Nome e e-mail são obrigatórios.' });
-    }
-
-    const sql = `UPDATE clientes 
-                 SET nome = ?, email = ?, busto = ?, cintura = ?, quadril = ?, altura = ? 
-                 WHERE id = ?`;
-
-    db.run(sql, [nome, email, busto, cintura, quadril, altura, id], function (err) {
-        if (err) {
-            if (err.message && err.message.includes('UNIQUE')) {
-                return res.status(400).json({ erro: 'Este e-mail já pertence a outro tripulante registrado.' });
+    if (senha && senha.trim() !== '') {
+        const sqlComSenha = `
+            UPDATE clientes 
+            SET nome = ?, email = ?, senha = ?, busto = ?, cintura = ?, quadril = ?, altura = ? 
+            WHERE id = ?
+        `;
+        db.run(sqlComSenha, [nome, email, senha, busto, cintura, quadril, altura, id], function(err) {
+            if (err) {
+                return res.status(500).json({ erro: 'Erro ao atualizar dados e senha do cliente.' });
             }
-            return res.status(500).json({ erro: 'Erro ao atualizar dados do cliente.', detalhes: err.message });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ erro: 'Cliente não encontrado.' });
-        }
-        res.json({ mensagem: 'Dados atualizados com sucesso!', id });
-    });
+            res.json({ mensagem: 'Dados e senha atualizados com sucesso!' });
+        });
+    } else {
+        const sqlSemSenha = `
+            UPDATE clientes 
+            SET nome = ?, email = ?, busto = ?, cintura = ?, quadril = ?, altura = ? 
+            WHERE id = ?
+        `;
+        db.run(sqlSemSenha, [nome, email, busto, cintura, quadril, altura, id], function(err) {
+            if (err) {
+                return res.status(500).json({ erro: 'Erro ao atualizar dados do cliente.' });
+            }
+            res.json({ mensagem: 'Dados atualizados com sucesso!' });
+        });
+    }
 });
-
 // Excluir cliente (Admin)
 app.delete('/api/clientes/:id', (req, res) => {
     const { id } = req.params;

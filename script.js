@@ -20,6 +20,94 @@ const pecasDestaqueCatalogo = [
 ];
 
 // ==========================================
+// UTILITÁRIOS DE SEGURANÇA, STORAGE & REDE
+// ==========================================
+
+function escaparHTML(valor) {
+    if (valor === null || valor === undefined) return '';
+    return String(valor)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function lerStorageSeguro(chave, padrao = null) {
+    try {
+        const raw = localStorage.getItem(chave);
+        return raw ? JSON.parse(raw) : padrao;
+    } catch (erro) {
+        console.warn(`Falha ao ler "${chave}" do armazenamento local:`, erro);
+        return padrao;
+    }
+}
+
+function salvarStorageSeguro(chave, valor) {
+    try {
+        localStorage.setItem(chave, JSON.stringify(valor));
+        return true;
+    } catch (erro) {
+        console.warn(`Falha ao salvar "${chave}" no armazenamento local:`, erro);
+        return false;
+    }
+}
+
+async function requisicaoAPI(endpoint, opcoes = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    try {
+        const resposta = await fetch(`${API_URL}${endpoint}`, {
+            ...opcoes,
+            signal: controller.signal
+        });
+
+        let dados = null;
+        const tipoConteudo = resposta.headers.get('content-type') || '';
+        if (tipoConteudo.includes('application/json')) {
+            dados = await resposta.json();
+        }
+
+        if (!resposta.ok) {
+            const mensagemErro = (dados && dados.erro) ? dados.erro : `Erro no servidor (código ${resposta.status}).`;
+            throw new Error(mensagemErro);
+        }
+
+        return dados;
+    } catch (erro) {
+        if (erro.name === 'AbortError') {
+            throw new Error('Tempo limite de conexão esgotado. Verifique se o servidor está ativo.');
+        }
+        if (erro instanceof TypeError) {
+            throw new Error('Servidor offline ou inacessível. Inicie o backend Node.js (node index.js).');
+        }
+        throw erro;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
+function alternarEstadoBotaoEnvio(form, enviando, textoCarregando = '⏳ Processando...') {
+    if (!form) return;
+    const btn = form.querySelector('button[type="submit"]');
+    if (!btn) return;
+
+    if (enviando) {
+        btn.dataset.textoOriginal = btn.innerHTML;
+        btn.disabled = true;
+        btn.style.opacity = '0.65';
+        btn.innerHTML = textoCarregando;
+    } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        if (btn.dataset.textoOriginal) {
+            btn.innerHTML = btn.dataset.textoOriginal;
+        }
+    }
+}
+
+// ==========================================
 // 1. BASE DE DADOS DE MATÉRIAS-PRIMAS & TEXTURAS
 // ==========================================
 const materiaisCelestine = [
@@ -398,7 +486,7 @@ const telasCelestine = {
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
                     <div>
                         <label for="nome">👤 Nome do Tripulante:</label>
-                        <input type="text" id="nome" required placeholder="Ex: Comandante Silva">
+                        <input type="text" id="nome" required minlength="2" placeholder="Ex: Comandante Silva">
                     </div>
                     <div>
                         <label for="email">📡 Frequência Digital (E-mail):</label>
@@ -448,7 +536,7 @@ const telasCelestine = {
 
                 <div>
                     <label for="observacoes-pedido">📝 Como deseja combinar os tecidos ou adaptar a peça? (Opcional)</label>
-                    <textarea id="observacoes-pedido" rows="3" placeholder="Ex: Gostaria do corte parecido com o Vestido Eclipse Total, mas usando Seda Flutuante de Nebulosa na saia e Tule de Poeira Estelar nas mangas..."></textarea>
+                    <textarea id="observacoes-pedido" rows="3" maxlength="500" placeholder="Ex: Gostaria do corte parecido com o Vestido Eclipse Total, mas usando Seda Flutuante de Nebulosa na saia e Tule de Poeira Estelar nas mangas..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit-login">🚀 Transmitir Sinal do Pedido</button>
@@ -471,7 +559,7 @@ const telasCelestine = {
                 <form id="form-cadastro" onsubmit="autenticarTripulante(event)">
                     <div class="input-group">
                         <label for="login-nome">👤 Nome do Tripulante</label>
-                        <input type="text" id="login-nome" required placeholder="Comandante Silva">
+                        <input type="text" id="login-nome" required minlength="2" placeholder="Comandante Silva">
                     </div>
                     <div class="input-group">
                         <label for="login-email">📡 Frequência Digital (E-mail)</label>
@@ -479,7 +567,7 @@ const telasCelestine = {
                     </div>
                     <div class="input-group">
                         <label for="login-senha">🔑 Palavra-passe</label>
-                        <input type="password" id="login-senha" required placeholder="••••••••">
+                        <input type="password" id="login-senha" required minlength="4" placeholder="••••••••">
                     </div>
                     <button type="submit" class="btn-submit-login">Cadastrar / Autenticar Assinatura</button>
                 </form>
@@ -533,22 +621,22 @@ const telasCelestine = {
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
                         <div>
                             <label style="font-size: 0.8rem; color: var(--text-main);">Busto (cm):</label>
-                            <input type="number" id="medida-busto" placeholder="ex: 90" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            <input type="number" id="medida-busto" min="30" max="250" placeholder="ex: 90" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
                             <label style="font-size: 0.8rem; color: var(--text-main);">Cintura (cm):</label>
-                            <input type="number" id="medida-cintura" placeholder="ex: 70" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            <input type="number" id="medida-cintura" min="30" max="250" placeholder="ex: 70" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
                             <label style="font-size: 0.8rem; color: var(--text-main);">Quadril (cm):</label>
-                            <input type="number" id="medida-quadril" placeholder="ex: 98" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            <input type="number" id="medida-quadril" min="30" max="250" placeholder="ex: 98" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                         <div>
                             <label style="font-size: 0.8rem; color: var(--text-main);">Altura (cm):</label>
-                            <input type="number" id="medida-altura" placeholder="ex: 165" style="width: 100%; padding: 8px; border-radius: 8px;">
+                            <input type="number" id="medida-altura" min="80" max="250" placeholder="ex: 165" style="width: 100%; padding: 8px; border-radius: 8px;">
                         </div>
                     </div>
-                    <button onclick="salvarMedidasCliente()" class="btn-submit-login" style="margin-top: 15px; padding: 9px 20px; font-size: 0.9rem;">✨ Salvar Medidas</button>
+                    <button id="btn-salvar-medidas" onclick="salvarMedidasCliente()" class="btn-submit-login" style="margin-top: 15px; padding: 9px 20px; font-size: 0.9rem;">✨ Salvar Medidas</button>
                 </div>
 
                 <!-- ABA DE MANTOS FAVORITOS DO CLIENTE -->
@@ -696,24 +784,28 @@ const telasCelestine = {
                                 <input type="email" id="admin-edit-email" required style="width: 100%; padding: 10px; border-radius: 8px;">
                             </div>
                         </div>
+                        <div>
+    <label style="color: var(--text-main); font-size: 0.85rem;">🔑 Nova Palavra-passe (Opcional):</label>
+    <input type="password" id="admin-edit-senha" placeholder="Deixe vazio para manter a atual" style="width: 100%; padding: 10px; border-radius: 8px;">
+</div>
 
                         <h4 style="color: var(--saturn-gold); margin-top: 15px; font-size: 0.95rem;">📏 Medidas Estelares (cm)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 8px;">
                             <div>
                                 <label style="color: var(--text-main); font-size: 0.8rem;">Busto:</label>
-                                <input type="number" id="admin-edit-busto" placeholder="90" style="width: 100%; padding: 8px; border-radius: 8px;">
+                                <input type="number" id="admin-edit-busto" min="30" max="250" placeholder="90" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="color: var(--text-main); font-size: 0.8rem;">Cintura:</label>
-                                <input type="number" id="admin-edit-cintura" placeholder="70" style="width: 100%; padding: 8px; border-radius: 8px;">
+                                <input type="number" id="admin-edit-cintura" min="30" max="250" placeholder="70" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="color: var(--text-main); font-size: 0.8rem;">Quadril:</label>
-                                <input type="number" id="admin-edit-quadril" placeholder="98" style="width: 100%; padding: 8px; border-radius: 8px;">
+                                <input type="number" id="admin-edit-quadril" min="30" max="250" placeholder="98" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="color: var(--text-main); font-size: 0.8rem;">Altura:</label>
-                                <input type="number" id="admin-edit-altura" placeholder="165" style="width: 100%; padding: 8px; border-radius: 8px;">
+                                <input type="number" id="admin-edit-altura" min="80" max="250" placeholder="165" style="width: 100%; padding: 8px; border-radius: 8px;">
                             </div>
                         </div>
 
@@ -757,9 +849,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add('light-mode');
         const icon = document.getElementById('themeIcon');
         const text = document.getElementById('themeText');
-        if (icon) icon.textContent = '🌑';
+        if (icon) icon.textContent = '🪐';
         if (text) text.textContent = 'Modo Saturno';
     }
+    atualizarEmojiLuaDestaque();
 });
 
 function toggleMenu() {
@@ -803,30 +896,35 @@ function mudarTela(nomeDaTela, callbackPosRender) {
         }
 
         containerPrincipal.style.opacity = 0;
-        
-        setTimeout(async () => {
-            containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
-            
-            if (nomeDaTela === 'orbita') {
-                configurarGatilhosNavegacao();
-            } else if (nomeDaTela === 'colecoes') {
-                await carregarMantosDoJson();
-            } else if (nomeDaTela === 'exploracao') {
-                carregarGuiaMateriais();
-            } else if (nomeDaTela === 'admin') {
-                await carregarPainelAdmin();
-            } else if (nomeDaTela === 'cliente') {
-                await carregarPerfilCliente();
-            } else if (nomeDaTela === 'agendamento') {
-                await inicializarTelaAgendamento();
-            }
 
-            if (typeof callbackPosRender === 'function') {
-                callbackPosRender();
+        setTimeout(async () => {
+            try {
+                containerPrincipal.innerHTML = telasCelestine[nomeDaTela];
+
+                if (nomeDaTela === 'orbita') {
+                    configurarGatilhosNavegacao();
+                    atualizarEmojiLuaDestaque();
+                } else if (nomeDaTela === 'colecoes') {
+                    await carregarMantosDoJson();
+                } else if (nomeDaTela === 'exploracao') {
+                    carregarGuiaMateriais();
+                } else if (nomeDaTela === 'admin') {
+                    await carregarPainelAdmin();
+                } else if (nomeDaTela === 'cliente') {
+                    await carregarPerfilCliente();
+                } else if (nomeDaTela === 'agendamento') {
+                    await inicializarTelaAgendamento();
+                }
+
+                if (typeof callbackPosRender === 'function') {
+                    callbackPosRender();
+                }
+            } catch (erro) {
+                console.error(`Erro ao carregar a tela "${nomeDaTela}":`, erro);
+            } finally {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                containerPrincipal.style.opacity = 1;
             }
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            containerPrincipal.style.opacity = 1;
         }, 200);
     }
 }
@@ -836,8 +934,7 @@ function mudarTela(nomeDaTela, callbackPosRender) {
 // ==========================================
 
 function obterClienteLogado() {
-    const dados = localStorage.getItem('celestine_cliente');
-    return dados ? JSON.parse(dados) : null;
+    return lerStorageSeguro('celestine_cliente', null);
 }
 
 function atualizarBotaoSessaoCabecalho() {
@@ -847,9 +944,9 @@ function atualizarBotaoSessaoCabecalho() {
     if (!btnLogin) return;
 
     const clienteLogado = obterClienteLogado();
-    if (clienteLogado) {
+    if (clienteLogado && clienteLogado.nome) {
         if (clienteLogado.foto) {
-            btnLogin.innerHTML = `<img src="${clienteLogado.foto}" alt="Perfil" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold); display: block;">`;
+            btnLogin.innerHTML = `<img src="${escaparHTML(clienteLogado.foto)}" alt="Perfil" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold); display: block;">`;
             btnLogin.style.padding = '4px';
             btnLogin.style.borderRadius = '50%';
             btnLogin.style.width = '46px';
@@ -858,7 +955,8 @@ function atualizarBotaoSessaoCabecalho() {
             btnLogin.style.alignItems = 'center';
             btnLogin.style.justifyContent = 'center';
         } else {
-            btnLogin.innerHTML = `👨‍🚀 ${clienteLogado.nome.split(' ')[0]}`;
+            const primeiroNome = escaparHTML(clienteLogado.nome.trim().split(' ')[0]);
+            btnLogin.innerHTML = `👨‍🚀 ${primeiroNome}`;
             btnLogin.style.padding = '8px 20px';
             btnLogin.style.borderRadius = '30px';
             btnLogin.style.width = 'auto';
@@ -906,57 +1004,60 @@ function alternarModoLogin(modo) {
 
 async function autenticarTripulante(event) {
     event.preventDefault();
-    const nome = document.getElementById('login-nome').value;
-    const email = document.getElementById('login-email').value;
+    const form = event.target;
+    const nome = document.getElementById('login-nome').value.trim();
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
     const senha = document.getElementById('login-senha').value;
 
+    if (nome.length < 2) {
+        alert('⚠️ Informe um nome válido com pelo menos 2 caracteres.');
+        return;
+    }
+
+    alternarEstadoBotaoEnvio(form, true, '🚀 Cadastrando...');
+
     try {
-        const resposta = await fetch(`${API_URL}/clientes`, {
+        const dados = await requisicaoAPI('/clientes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, email, senha })
         });
 
-        const dados = await resposta.json();
-
-        if (resposta.ok) {
-            const cliente = { id: dados.id, nome, email };
-            localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
-            atualizarBotaoSessaoCabecalho();
-            alert(`⚡ Tripulante ${nome} cadastrado com sucesso!`);
-            mudarTela('cliente');
-        } else {
-            alert(`⚠️ Aviso: ${dados.erro || 'Erro ao realizar cadastro.'}`);
-        }
+        const cliente = { id: dados.id, nome, email };
+        salvarStorageSeguro('celestine_cliente', cliente);
+        atualizarBotaoSessaoCabecalho();
+        alert(`⚡ Tripulante ${nome} cadastrado com sucesso!`);
+        mudarTela('cliente');
     } catch (erro) {
-        alert('❌ Falha ao conectar ao servidor Node.js.');
+        alert(`⚠️ ${erro.message}`);
+    } finally {
+        alternarEstadoBotaoEnvio(form, false);
     }
 }
 
 async function fazerLoginTripulante(event) {
     event.preventDefault();
-    const email = document.getElementById('login-existente-email').value;
+    const form = event.target;
+    const email = document.getElementById('login-existente-email').value.trim().toLowerCase();
     const senha = document.getElementById('login-existente-senha').value;
 
+    alternarEstadoBotaoEnvio(form, true, '📡 Sintonizando...');
+
     try {
-        const resposta = await fetch(`${API_URL}/clientes/login`, {
+        const dados = await requisicaoAPI('/clientes/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
         });
 
-        const dados = await resposta.json();
-
-        if (resposta.ok) {
-            localStorage.setItem('celestine_cliente', JSON.stringify(dados.cliente));
-            atualizarBotaoSessaoCabecalho();
-            alert(`🚀 Bem-vindo(a) de volta, Comandante ${dados.cliente.nome}!`);
-            mudarTela('cliente');
-        } else {
-            alert(`❌ ${dados.erro || 'Falha no login.'}`);
-        }
+        salvarStorageSeguro('celestine_cliente', dados.cliente);
+        atualizarBotaoSessaoCabecalho();
+        alert(`🚀 Bem-vindo(a) de volta, Comandante ${dados.cliente.nome}!`);
+        mudarTela('cliente');
     } catch (erro) {
-        alert('❌ Falha na conexão com o servidor.');
+        alert(`❌ ${erro.message}`);
+    } finally {
+        alternarEstadoBotaoEnvio(form, false);
     }
 }
 
@@ -964,7 +1065,7 @@ async function atualizarVisibilidadeMenuLateral() {
     const itemPedidos = document.getElementById('menu-item-pedidos');
     const itemClientes = document.getElementById('menu-item-clientes');
     const itemAdmin = document.getElementById('menu-item-admin');
-    
+
     const headerUser = document.getElementById('user-drawer-header');
     const elAvatar = document.getElementById('user-drawer-avatar');
     const elNome = document.getElementById('user-drawer-nome');
@@ -989,7 +1090,7 @@ async function atualizarVisibilidadeMenuLateral() {
             if (elEmail) elEmail.innerText = `📡 ${clienteLogado.email}`;
 
             if (clienteLogado.foto && elAvatar) {
-                elAvatar.innerHTML = `<img src="${clienteLogado.foto}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold);">`;
+                elAvatar.innerHTML = `<img src="${escaparHTML(clienteLogado.foto)}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--saturn-gold);">`;
             } else if (elAvatar) {
                 elAvatar.innerHTML = '👨‍🚀';
             }
@@ -999,7 +1100,7 @@ async function atualizarVisibilidadeMenuLateral() {
 
         if (timelineCard) {
             timelineCard.style.display = 'block';
-            carregarTimelinePedidoMenu(clienteLogado.email);
+            await carregarTimelinePedidoMenu(clienteLogado.email);
         }
     } else {
         if (itemPedidos) itemPedidos.style.display = 'block';
@@ -1019,19 +1120,19 @@ async function atualizarVisibilidadeMenuLateral() {
 
 function obterFavoritosCliente(email) {
     if (!email) return [];
-    return JSON.parse(localStorage.getItem(`favoritos_${email}`) || '[]');
+    const lista = lerStorageSeguro(`favoritos_${email}`, []);
+    return Array.isArray(lista) ? lista : [];
 }
 
 function salvarFavoritosCliente(email, favoritos) {
     if (!email) return;
-    localStorage.setItem(`favoritos_${email}`, JSON.stringify(favoritos));
+    salvarStorageSeguro(`favoritos_${email}`, favoritos);
 }
 
 function ehFavorito(tituloManto) {
     const cliente = obterClienteLogado();
     if (!cliente) return false;
-    const favoritos = obterFavoritosCliente(cliente.email);
-    return favoritos.includes(tituloManto);
+    return obterFavoritosCliente(cliente.email).includes(tituloManto);
 }
 
 function alternarFavorito(tituloManto, event) {
@@ -1082,17 +1183,18 @@ function carregarFavoritosNoPerfil() {
     }
 
     container.innerHTML = favoritos.map(manto => {
-        const mantoEscapado = manto.replace(/'/g, "\\'");
+        const mantoSeguro = escaparHTML(manto);
+        const mantoJs = manto.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return `
             <div style="background: var(--card-inner); border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
                 <div>
                     <div style="font-size: 2.2rem; margin-bottom: 5px;">✨</div>
-                    <strong style="color: var(--text-main); font-size: 1rem; display: block; margin-bottom: 5px;">${manto}</strong>
+                    <strong style="color: var(--text-main); font-size: 1rem; display: block; margin-bottom: 5px;">${mantoSeguro}</strong>
                     <span style="font-size: 0.75rem; color: var(--saturn-gold);">Manto Autoral Salvo</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-                    <button onclick="iniciarAgendamentoComProduto('${mantoEscapado}')" class="btn-submit-login" style="padding: 8px; border-radius: 8px; font-size: 0.85rem;">🌙 Agendar Prova</button>
-                    <button onclick="alternarFavorito('${mantoEscapado}')" style="background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid #dc2626; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
+                    <button onclick="iniciarAgendamentoComProduto('${mantoJs}')" class="btn-submit-login" style="padding: 8px; border-radius: 8px; font-size: 0.85rem;">🌙 Agendar Prova</button>
+                    <button onclick="alternarFavorito('${mantoJs}')" style="background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid #dc2626; padding: 6px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">💔 Remover dos Favoritos</button>
                 </div>
             </div>
         `;
@@ -1107,14 +1209,25 @@ function salvarFotoPerfil(event) {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
 
+    if (!arquivo.type.startsWith('image/')) {
+        alert('⚠️ Selecione um arquivo de imagem válido (JPG, PNG, WEBP).');
+        return;
+    }
+
+    if (arquivo.size > 5 * 1024 * 1024) {
+        alert('⚠️ A imagem deve ter no máximo 5MB.');
+        return;
+    }
+
     const reader = new FileReader();
+    reader.onerror = () => alert('❌ Não foi possível ler a imagem selecionada.');
     reader.onload = async function (e) {
         const fotoBase64 = e.target.result;
         const cliente = obterClienteLogado();
         if (!cliente) return;
 
         cliente.foto = fotoBase64;
-        localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
+        salvarStorageSeguro('celestine_cliente', cliente);
 
         const imgPerfil = document.getElementById('img-perfil');
         const avatarPadrao = document.getElementById('avatar-padrao');
@@ -1126,14 +1239,16 @@ function salvarFotoPerfil(event) {
 
         atualizarBotaoSessaoCabecalho();
 
-        try {
-            await fetch(`${API_URL}/clientes/${cliente.id}/foto`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ foto: fotoBase64 })
-            });
-        } catch (err) {
-            console.warn('Foto salva localmente no navegador.');
+        if (cliente.id) {
+            try {
+                await requisicaoAPI(`/clientes/${cliente.id}/foto`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ foto: fotoBase64 })
+                });
+            } catch (err) {
+                console.warn('Foto salva localmente no navegador:', err.message);
+            }
         }
     };
     reader.readAsDataURL(arquivo);
@@ -1143,27 +1258,51 @@ async function salvarMedidasCliente() {
     const cliente = obterClienteLogado();
     if (!cliente) return;
 
-    const busto = document.getElementById('medida-busto').value;
-    const cintura = document.getElementById('medida-cintura').value;
-    const quadril = document.getElementById('medida-quadril').value;
-    const altura = document.getElementById('medida-altura').value;
+    const busto = document.getElementById('medida-busto').value.trim();
+    const cintura = document.getElementById('medida-cintura').value.trim();
+    const quadril = document.getElementById('medida-quadril').value.trim();
+    const altura = document.getElementById('medida-altura').value.trim();
+
+    const validarMedida = (val, min, max, nomeCampo) => {
+        if (!val) return true;
+        const num = Number(val);
+        if (isNaN(num) || num < min || num > max) {
+            alert(`⚠️ O valor de ${nomeCampo} deve estar entre ${min} cm e ${max} cm.`);
+            return false;
+        }
+        return true;
+    };
+
+    if (
+        !validarMedida(busto, 30, 250, 'Busto') ||
+        !validarMedida(cintura, 30, 250, 'Cintura') ||
+        !validarMedida(quadril, 30, 250, 'Quadril') ||
+        !validarMedida(altura, 80, 250, 'Altura')
+    ) {
+        return;
+    }
 
     cliente.busto = busto;
     cliente.cintura = cintura;
     cliente.quadril = quadril;
     cliente.altura = altura;
 
-    localStorage.setItem('celestine_cliente', JSON.stringify(cliente));
+    salvarStorageSeguro('celestine_cliente', cliente);
+
+    if (!cliente.id) {
+        alert('✨ Medidas salvas localmente!');
+        return;
+    }
 
     try {
-        await fetch(`${API_URL}/clientes/${cliente.id}/medidas`, {
+        await requisicaoAPI(`/clientes/${cliente.id}/medidas`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ busto, cintura, quadril, altura })
         });
         alert('📐 Medidas salvas com sucesso!');
     } catch (err) {
-        alert('✨ Medidas salvas localmente!');
+        alert('✨ Medidas salvas localmente no navegador (servidor indisponível no momento).');
     }
 }
 
@@ -1198,8 +1337,7 @@ async function carregarPerfilCliente() {
 
     if (containerPedidos) {
         try {
-            const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(cliente.email)}`);
-            const pedidos = await res.json();
+            const pedidos = await requisicaoAPI(`/pedidos/cliente/${encodeURIComponent(cliente.email)}`);
 
             if (!pedidos || pedidos.length === 0) {
                 containerPedidos.innerHTML = '<p style="text-align:center; padding: 10px; color: var(--text-sub);">Você ainda não possui pedidos registrados nesta conta.</p>';
@@ -1207,15 +1345,15 @@ async function carregarPerfilCliente() {
                 containerPedidos.innerHTML = pedidos.map(p => `
                     <div class="card-pedido-item" style="background: var(--card-inner); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                         <div>
-                            <strong style="color: var(--text-main);">#${p.id} ${p.estilo}</strong><br>
+                            <strong style="color: var(--text-main);">#${escaparHTML(p.id)} ${escaparHTML(p.estilo)}</strong><br>
                             <small style="color: var(--text-sub);">${p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Recente'}</small>
                         </div>
-                        <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
+                        <span class="badge-status ${escaparHTML((p.status || 'pendente').toLowerCase())}">${escaparHTML(p.status || 'Pendente')}</span>
                     </div>
                 `).join('');
             }
         } catch (err) {
-            containerPedidos.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao carregar histórico de pedidos.</p>';
+            containerPedidos.innerHTML = `<p style="color: #dc2626; text-align: center;">⚠️ ${escaparHTML(err.message)}</p>`;
         }
     }
 }
@@ -1225,53 +1363,82 @@ async function carregarPerfilCliente() {
 // ==========================================
 
 async function carregarMantosDoJson() {
+    const p1 = document.getElementById('galeria-p1');
+    const p2 = document.getElementById('galeria-p2');
+    if (!p1 || !p2) return;
+
     try {
         const resposta = await fetch('produtos.json');
+        if (!resposta.ok) throw new Error('Arquivo produtos.json não encontrado.');
         produtosGlobais = await resposta.json();
-
-        const p1 = document.getElementById('galeria-p1');
-        const p2 = document.getElementById('galeria-p2');
-
-        if (!p1 || !p2) return;
-
-        p1.innerHTML = '';
-        p2.innerHTML = '';
-
-        produtosGlobais.forEach((produto, index) => {
-            const favoritado = ehFavorito(produto.titulo);
-            const iconeFav = favoritado ? '❤️ Favoritado' : '🤍 Favoritar';
-            const tituloEscapado = produto.titulo.replace(/'/g, "\\'");
-
-            const cardHTML = `
-                <article class="product-item" onclick="verDetalhesProduto(${index})" style="cursor: pointer; position: relative;">
-                    <div class="product-thumb">
-                        <img src="${produto.imagem}" alt="${produto.alt}">
-                    </div>
-                    <div class="product-info-block">
-                        <h4>${produto.titulo}</h4>
-                        <p>${produto.descricao}</p>
-                        
-                        <div style="display: flex; gap: 8px; margin-top: 12px;">
-                            <button type="button" class="btn-buy" style="flex: 1;" onclick="event.stopPropagation(); verDetalhesProduto(${index})">
-                                ✨ Ver Detalhes
-                            </button>
-                            <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="background: var(--card-inner); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
-                                ${iconeFav}
-                            </button>
-                        </div>
-                    </div>
-                </article>
-            `;
-
-            if (index < 9) {
-                p1.innerHTML += cardHTML;
-            } else {
-                p2.innerHTML += cardHTML;
-            }
-        });
     } catch (erro) {
-        console.warn('produtos.json não carregado ou sem dados.');
+        console.warn('Usando acervo padrão (produtos.json indisponível):', erro.message);
+        if (produtosGlobais.length === 0) {
+            produtosGlobais = [
+                {
+                    titulo: "Vestido Eclipse Total",
+                    descricao: "Veludo negro profundo com detalhes em branco puro.",
+                    imagem: "img/vestido.jpeg",
+                    alt: "Vestido Eclipse Total",
+                    preco: "R$ 2.150,00 (Sob Medida)",
+                    tempo: "15 Dias Orbitais"
+                },
+                {
+                    titulo: "Terno Alinhamento Astral",
+                    descricao: "Cortes assimétricos com reflexos furta-cor de nebulosas.",
+                    imagem: "img/terno.jpg",
+                    alt: "Terno Alinhamento Astral",
+                    preco: "R$ 2.450,00 (Sob Medida)",
+                    tempo: "18 Dias Orbitais"
+                },
+                {
+                    titulo: "Corset Aurora Lunar",
+                    descricao: "Estrutura translúcida banhada a pó de pérola cósmica.",
+                    imagem: "img/corset.jpeg",
+                    alt: "Corset Aurora Lunar",
+                    preco: "R$ 1.650,00 (Sob Medida)",
+                    tempo: "12 Dias Orbitais"
+                }
+            ];
+        }
     }
+
+    p1.innerHTML = '';
+    p2.innerHTML = '';
+
+    produtosGlobais.forEach((produto, index) => {
+        const favoritado = ehFavorito(produto.titulo);
+        const iconeFav = favoritado ? '❤️ Favoritado' : '🤍 Favoritar';
+        const tituloSeguro = escaparHTML(produto.titulo);
+        const tituloJs = (produto.titulo || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+        const cardHTML = `
+            <article class="product-item" onclick="verDetalhesProduto(${index})" style="cursor: pointer; position: relative;">
+                <div class="product-thumb">
+                    <img src="${escaparHTML(produto.imagem)}" alt="${escaparHTML(produto.alt || produto.titulo)}">
+                </div>
+                <div class="product-info-block">
+                    <h4>${tituloSeguro}</h4>
+                    <p>${escaparHTML(produto.descricao)}</p>
+                    
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button type="button" class="btn-buy" style="flex: 1;" onclick="event.stopPropagation(); verDetalhesProduto(${index})">
+                            ✨ Ver Detalhes
+                        </button>
+                        <button type="button" onclick="alternarFavorito('${tituloJs}', event)" style="background: var(--card-inner); border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">
+                            ${iconeFav}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        `;
+
+        if (index < 9) {
+            p1.innerHTML += cardHTML;
+        } else {
+            p2.innerHTML += cardHTML;
+        }
+    });
 }
 
 function verDetalhesProduto(index) {
@@ -1279,10 +1446,13 @@ function verDetalhesProduto(index) {
     if (!produto) return;
 
     const containerPrincipal = document.querySelector('main');
-    const precoEstimado = produto.preco || "R$ 1.850,00 - R$ 2.400,00 (Sob Medida)";
-    const tempoConfeccao = produto.tempo || "15 a 20 Dias Orbitais";
+    if (!containerPrincipal) return;
+
+    const precoEstimado = escaparHTML(produto.preco || "R$ 1.850,00 - R$ 2.400,00 (Sob Medida)");
+    const tempoConfeccao = escaparHTML(produto.tempo || "15 a 20 Dias Orbitais");
     const favoritado = ehFavorito(produto.titulo);
-    const tituloEscapado = produto.titulo.replace(/'/g, "\\'");
+    const tituloSeguro = escaparHTML(produto.titulo);
+    const tituloJs = (produto.titulo || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
     const htmlDetalhes = `
         <section class="produto-detalhe-section">
@@ -1292,13 +1462,13 @@ function verDetalhesProduto(index) {
 
             <div class="produto-detalhe-grid">
                 <div class="detalhe-imagem-container">
-                    <img src="${produto.imagem}" alt="${produto.alt}" class="detalhe-img-principal">
+                    <img src="${escaparHTML(produto.imagem)}" alt="${escaparHTML(produto.alt || produto.titulo)}" class="detalhe-img-principal">
                     <div class="detalhe-badge-selo">🌌 Peça Autoral Exclusiva</div>
                 </div>
 
                 <div class="detalhe-info-container">
                     <span class="detalhe-categoria">Boutique Interplanetária</span>
-                    <h2>${produto.titulo}</h2>
+                    <h2>${tituloSeguro}</h2>
                     
                     <div class="detalhe-preco-box">
                         <span class="preco-label">Investimento Médio Estimado:</span>
@@ -1306,7 +1476,7 @@ function verDetalhesProduto(index) {
                     </div>
 
                     <p class="detalhe-descricao-longa">
-                        ${produto.descricao} Confeccionado com técnicas de alfaiataria de alta precisão e modelagem ergonômica ajustada às frequências de movimento do tripulante.
+                        ${escaparHTML(produto.descricao)} Confeccionado com técnicas de alfaiataria de alta precisão e modelagem ergonômica ajustada às frequências de movimento do tripulante.
                     </p>
 
                     <div class="detalhe-especificacoes">
@@ -1325,15 +1495,15 @@ function verDetalhesProduto(index) {
                     </div>
 
                     <div class="detalhe-acoes-group">
-                        <button type="button" class="btn-submit-quiz" onclick="iniciarAgendamentoComProduto('${tituloEscapado}')">
+                        <button type="button" class="btn-submit-quiz" onclick="iniciarAgendamentoComProduto('${tituloJs}')">
                             🌙 Agendar Prova & Escolher Tecidos Desta Peça
                         </button>
 
-                        <button type="button" onclick="alternarFavorito('${tituloEscapado}', event)" style="margin-top: 10px; background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 12px; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+                        <button type="button" onclick="alternarFavorito('${tituloJs}', event)" style="margin-top: 10px; background: transparent; border: 1px solid var(--saturn-gold); color: var(--saturn-gold); border-radius: 12px; padding: 12px; font-weight: bold; cursor: pointer; width: 100%;">
                             ${favoritado ? '❤️ Remover dos Favoritos' : '🤍 Adicionar aos Meus Favoritos'}
                         </button>
 
-                        <button type="button" class="btn-interagir-material" style="margin-top: 10px; padding: 12px;" onclick="acionarAtendimentoPersonalizado('${tituloEscapado}')">
+                        <button type="button" class="btn-interagir-material" style="margin-top: 10px; padding: 12px;" onclick="acionarAtendimentoPersonalizado('${tituloJs}')">
                             💬 Acionar Atendimento no WhatsApp
                         </button>
                     </div>
@@ -1341,6 +1511,7 @@ function verDetalhesProduto(index) {
             </div>
         </section>
     `;
+
     containerPrincipal.style.opacity = 0;
     setTimeout(() => {
         containerPrincipal.innerHTML = htmlDetalhes;
@@ -1385,7 +1556,7 @@ function alternarPaginaColecao(numeroPagina) {
 function acionarAtendimentoPersonalizado(nomeProduto) {
     const mensagem = encodeURIComponent(`Olá, equipe Celestine Ateliê! Gostaria de mais detalhes e atendimento sobre o manto: ${nomeProduto}`);
     const urlWhatsapp = `https://api.whatsapp.com/send?phone=5541999999999&text=${mensagem}`;
-    window.open(urlWhatsapp, '_blank');
+    window.open(urlWhatsapp, '_blank', 'noopener,noreferrer');
 }
 
 // ==========================================
@@ -1526,18 +1697,18 @@ function abrirModalTextura(idTecido) {
 
     const listaPecasEl = document.getElementById('modal-tecido-pecas');
     listaPecasEl.innerHTML = mat.pecasLoja.map(peca => {
-        const nomeEscapado = peca.nome.replace(/'/g, "\\'");
+        const nomeJs = peca.nome.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return `
             <div class="peca-citada-card">
                 <div>
-                    <strong>${peca.nome}</strong>
-                    <span>${peca.detalhe}</span>
+                    <strong>${escaparHTML(peca.nome)}</strong>
+                    <span>${escaparHTML(peca.detalhe)}</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
-                    <button type="button" class="btn-submit-login" style="padding: 8px 12px; font-size: 0.84rem;" onclick="encomendarPecaComTecido('${nomeEscapado}', '${mat.id}')">
+                    <button type="button" class="btn-submit-login" style="padding: 8px 12px; font-size: 0.84rem;" onclick="encomendarPecaComTecido('${nomeJs}', '${mat.id}')">
                         🌙 Encomendar Esta Peça + Tecido
                     </button>
-                    <button type="button" class="btn-ver-peca-citada" onclick="irParaPecaDaLoja('${nomeEscapado}', '${peca.destino}')">
+                    <button type="button" class="btn-ver-peca-citada" onclick="irParaPecaDaLoja('${nomeJs}', '${peca.destino}')">
                         ✨ Ver Peça na Loja
                     </button>
                 </div>
@@ -1559,7 +1730,12 @@ function fecharModalTextura() {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') fecharModalTextura();
+    if (e.key === 'Escape') {
+        fecharModalTextura();
+        fecharModalPedidos();
+        fecharModalClientes();
+        fecharModalMoodboard();
+    }
 });
 
 async function irParaPecaDaLoja(nomePeca, destinoPadrao) {
@@ -1568,7 +1744,7 @@ async function irParaPecaDaLoja(nomePeca, destinoPadrao) {
     if (produtosGlobais.length === 0) {
         try {
             const resp = await fetch('produtos.json');
-            produtosGlobais = await resp.json();
+            if (resp.ok) produtosGlobais = await resp.json();
         } catch (e) {
             produtosGlobais = [];
         }
@@ -1664,8 +1840,8 @@ function preencherFormularioAgendamentoSeLogado() {
     const inputNome = document.getElementById('nome');
     const inputEmail = document.getElementById('email');
 
-    if (inputNome) inputNome.value = cliente.nome;
-    if (inputEmail) inputEmail.value = cliente.email;
+    if (inputNome) inputNome.value = cliente.nome || '';
+    if (inputEmail) inputEmail.value = cliente.email || '';
 }
 
 async function popularSelectPecasReferencia() {
@@ -1675,7 +1851,7 @@ async function popularSelectPecasReferencia() {
     if (produtosGlobais.length === 0) {
         try {
             const resp = await fetch('produtos.json');
-            produtosGlobais = await resp.json();
+            if (resp.ok) produtosGlobais = await resp.json();
         } catch (e) {
             produtosGlobais = [];
         }
@@ -1760,7 +1936,7 @@ function abrirAgendamentoPersonalizado({ peca = '', tecidosIds = [], estilo = ''
                 }
                 selectPeca.value = peca;
             }
-            mensagensAviso.push(`👗 Peça de inspiração: <strong>${peca}</strong>`);
+            mensagensAviso.push(`👗 Peça de inspiração: <strong>${escaparHTML(peca)}</strong>`);
         }
 
         if (tecidosIds && tecidosIds.length > 0) {
@@ -1771,7 +1947,7 @@ function abrirAgendamentoPersonalizado({ peca = '', tecidosIds = [], estilo = ''
                 .map(m => `${m.icone} ${m.nome}`);
 
             if (nomesTecidos.length > 0) {
-                mensagensAviso.push(`🧵 Tecido pré-selecionado: <strong>${nomesTecidos.join(', ')}</strong> (você pode marcar mais tecidos abaixo)`);
+                mensagensAviso.push(`🧵 Tecido pré-selecionado: <strong>${escaparHTML(nomesTecidos.join(', '))}</strong> (você pode marcar mais tecidos abaixo)`);
             }
         }
 
@@ -1814,12 +1990,18 @@ function encomendarPecaComTecido(nomePeca, idTecido) {
 
 async function processarAgendamentoEspacial(event) {
     event.preventDefault();
+    const form = event.target;
 
-    const nome = document.getElementById('nome').value;
-    const email = document.getElementById('email').value;
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase();
     const estiloBase = document.getElementById('Estilo').value;
     const pecaReferencia = document.getElementById('peca-referencia')?.value || '';
     const observacoes = document.getElementById('observacoes-pedido')?.value.trim() || '';
+
+    if (nome.length < 2) {
+        alert('⚠️ Por favor, informe um nome válido.');
+        return;
+    }
 
     const tecidosSelecionados = Array.from(document.querySelectorAll('.checkbox-tecido-pedido:checked'))
         .map(cb => cb.getAttribute('data-nome'))
@@ -1832,21 +2014,21 @@ async function processarAgendamentoEspacial(event) {
 
     const estiloCompleto = partesResumo.join(' | ');
 
+    alternarEstadoBotaoEnvio(form, true, '📡 Transmitindo...');
+
     try {
-        const resposta = await fetch(`${API_URL}/pedidos`, {
+        await requisicaoAPI('/pedidos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, email, estilo: estiloCompleto })
         });
 
-        if (resposta.ok) {
-            alert('🚀 Pedido gravado no banco de dados com sucesso!');
-            mudarTela('orbita');
-        } else {
-            alert('❌ Falha ao salvar o pedido.');
-        }
+        alert('🚀 Pedido gravado no banco de dados com sucesso!');
+        mudarTela('orbita');
     } catch (erro) {
-        alert('❌ Falha de conexão com o servidor Node.js.');
+        alert(`❌ ${erro.message}`);
+    } finally {
+        alternarEstadoBotaoEnvio(form, false);
     }
 }
 
@@ -1867,9 +2049,10 @@ async function carregarPedidosDoBanco() {
     const container = document.getElementById('lista-pedidos-container');
     if (!container) return;
 
+    container.innerHTML = '<p style="text-align:center; padding: 20px;">Buscando registros estelares...</p>';
+
     try {
-        const resposta = await fetch(`${API_URL}/pedidos`);
-        const pedidos = await resposta.json();
+        const pedidos = await requisicaoAPI('/pedidos');
 
         if (!pedidos || pedidos.length === 0) {
             container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum pedido registrado no cosmos ainda.</p>';
@@ -1878,17 +2061,17 @@ async function carregarPedidosDoBanco() {
 
         container.innerHTML = pedidos.map(p => `
             <div class="card-pedido-item">
-                <div class="pedido-id">#${p.id}</div>
+                <div class="pedido-id">#${escaparHTML(p.id)}</div>
                 <div class="pedido-dados">
-                    <strong>${p.nome_cliente || p.nome}</strong>
-                    <span>📡 ${p.email}</span>
-                    <small>✨ ${p.estilo}</small>
+                    <strong>${escaparHTML(p.nome_cliente || p.nome)}</strong>
+                    <span>📡 ${escaparHTML(p.email)}</span>
+                    <small>✨ ${escaparHTML(p.estilo)}</small>
                 </div>
-                <span class="badge-status ${(p.status || 'pendente').toLowerCase()}">${p.status || 'Pendente'}</span>
+                <span class="badge-status ${escaparHTML((p.status || 'pendente').toLowerCase())}">${escaparHTML(p.status || 'Pendente')}</span>
             </div>
         `).join('');
     } catch (erro) {
-        container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao conectar com o banco SQLite.</p>';
+        container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 15px;">⚠️ ${escaparHTML(erro.message)}</p>`;
     }
 }
 
@@ -1909,9 +2092,10 @@ async function carregarClientesDoBanco() {
     const container = document.getElementById('lista-clientes-container');
     if (!container) return;
 
+    container.innerHTML = '<p style="text-align:center; padding: 20px;">Buscando clientes registrados...</p>';
+
     try {
-        const resposta = await fetch(`${API_URL}/clientes`);
-        const clientes = await resposta.json();
+        const clientes = await requisicaoAPI('/clientes');
 
         if (!clientes || clientes.length === 0) {
             container.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum cliente cadastrado no site ainda.</p>';
@@ -1920,15 +2104,15 @@ async function carregarClientesDoBanco() {
 
         container.innerHTML = clientes.map(c => `
             <div class="card-pedido-item">
-                <div class="pedido-id">#${c.id}</div>
+                <div class="pedido-id">#${escaparHTML(c.id)}</div>
                 <div class="pedido-dados">
-                    <strong>${c.nome}</strong>
-                    <span>✉️ E-mail: ${c.email}</span>
+                    <strong>${escaparHTML(c.nome)}</strong>
+                    <span>✉️ E-mail: ${escaparHTML(c.email)}</span>
                 </div>
             </div>
         `).join('');
     } catch (erro) {
-        container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao consultar a lista de clientes.</p>';
+        container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 15px;">⚠️ ${escaparHTML(erro.message)}</p>`;
     }
 }
 
@@ -1957,17 +2141,18 @@ function mudarSubAbaAdmin(nomeAba) {
 }
 
 async function carregarPainelAdmin() {
-    await carregarMetricasEGrafico();
-    await buscarClientesAPI();
-    await carregarTabelaAdmin();
+    await Promise.all([
+        carregarMetricasEGrafico(),
+        buscarClientesAPI(),
+        carregarTabelaAdmin()
+    ]);
     renderizarFichasAlfaiate();
     gerarCalendarioOrbital();
 }
 
 async function carregarMetricasEGrafico() {
     try {
-        const res = await fetch(`${API_URL}/admin/estatisticas`);
-        const dados = await res.json();
+        const dados = await requisicaoAPI('/admin/estatisticas');
 
         if (document.getElementById('metric-total')) document.getElementById('metric-total').innerText = dados.total || 0;
         if (document.getElementById('metric-pendentes')) document.getElementById('metric-pendentes').innerText = dados.pendentes || 0;
@@ -1982,7 +2167,7 @@ async function carregarMetricasEGrafico() {
         }
 
         const isLight = document.body.classList.contains('light-mode');
-        const corLegenda = isLight ? '#181b26' : '#ffffff';
+        const corLegenda = isLight ? '#1e293b' : '#ffffff';
 
         graficoPedidosInstance = new Chart(ctx, {
             type: 'doughnut',
@@ -2002,7 +2187,7 @@ async function carregarMetricasEGrafico() {
             }
         });
     } catch (err) {
-        console.error('Erro ao carregar estatísticas:', err);
+        console.warn('Erro ao carregar estatísticas:', err.message);
     }
 }
 
@@ -2011,8 +2196,7 @@ async function carregarTabelaAdmin() {
     if (!container) return;
 
     try {
-        const res = await fetch(`${API_URL}/pedidos`);
-        const pedidos = await res.json();
+        const pedidos = await requisicaoAPI('/pedidos');
         listaPedidosAdminCache = Array.isArray(pedidos) ? pedidos : [];
 
         if (listaPedidosAdminCache.length === 0) {
@@ -2023,23 +2207,23 @@ async function carregarTabelaAdmin() {
         container.innerHTML = listaPedidosAdminCache.map(p => `
             <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-inner); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid var(--glass-border);">
                 <div style="max-width: 720px;">
-                    <strong style="color: var(--text-main);">#${p.id} ${p.nome_cliente || p.nome}</strong> <span style="color: var(--text-sub);">(${p.email})</span><br>
-                    <small style="color: var(--saturn-gold);">✨ ${p.estilo} | Status: <span class="badge-status ${(p.status||'pendente').toLowerCase()}">${p.status||'Pendente'}</span></small>
+                    <strong style="color: var(--text-main);">#${escaparHTML(p.id)} ${escaparHTML(p.nome_cliente || p.nome)}</strong> <span style="color: var(--text-sub);">(${escaparHTML(p.email)})</span><br>
+                    <small style="color: var(--saturn-gold);">✨ ${escaparHTML(p.estilo)} | Status: <span class="badge-status ${escaparHTML((p.status || 'pendente').toLowerCase())}">${escaparHTML(p.status || 'Pendente')}</span></small>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">❌ Recusar</button>
-                    <button onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 6px 12px; border-radius: 6px; cursor: pointer;">⏳ Pendente</button>
+                    <button onclick="atualizarStatusPedido(${Number(p.id)}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">✅ Aprovar</button>
+                    <button onclick="atualizarStatusPedido(${Number(p.id)}, 'Recusado')" style="background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">❌ Recusar</button>
+                    <button onclick="atualizarStatusPedido(${Number(p.id)}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 6px 12px; border-radius: 6px; cursor: pointer;">⏳ Pendente</button>
                 </div>
             </div>
         `).join('');
     } catch (err) {
-        container.innerHTML = '<p style="color: #dc2626;">Erro ao carregar lista de pedidos.</p>';
+        container.innerHTML = `<p style="color: #dc2626;">⚠️ ${escaparHTML(err.message)}</p>`;
     }
 }
 
 function parsearDetalhesPedido(estiloStr = '') {
-    const partes = estiloStr.split(' | ').map(s => s.trim()).filter(Boolean);
+    const partes = String(estiloStr).split(' | ').map(s => s.trim()).filter(Boolean);
     let estiloBase = partes[0] || 'Não especificado';
     let pecaRef = '';
     let tecidos = [];
@@ -2112,9 +2296,10 @@ function renderizarFichasAlfaiate() {
     }
 
     container.innerHTML = pedidosFiltrados.map(p => {
-        const nomeCliente = p.nome_cliente || p.nome || 'Tripulante';
-        const statusAtual = p.status || 'Pendente';
-        const statusClasse = statusAtual.toLowerCase();
+        const nomeCliente = escaparHTML(p.nome_cliente || p.nome || 'Tripulante');
+        const emailCliente = escaparHTML(p.email || '');
+        const statusAtual = escaparHTML(p.status || 'Pendente');
+        const statusClasse = escaparHTML((p.status || 'pendente').toLowerCase());
         const dataFormatada = p.data ? new Date(p.data).toLocaleDateString('pt-BR') : 'Data não registrada';
         const info = parsearDetalhesPedido(p.estilo || '');
 
@@ -2129,10 +2314,10 @@ function renderizarFichasAlfaiate() {
         const htmlMedidas = temMedidas
             ? `
                 <div class="ficha-medidas-grid">
-                    <span><strong>Busto:</strong> ${clienteCadastrado.busto || '-'} cm</span>
-                    <span><strong>Cintura:</strong> ${clienteCadastrado.cintura || '-'} cm</span>
-                    <span><strong>Quadril:</strong> ${clienteCadastrado.quadril || '-'} cm</span>
-                    <span><strong>Altura:</strong> ${clienteCadastrado.altura || '-'} cm</span>
+                    <span><strong>Busto:</strong> ${escaparHTML(clienteCadastrado.busto || '-')} cm</span>
+                    <span><strong>Cintura:</strong> ${escaparHTML(clienteCadastrado.cintura || '-')} cm</span>
+                    <span><strong>Quadril:</strong> ${escaparHTML(clienteCadastrado.quadril || '-')} cm</span>
+                    <span><strong>Altura:</strong> ${escaparHTML(clienteCadastrado.altura || '-')} cm</span>
                 </div>
               `
             : `<span style="font-size: 0.85rem; color: var(--text-sub); font-style: italic;">Medidas corporais ainda não registradas pelo cliente.</span>`;
@@ -2142,21 +2327,21 @@ function renderizarFichasAlfaiate() {
                 const matObj = materiaisCelestine.find(m => m.nome.toLowerCase() === nomeTecido.toLowerCase());
                 const icone = matObj ? matObj.icone : '🧵';
                 const extra = matObj ? ` • ${matObj.gramatura}` : '';
-                return `<span class="tag-tecido-ficha">${icone} <strong>${nomeTecido}</strong><small>${extra}</small></span>`;
+                return `<span class="tag-tecido-ficha">${icone} <strong>${escaparHTML(nomeTecido)}</strong><small>${extra}</small></span>`;
             }).join('')
             : `<span class="tag-tecido-vazio">Nenhum tecido específico marcado (definir com o cliente)</span>`;
 
         const htmlObservacoes = info.observacoes
-            ? `<p class="texto-escrita-cliente">“${info.observacoes}”</p>`
+            ? `<p class="texto-escrita-cliente">“${escaparHTML(info.observacoes)}”</p>`
             : `<p class="texto-escrita-vazio">O cliente não deixou observações escritas adicionais neste pedido.</p>`;
 
         return `
             <article class="ficha-alfaiate-card">
                 <div class="ficha-topo">
                     <div>
-                        <span class="ficha-numero-pedido">ORDEM DE CORTE #${p.id}</span>
+                        <span class="ficha-numero-pedido">ORDEM DE CORTE #${escaparHTML(p.id)}</span>
                         <h4>${nomeCliente}</h4>
-                        <small style="color: var(--text-sub);">📡 ${p.email} • 🗓️ ${dataFormatada}</small>
+                        <small style="color: var(--text-sub);">📡 ${emailCliente} • 🗓️ ${dataFormatada}</small>
                     </div>
                     <span class="badge-status ${statusClasse}">${statusAtual}</span>
                 </div>
@@ -2164,11 +2349,11 @@ function renderizarFichasAlfaiate() {
                 <div class="ficha-resumo-modelo">
                     <div class="ficha-campo">
                         <span class="ficha-label">👗 Peça de Referência / Base:</span>
-                        <strong class="ficha-valor-destaque">${info.pecaRef || '✨ Criação 100% Inédita (Sem peça base)'}</strong>
+                        <strong class="ficha-valor-destaque">${escaparHTML(info.pecaRef) || '✨ Criação 100% Inédita (Sem peça base)'}</strong>
                     </div>
                     <div class="ficha-campo">
                         <span class="ficha-label">🌌 Atmosfera / Estilo Base:</span>
-                        <strong class="ficha-valor">${info.estiloBaseFormatado}</strong>
+                        <strong class="ficha-valor">${escaparHTML(info.estiloBaseFormatado)}</strong>
                     </div>
                 </div>
 
@@ -2190,13 +2375,13 @@ function renderizarFichasAlfaiate() {
                 </div>
 
                 <div class="ficha-acoes-rodape">
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${Number(p.id)}, 'Aprovado')" style="background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
                         ✅ Aprovar & Iniciar Corte
                     </button>
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${Number(p.id)}, 'Pendente')" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid #d97706; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
                         ⏳ Em Análise
                     </button>
-                    <button type="button" onclick="atualizarStatusPedido(${p.id}, 'Recusado')" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <button type="button" onclick="atualizarStatusPedido(${Number(p.id)}, 'Recusado')" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
                         ❌ Recusar
                     </button>
                 </div>
@@ -2207,22 +2392,18 @@ function renderizarFichasAlfaiate() {
 
 async function atualizarStatusPedido(id, novoStatus) {
     try {
-        const res = await fetch(`${API_URL}/pedidos/${id}/status`, {
+        await requisicaoAPI(`/pedidos/${id}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: novoStatus })
         });
 
-        if (res.ok) {
-            alert(`✨ Pedido #${id} alterado para ${novoStatus}!`);
-            await carregarMetricasEGrafico();
-            await carregarTabelaAdmin();
-            renderizarFichasAlfaiate();
-        } else {
-            alert('Erro ao atualizar o status.');
-        }
+        alert(`✨ Pedido #${id} alterado para ${novoStatus}!`);
+        await carregarMetricasEGrafico();
+        await carregarTabelaAdmin();
+        renderizarFichasAlfaiate();
     } catch (err) {
-        alert('Falha na conexão com o servidor.');
+        alert(`❌ ${err.message}`);
     }
 }
 
@@ -2230,14 +2411,14 @@ async function buscarClientesAPI() {
     const container = document.getElementById('tabela-clientes-admin');
 
     try {
-        const res = await fetch(`${API_URL}/clientes`);
-        listaClientesCache = await res.json();
+        const clientes = await requisicaoAPI('/clientes');
+        listaClientesCache = Array.isArray(clientes) ? clientes : [];
         if (container) {
             renderizarListaClientesAdmin(listaClientesCache);
         }
     } catch (err) {
         if (container) {
-            container.innerHTML = '<p style="color: #dc2626; text-align: center;">Erro ao conectar com o banco de dados.</p>';
+            container.innerHTML = `<p style="color: #dc2626; text-align: center;">⚠️ ${escaparHTML(err.message)}</p>`;
         }
     }
 }
@@ -2254,17 +2435,17 @@ function renderizarListaClientesAdmin(clientes) {
     container.innerHTML = clientes.map(c => `
         <div style="background: var(--card-inner); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
-                <strong style="color: var(--text-main); font-size: 1.05rem;">#${c.id} - ${c.nome}</strong><br>
-                <span style="color: var(--text-sub); font-size: 0.9rem;">📡 ${c.email}</span>
+                <strong style="color: var(--text-main); font-size: 1.05rem;">#${escaparHTML(c.id)} - ${escaparHTML(c.nome)}</strong><br>
+                <span style="color: var(--text-sub); font-size: 0.9rem;">📡 ${escaparHTML(c.email)}</span>
                 <div style="margin-top: 5px; font-size: 0.8rem; color: var(--saturn-gold);">
-                    📏 Busto: ${c.busto || '-'} cm | Cintura: ${c.cintura || '-'} cm | Quadril: ${c.quadril || '-'} cm | Altura: ${c.altura || '-'} cm
+                    📏 Busto: ${escaparHTML(c.busto || '-')} cm | Cintura: ${escaparHTML(c.cintura || '-')} cm | Quadril: ${escaparHTML(c.quadril || '-')} cm | Altura: ${escaparHTML(c.altura || '-')} cm
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button onclick="prepararEdicaoCliente(${c.id})" class="btn-submit-login" style="padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;">
+                <button onclick="prepararEdicaoCliente(${Number(c.id)})" class="btn-submit-login" style="padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;">
                     ✏️ Editar
                 </button>
-                <button onclick="excluirClienteAdmin(${c.id})" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                <button onclick="excluirClienteAdmin(${Number(c.id)})" style="background: rgba(220, 38, 38, 0.14); color: #dc2626; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
                     🗑️ Excluir
                 </button>
             </div>
@@ -2279,6 +2460,7 @@ function prepararEdicaoCliente(id) {
     document.getElementById('admin-edit-id').value = cliente.id;
     document.getElementById('admin-edit-nome').value = cliente.nome || '';
     document.getElementById('admin-edit-email').value = cliente.email || '';
+    document.getElementById('admin-edit-senha').value = '';
     document.getElementById('admin-edit-busto').value = cliente.busto || '';
     document.getElementById('admin-edit-cintura').value = cliente.cintura || '';
     document.getElementById('admin-edit-quadril').value = cliente.quadril || '';
@@ -2292,8 +2474,8 @@ function filtrarClientesAdmin() {
     if (!campoFiltro) return;
 
     const termo = campoFiltro.value.toLowerCase();
-    const filtrados = listaClientesCache.filter(c => 
-        (c.nome && c.nome.toLowerCase().includes(termo)) || 
+    const filtrados = listaClientesCache.filter(c =>
+        (c.nome && c.nome.toLowerCase().includes(termo)) ||
         (c.email && c.email.toLowerCase().includes(termo))
     );
     renderizarListaClientesAdmin(filtrados);
@@ -2301,34 +2483,40 @@ function filtrarClientesAdmin() {
 
 async function salvarEdicaoClienteAdmin(event) {
     event.preventDefault();
+    const form = event.target;
 
     const id = document.getElementById('admin-edit-id').value;
+    if (!id) {
+        alert('⚠️ Selecione um cliente na aba "Consultar Clientes" antes de editar.');
+        return;
+    }
+
     const dados = {
-        nome: document.getElementById('admin-edit-nome').value,
-        email: document.getElementById('admin-edit-email').value,
-        busto: document.getElementById('admin-edit-busto').value,
-        cintura: document.getElementById('admin-edit-cintura').value,
-        quadril: document.getElementById('admin-edit-quadril').value,
-        altura: document.getElementById('admin-edit-altura').value
+        nome: document.getElementById('admin-edit-nome').value.trim(),
+        email: document.getElementById('admin-edit-email').value.trim().toLowerCase(),
+        busto: document.getElementById('admin-edit-busto').value.trim(),
+        cintura: document.getElementById('admin-edit-cintura').value.trim(),
+        quadril: document.getElementById('admin-edit-quadril').value.trim(),
+        altura: document.getElementById('admin-edit-altura').value.trim()
     };
 
+    alternarEstadoBotaoEnvio(form, true, '💾 Salvando...');
+
     try {
-        const res = await fetch(`${API_URL}/clientes/${id}`, {
+        await requisicaoAPI(`/clientes/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
         });
 
-        if (res.ok) {
-            alert(`✨ Dados do tripulante #${id} alterados com sucesso!`);
-            await buscarClientesAPI();
-            renderizarFichasAlfaiate();
-            mudarSubAbaAdmin('consulta');
-        } else {
-            alert('⚠️ Não foi possível salvar as alterações.');
-        }
+        alert(`✨ Dados do tripulante #${id} alterados com sucesso!`);
+        await buscarClientesAPI();
+        renderizarFichasAlfaiate();
+        mudarSubAbaAdmin('consulta');
     } catch (err) {
-        alert('❌ Erro de conexão com a API.');
+        alert(`⚠️ ${err.message}`);
+    } finally {
+        alternarEstadoBotaoEnvio(form, false);
     }
 }
 
@@ -2336,13 +2524,11 @@ async function excluirClienteAdmin(id) {
     if (!confirm(`Deseja realmente remover o cliente #${id}?`)) return;
 
     try {
-        const res = await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            await buscarClientesAPI();
-            renderizarFichasAlfaiate();
-        }
+        await requisicaoAPI(`/clientes/${id}`, { method: 'DELETE' });
+        await buscarClientesAPI();
+        renderizarFichasAlfaiate();
     } catch (err) {
-        alert('❌ Erro ao excluir cliente.');
+        alert(`❌ ${err.message}`);
     }
 }
 
@@ -2419,8 +2605,7 @@ async function carregarTimelinePedidoMenu(email) {
     if (!container) return;
 
     try {
-        const res = await fetch(`${API_URL}/pedidos/cliente/${encodeURIComponent(email)}`);
-        const pedidos = await res.json();
+        const pedidos = await requisicaoAPI(`/pedidos/cliente/${encodeURIComponent(email)}`);
 
         if (!pedidos || pedidos.length === 0) {
             container.innerHTML = `<span style="color: var(--text-sub);">Nenhum manto em confecção ativa.</span>`;
@@ -2440,7 +2625,7 @@ async function carregarTimelinePedidoMenu(email) {
         }
 
         container.innerHTML = `
-            <div style="color: var(--text-main); margin-bottom: 2px;"><strong>Manto:</strong> #${ultimo.id} (${ultimo.estilo})</div>
+            <div style="color: var(--text-main); margin-bottom: 2px;"><strong>Manto:</strong> #${escaparHTML(ultimo.id)} (${escaparHTML(ultimo.estilo)})</div>
             <div style="color: var(--saturn-gold);">${etapa1} Pedido Recebido</div>
             <div style="color: ${status === 'aprovado' ? '#16a34a' : '#d97706'};">${etapa2}</div>
             <div style="color: var(--text-sub);">${etapa3}</div>
@@ -2463,7 +2648,8 @@ function fecharModalMoodboard() {
 
 function obterEventosMoodboard(email) {
     if (!email) return [];
-    return JSON.parse(localStorage.getItem(`moodboard_${email}`) || '[]');
+    const lista = lerStorageSeguro(`moodboard_${email}`, []);
+    return Array.isArray(lista) ? lista : [];
 }
 
 function salvarEventoMoodboard(event) {
@@ -2471,14 +2657,19 @@ function salvarEventoMoodboard(event) {
     const cliente = obterClienteLogado();
     if (!cliente) return;
 
-    const evento = document.getElementById('mb-evento').value;
+    const evento = document.getElementById('mb-evento').value.trim();
     const data = document.getElementById('mb-data').value;
-    const notas = document.getElementById('mb-notas').value;
+    const notas = document.getElementById('mb-notas').value.trim();
+
+    if (!evento || !data) {
+        alert('⚠️ Preencha o nome do evento e a data.');
+        return;
+    }
 
     const lista = obterEventosMoodboard(cliente.email);
     lista.unshift({ id: Date.now(), evento, data, notas });
 
-    localStorage.setItem(`moodboard_${cliente.email}`, JSON.stringify(lista));
+    salvarStorageSeguro(`moodboard_${cliente.email}`, lista);
     document.getElementById('form-moodboard').reset();
     alert('✨ Evento e notas salvas no seu Caderno Estelar!');
     carregarEventosMoodboard();
@@ -2501,11 +2692,11 @@ function carregarEventosMoodboard() {
     container.innerHTML = lista.map(item => `
         <div style="background: var(--card-inner); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong style="color: var(--text-main); font-size: 0.95rem;">${item.evento}</strong>
-                <small style="color: var(--saturn-gold);">${new Date(item.data).toLocaleDateString('pt-BR')}</small>
+                <strong style="color: var(--text-main); font-size: 0.95rem;">${escaparHTML(item.evento)}</strong>
+                <small style="color: var(--saturn-gold);">${item.data ? new Date(item.data).toLocaleDateString('pt-BR') : ''}</small>
             </div>
-            <p style="color: var(--text-sub); font-size: 0.85rem; margin-top: 6px;">${item.notas}</p>
-            <button onclick="removerEventoMoodboard(${item.id})" style="background: transparent; border: none; color: #dc2626; font-size: 0.75rem; cursor: pointer; padding: 0; margin-top: 5px;">
+            <p style="color: var(--text-sub); font-size: 0.85rem; margin-top: 6px;">${escaparHTML(item.notas)}</p>
+            <button onclick="removerEventoMoodboard(${Number(item.id)})" style="background: transparent; border: none; color: #dc2626; font-size: 0.75rem; cursor: pointer; padding: 0; margin-top: 5px;">
                 🗑️ Remover Evento
             </button>
         </div>
@@ -2518,7 +2709,7 @@ function removerEventoMoodboard(id) {
 
     let lista = obterEventosMoodboard(cliente.email);
     lista = lista.filter(item => item.id !== id);
-    localStorage.setItem(`moodboard_${cliente.email}`, JSON.stringify(lista));
+    salvarStorageSeguro(`moodboard_${cliente.email}`, lista);
     carregarEventosMoodboard();
 }
 
@@ -2535,18 +2726,27 @@ function abrirWhatsappVip() {
     mensagem += ` Gostaria de uma consultoria exclusiva com o alfaiate pessoal sobre o meu próximo manto.`;
 
     const url = `https://api.whatsapp.com/send?phone=5541999999999&text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function atualizarEmojiLuaDestaque() {
+    const emojiLua = document.getElementById('emoji-lua-destaque');
+    if (!emojiLua) return;
+
+    const isLight = document.body.classList.contains('light-mode');
+    emojiLua.textContent = isLight ? '🌑' : '🌙';
 }
 
 function toggleTheme() {
     const body = document.body;
     const icon = document.getElementById('themeIcon');
     const text = document.getElementById('themeText');
-  
+
     body.classList.toggle('light-mode');
     const isLight = body.classList.contains('light-mode');
+
     if (isLight) {
-        if (icon) icon.textContent = '🌑';
+        if (icon) icon.textContent = '🪐';
         if (text) text.textContent = 'Modo Saturno';
         localStorage.setItem('siteTheme', 'lunar');
     } else {
@@ -2554,14 +2754,17 @@ function toggleTheme() {
         if (text) text.textContent = 'Modo Lunar';
         localStorage.setItem('siteTheme', 'saturn');
     }
+
     // Atualiza cores dinâmicas de gráficos e calendário caso o Admin esteja aberto
     if (graficoPedidosInstance) {
-        graficoPedidosInstance.options.plugins.legend.labels.color = isLight ? '#181b26' : '#ffffff';
+        graficoPedidosInstance.options.plugins.legend.labels.color = isLight ? '#1e293b' : '#ffffff';
         graficoPedidosInstance.update();
     }
     if (document.getElementById('grid-calendario')) {
         gerarCalendarioOrbital();
     }
+
+    atualizarEmojiLuaDestaque();
 }
 
 // ==========================================
@@ -2575,15 +2778,22 @@ window.addEventListener('scroll', () => {
 });
 
 document.addEventListener('mousemove', (e) => {
+    const isLight = document.body.classList.contains('light-mode');
     const star = document.createElement('div');
     star.innerHTML = '✦';
     star.style.position = 'fixed';
     star.style.left = e.clientX + 'px';
     star.style.top = e.clientY + 'px';
     star.style.pointerEvents = 'none';
-    star.style.color = Math.random() > 0.5 ? 'var(--saturn-gold)' : 'var(--lavender-glow)';
-    star.style.fontSize = Math.random() * (14 - 6) + 6 + 'px';
-    star.style.opacity = '0.85';
+
+    if (isLight) {
+        star.style.color = Math.random() > 0.4 ? 'rgba(15, 23, 42, 0.55)' : 'rgba(59, 77, 102, 0.55)';
+    } else {
+        star.style.color = Math.random() > 0.5 ? 'var(--saturn-gold)' : 'var(--lavender-glow)';
+    }
+
+    star.style.fontSize = Math.random() * (13 - 6) + 6 + 'px';
+    star.style.opacity = isLight ? '0.65' : '0.85';
     star.style.transition = 'all 0.8s ease-out';
     star.style.zIndex = '9999';
     star.style.transform = 'translate(-50%, -50%)';
